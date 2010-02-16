@@ -1,21 +1,30 @@
 /**
- * Auto Complete 4.1
- * October 5, 2009
+ * Auto Complete 5.0 - CSS Temp
+ * November 22, 2009
  * Corey Hart @ http://www.codenothing.com
  */ 
+
 
 body {
 	font-family: Verdana;
 	font-size: 10pt;
 	margin: 0;
-	padding: 0;
+	padding: 5px;
+}
+
+h1 {
+	font-family: default;
+	margin: -5px -5px 0 -5px;
+	padding: 10px;
+	background-color: #6A1617;
+	color: white;
 }
 
 h3 {
 	background-color: #5DB0E6;
 	color: white;
 	font-size: 12pt;
-	margin: 0;
+	margin: 0 0 0 -5px;
 	padding: 5px;
 	width: 600px;
 }
@@ -29,9 +38,18 @@ p {
 	width: 600px;
 }
 
+p.notes {
+	margin: 0;
+	width: 600px;
+}
+
 a {
 	color: blue;
 	text-decoration: none;
+}
+
+h2 {
+	margin-top: 100px;
 }
 
 h3 a {
@@ -42,13 +60,55 @@ pre {
 	font-size: 9pt;
 }
 
-#header {
+/* Notes Section */
+#notes {
+	margin: 25px 0 40px 0;
+	width: 600px;
+}
+
+#notes h2 {
+	margin-top: 0;
+}
+
+#notes b {
+	display: block;
+	margin: 20px 0 10px 10px;
+	font-size: 11pt;
+}
+
+#notes pre {
+	width: 550px;
+	background-color: #f7f7f7;
+	border: 1px solid #c1c1c1;
+	overflow: auto;
+	margin-left: 5px;
+	padding: 10px;
+}
+
+
+/* ui object menu */
+ul.ui {
+	list-style: none;
+	margin:-50px 0 60px 0;
+	padding:0 15px;
+	width: 500px;
+}
+
+ul.ui .title {
+	font-size: 9pt;
+	font-style: italic;
+	color: #989898;
+}
+
+
+/* Header */
+.header {
 	width: 600px;
 	font-size: 12pt;
 	font-weight: bold;
 }
 
-#header div {
+.header div {
 	float: right;
 }
 
@@ -66,18 +126,28 @@ pre {
 
 /* Floating Menu */
 ul#menu {
-	position: absolute;
+	position: fixed;
 	top: 30px;
 	left: 750px;
+	width: 250px;
 	list-style-type: square;
 	list-style-position: inside;
 	padding: 5px;
-	border: 1px solid black;
+	border: 1px solid #595959;
 	background-color: #f1f1f1;
 }
 
 ul#menu li {
 	padding: 1px 25px 1px 5px;
+}
+
+ul#menu li.focus {
+	background-color: #c1c1c1;
+}
+
+ul#menu li.focus a {
+	color: black;
+	font-style: italic;
 }
 
 ul#menu li.title {

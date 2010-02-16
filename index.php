@@ -1,3 +1,15 @@
+<?php
+/**
+ * Auto Complete 5.0
+ * November 22, 2009
+ * Corey Hart @ http://www.codenothing.com
+ *
+ *
+ * This is the dev page of the index.html demo page. It ensures
+ * that the browser never uses a cached version of the plugin or the
+ * css file included
+ */ 
+?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -5,19 +17,16 @@
 <head>
 	<title>Auto Complete 5.0</title>
 	<script type='text/javascript' src='jquery-1.3.2.js'></script>
+	<script type='text/javascript' src='http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js'></script>
 	<script type='text/javascript' src='jquery.metadata.js'></script>
-	<script type='text/javascript' src='jquery.auto-complete.js'></script>
-	<script type='text/javascript' src='js.js'></script>
-	<link rel='stylesheet' type='text/css' href='jquery.auto-complete.css' />
-	<link rel='stylesheet' type='text/css' href='styles.css' />
+	<script type='text/javascript' src='jquery.auto-complete.js?<?= mktime() ?>'></script>
+	<script type='text/javascript' src='js.js?<?= mktime() ?>'></script>
+	<link rel='stylesheet' type='text/css' href='jquery.auto-complete.css?<?= mktime() ?>' />
+	<link rel='stylesheet' type='text/css' href='styles.css?<?= mktime() ?>' />
 </head>
 <body>
 
-<!--
-Auto Complete 5.0
-November 22, 2009
-Corey Hart @ http://www.codenothing.com
--->
+
 
 <h1>Auto Complete 5.0</h1>
 
@@ -110,7 +119,7 @@ $('input[name=search2]').autoComplete({
 	}
 });
 </pre>
-<form action='index.html' method='GET'>
+<form action='index.php' method='GET'>
 <input type='text' name='search2' style='width:300px;' />
 <input type='submit' value='Do Something' />
 </form>

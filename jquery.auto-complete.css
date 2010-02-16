@@ -1,6 +1,6 @@
 /**
- * Auto Complete 4.1 - CSS Temp
- * October 5, 2009
+ * Auto Complete 5.0 - CSS Temp
+ * November 22, 2009
  * Corey Hart @ http://www.codenothing.com
  */ 
 
@@ -27,4 +27,8 @@ ul.auto-complete-list li {
 
 ul.auto-complete-list li.auto-complete-list-rollover {
 	background-color: #c5c5c5;
+}
+
+ul.auto-complete-list .auto-complete-striped {
+	background-color: #D7EEF9;
 }

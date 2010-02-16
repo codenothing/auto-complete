@@ -1,0 +1,43 @@
+/**
+ * Auto Complete 5.0 - CSS Temp
+ * November 22, 2009
+ * Corey Hart @ http://www.codenothing.com
+ */ 
+body {
+	font-size: 10pt;
+	margin: 0;
+	padding: 2px;
+}
+
+body > div {
+	font-size: 9pt;
+	width: 600px;
+}
+
+h1 {
+	margin: -2px -2px 10px -2px;
+	padding: 10px;
+	background-color: #6A1617;
+	color: white;
+}
+
+#AutoCompleteFocus {
+	background-color: #f6f6f6;
+	border: 2px solid #c1c1c1;
+	position: fixed;
+	top: 80px;
+	left: 800px;
+	/*margin: 40px 0 0 700px;*/
+	padding: 15px;
+	width: 300px;
+	height: 100px;
+	overflow: auto;
+}
+
+#AutoCompleteFocus div {
+	margin-bottom: 20px;
+}
+
+#AutoCompleteFocus pre {
+	display: none;
+}
