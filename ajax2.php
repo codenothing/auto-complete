@@ -13,13 +13,13 @@ $value = trim($_POST['value']);
 
 // Standard Values to search through
 $standard = array(
-	"apple" => 42,
-	"alcatraz" => 49,
-	"aries" => 15,
-	"art" => 75,
-	"auto-complete" => 67,
-	"application" => 91,
-	"associate" => 5,
+	"balance" => 47,
+	"berries" => 33,
+	"bob" => 13,
+	"ball" => 06,
+	"bowl" => 99,
+	"bag" => 41,
+	"body" => 31,
 );
 
 // Ensure there is a value to search for

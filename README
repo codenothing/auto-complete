@@ -1,6 +1,9 @@
-jQuery Auto Complete 
-February 16, 2009
+Auto Complete v2.0
+June 10, 2009
 Corey Hart @ http://www.codenothing.com
 
+Auto Complete takes input from the user and runs a check through PHP to find what the user
+is looking for. This test case runs a limited search on words that begin with the letter 'a'.
 
-Testing Push
+@selclass: Optional class for arrow up/down's, defaults to 'non-404'
+@ajaxscript: Script name for ajax request, defaults to ajax.php
