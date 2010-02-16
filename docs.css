@@ -1,0 +1,80 @@
+/**
+ * Auto Complete v3.0
+ * July 26, 2009
+ * Released under the MIT License @ http://www.codenothing.com/license
+ * Corey Hart @ http://www.codenothing.com
+ */ 
+
+body {
+	font-family: Verdana;
+	font-size: 10pt;
+	margin: 0;
+	padding: 0;
+}
+
+h3 {
+	background-color: #5DB0E6;
+	color: white;
+	font-size: 12pt;
+	margin: 0;
+	padding: 5px;
+	width: 600px;
+}
+
+p {
+	margin: 0 0 60px 0;
+	width: 600px;
+}
+
+a {
+	color: blue;
+	text-decoration: none;
+}
+
+h3 a {
+	color: white;
+}
+
+#header {
+	width: 600px;
+	font-size: 12pt;
+	font-weight: bold;
+}
+
+#header div {
+	float: right;
+}
+
+.type {
+	color: #f0f0f0;
+}
+
+.default {
+	float: right;
+	font-size: 9pt;
+	padding-top:2px;
+	color: #e9e9e9;
+}
+
+
+/* Floating Menu */
+ul#menu {
+	position: fixed;
+	top: 30px;
+	margin-left: 800px;
+	list-style-type: square;
+	list-style-position: inside;
+	padding: 5px;
+	border: 1px solid black;
+	background-color: #f1f1f1;
+}
+
+ul#menu li {
+	padding: 1px 25px 1px 5px;
+}
+
+ul#menu li.title {
+	list-style: none;
+	font-weight: bold;
+	color: #696969;
+}

@@ -1,8 +1,4 @@
-Auto Complete v2.1
-June 11, 2009
+Auto Complete v3.0
+July 26, 2009
+Released under the MIT License @ http://www.codenothing.com/license
 Corey Hart @ http://www.codenothing.com
-
-Auto Complete takes input from the user and runs a check through PHP to find what the user
-is looking for. This test case runs a limited search on words that begin with the letter 'a'.
-
-@css: Optional class for list rollovers, defaults to 'non-404'

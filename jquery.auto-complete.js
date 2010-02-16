@@ -1,89 +1,171 @@
 /**
- * Auto Complete v2.1
- * June 11, 2009
+ * Auto Complete v3.0
+ * July 26, 2009
+ * Released under the MIT License @ http://www.codenothing.com/license
  * Corey Hart @ http://www.codenothing.com
- *
- * Auto Complete takes input from the user and runs a check through PHP to find what the user
- * is looking for. This test case runs a limited search on words that begin with the letter 'a'.
- *
- * @css: Optional class for list rollovers, defaults to 'non-404'
  */ 
 ;(function($){
-	$.fn.autoComplete = function(css){
-		this.each(function(){
+	$.fn.autoComplete = function(options){
+		// Set up autocomplete on all possible elements
+		return this.each(function(){
 			// Cache objects
-			var $obj = $(this), 
-				$input = $("input[type='text']", $obj), 
-				settings = {
+			var $input = $(this).attr('autocomplete', 'off'), $li, timeid, blurid, 
+				// Set defaults and include metadata support
+				settings = $.extend({
+					// Inner Function Defaults (Best to leave alone)
 					opt: -1,
 					inputval: '',
-					css: (css) ? css : 'non-404',
-					ajax: $("input[name='href']", $obj).val()
-				};
+					mouseClick: false,
+					// Server Script Path
+					ajax: 'ajax.php',
+					// Drop List CSS
+					list: 'auto-complete-list',
+					rollover: 'auto-complete-list-rollover',
+					width: $input.outerWidth(),
+					top: $input.offset().top + $input.outerHeight(),
+					left: $input.offset().left,
+					// Post Data
+					postVar: 'value',
+					postData: {},
+					// Limitations
+					minChars: 1,
+					maxRequests: 0,
+					requests: 0, // Inner Function Default
+					// Events
+					onMaxRequest: function(){},
+					onSelect: function(){},
+					onRollover: function(){},
+					onBlur: function(){},
+					preventEnterSubmit: false,
+					enter: false, // Inner Function Default
+					delay: 100,
+					selectFuncFire: true, // Inner Function Default
+					// Caching Options
+					useCache: true,
+					cacheLimit: 50,
+					cacheLength: 0, // Inner Function Default
+					cache: {} // Inner Function Default
+				}, options||{}, $.metadata?$input.metadata():{});
+
+			// Create the drop list (Use an existing one if possible)
+			var $ul = $('ul.'+settings.list)[0] ? $('ul.'+settings.list) : $('<ul/>').appendTo('body').addClass(settings.list).hide();
 
 			// Run on keyup
 			$input.keyup(function(e){
 				var key = e.keyCode;
-				if ((key > 47 && key < 91) || key == 8){
+				settings.enter = false;
+				settings.mouseClick = false;
+				if ((key > 47 && key < 91) || key == 8){ // Input Keys and Backspace
 					settings.opt = -1;
 					settings.inputval = $input.val();
-					sendRequest(settings.inputval);
-				}
-				else if (key == 37 || key == 39){
-					settings.opt = -1;
-					$('ul', $obj).html('');
-				}
-				else if (key == 38){
-					if (settings.opt >= 0){
-						settings.opt--;
-						var val = $('ul li', $obj).removeClass(settings.css).eq(settings.opt).addClass(settings.css).attr('rel');
-						val = (settings.opt < 0) ? settings.inputval : val;
-						if (val) $input.val(val);
+					if (settings.inputval.length >= settings.minChars){
+						if (timeid) clearTimeout(timeid);
+						timeid = setTimeout(function(){ sendRequest(settings); }, settings.delay);
+					} else if (key == 8) { // Remove list on backspace of small string
+						$ul.html('').hide();
 					}
 				}
-				else if (key == 40){
-					if (settings.opt < $('ul li', $obj).length-1){
+				else if (key == 13 && $li){ // Enter
+					settings.opt = -1;
+					settings.enter = true;
+					if (settings.selectFuncFire) {
+						settings.selectFuncFire = false;
+						settings.onSelect($li.data('data'), $li);
+						setTimeout(function(){ settings.selectFuncFire = true; }, 1000);
+					}
+					$ul.hide();
+				}
+				else if (key == 38){ // Up arrow
+					if (settings.opt > 0){
+						settings.opt--;
+						$li = $('li', $ul).removeClass(settings.rollover).eq(settings.opt).addClass(settings.rollover);
+						$input.val($li.data('data').value||'');
+						settings.onRollover($li.data('data'), $li);
+					}else{
+						settings.opt = -1;
+						$input.val(settings.inputval);
+						$ul.hide();
+					}
+				}
+				else if (key == 40){ // Down arrow
+					if (settings.opt < $('li', $ul).length-1){
 						settings.opt++;
-						var val = $('ul li', $obj).removeClass(settings.css).eq(settings.opt).addClass(settings.css).attr('rel');
-						if (val) $input.val(val);
+						$li = $('li', $ul.show()).removeClass(settings.rollover).eq(settings.opt).addClass(settings.rollover);
+						$input.val($li.data('data').value||'');
+						settings.onRollover($li.data('data'), $li);
 					}
 				}
 			}).blur(function(){
-				settings.opt = -1;
-				$('ul', $obj).html('');
+				blurid = setTimeout(function(){
+					if (settings.mouseClick) return false;
+					settings.opt = -1;
+					settings.onBlur(settings.inputval, $ul);
+					$ul.hide();
+				}, 150);
+			}).parents('form').eq(0).submit(function(){
+				return settings.preventEnterSubmit ? settings.enter : true;
 			});
 	
-			// Ajax Request
-			var sendRequest = function(val){
-				$.post(settings.ajax, {value: val}, function(json){
-					// Clear the List
-					$('ul', $obj).html('');
-					// Evaluate the return obj
-					json = eval(json);
-					// Show the list if there is a return
-					if (json && json.length > 0){
-						for (i in json){
-							$('ul', $obj).append('<li rel="'+json[i].value+'">'+json[i].display+'</li>');
+			// Ajax/Cache Request
+			function sendRequest(settings){
+				// Check Max reqests first
+				if (settings.maxRequests && settings.requests > settings.maxRequests){
+					return settings.onMaxRequest();
+				}else if (settings.maxRequests)
+					settings.requests++;
+
+				// Load from cache if possible
+				if (settings.useCache && settings.cache[settings.inputval])
+					return loadResults(settings.cache[settings.inputval]);
+
+				// Send request server side
+				settings.postData[settings.postVar] = settings.inputval
+				$.post(settings.ajax, settings.postData, function(json){
+					json = json && json != '' ? eval('('+json+')') : {};
+					// Store results into the cache if need be
+					if (settings.useCache){
+						settings.cacheLength++;
+						settings.cache[settings.inputval] = json;
+						// Shift out old cache if necessary
+						if (settings.cacheLength > settings.cacheLimit){
+							settings.cache = {};
+							settings.cacheLength = 0;
 						}
-						// Start mouse actions after list is set
-						mouseaction();
 					}
+					// Show the list if there is a return, else hide it
+					if (json.length > 0)
+						loadResults(json);
+					else
+						$ul.html('').hide();
 				});
 			}
-	
-			// Run Mouse Actions
-			function mouseaction(){
-				// List effects
-				$('ul li', $obj).mouseover(function(){
-					$('ul li', $obj).removeClass(settings.css);
-					$input.val( $(this).addClass(settings.css).attr('rel') );
+
+			// List Functionality
+			function loadResults(list){
+				// Clear the List and align it properly
+				$ul.html('').css({top: settings.top, left: settings.left, width: settings.width});
+				// Add new rows to the list
+				for (i in list)
+					if (list[i].value) $('<li/>').appendTo($ul).html(list[i].display||list[i].value).data('data', list[i]);
+				// Start mouse actions after list is set and shown
+				$ul.show().children('li').mouseover(function(){
+					$li = $(this);
+					$('li.'+settings.rollover, $ul).removeClass(settings.rollover);
+					$input.val( $li.addClass(settings.rollover).data('data').value );
+					settings.onRollover($li.data('data'), $li);
 				}).click(function(){
-					$('ul', $obj).html('');
+					settings.mouseClick = true;
+					if (blurid) clearTimeout(blurid);
+					settings.onSelect($li.data('data'), $li);
+					$ul.hide();
+					// Bring the focus back to the input when clicking a list member
+					$input.focus();
 				});
 	
 				// Return orignal val when not hovering
-				$('ul', $obj).mouseout(function(){
-					$input.val(settings.inputval);
+				$ul.mouseout(function(){
+					$('li.'+settings.rollover, $ul).removeClass(settings.rollover);
+					if (! settings.mouseClick) $input.val(settings.inputval);
 				});
 			}
 		});

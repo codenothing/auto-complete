@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<title>Auto Complete v3.0</title>
+	<link rel='stylesheet' type='text/css' href='docs.css' />
+</head>
+<body>
+
+<!--
+Auto Complete v3.0
+July 26, 2009
+Released under the MIT License @ http://www.codenothing.com/license
+Corey Hart @ http://www.codenothing.com
+-->
+
+<h1>Auto Complete v3.0 Options</h1>
+
+
+<ul id='menu'>
+	<li class='title'>Options</li>
+	<li><a href='#ajax'>ajax</a></li>
+	<li><a href='#cacheLimit'>cacheLimit</a></li>
+	<li><a href='#delay'>delay</a></li>
+	<li><a href='#left'>left</a></li>
+	<li><a href='#list'>list</a></li>
+	<li><a href='#maxRequests'>maxRequests</a></li>
+	<li><a href='#minChars'>minChars</a></li>
+	<li><a href='#postData'>postData</a></li>
+	<li><a href='#postVar'>postVar</a></li>
+	<li><a href='#preventEnterSubmit'>preventEnterSubmit</a></li>
+	<li><a href='#rollover'>rollover</a></li>
+	<li><a href='#top'>top</a></li>
+	<li><a href='#useCache'>useCache</a></li>
+	<li><a href='#width'>width</a></li>
+	<li class='title' style='margin-top:20px;'>Events</li>
+	<li><a href='#onBlur'>onBlur</a></li>
+	<li><a href='#onMaxRequest'>onMaxRequest</a></li>
+	<li><a href='#onSelect'>onSelect</a></li>
+	<li><a href='#onRollover'>onRollover</a></li>
+</ul>
+
+
+
+<div id='header'>
+	<div>Default</div>
+	Name - Type
+</div>
+<h3><div class='default'>'ajax.php'</div> <a name='ajax'>ajax</a> - <span class='type'>String</span></h3>
+<p>URL of the server side script.</p>
+
+
+
+<h3><div class='default'>50</div> <a name='cacheLimit'>cacheLimit</a> - <span class='type'>Integer</span></h3>
+<p>Limit's the number of entries stored in cache. </p>
+
+
+
+<h3><div class='default'>100</div> <a name='delay'>delay</a> - <span class='type'>Integer</span></h3>
+<p>Time delay of when to send the ajax requests in milliseconds.</p>
+
+
+
+<h3><div class='default'>Input's Left</div> <a name='left'>left</a> - <span class='type'>Float</span></h3>
+<p>Left offset alignment of the UL drop down list. Defaults to the offset left alignment of the input field</p>
+
+
+
+<h3><div class='default'>'auto-complete-list'</div> <a name='list'>list</a> - <span class='type'>String</span></h3>
+<p>CSS Class that will be attached to the UL created.</p>
+
+
+
+<h3><div class='default'>0</div> <a name='maxRequests'>maxRequests</a> - <span class='type'>Integer</span></h3>
+<p>Maximum number of ajax requests allowed within a scripts duration. If 0, no limit is applied</p>
+
+
+
+<h3><div class='default'>1</div> <a name='minChars'>minChars</a> - <span class='type'>Integer</span></h3>
+<p>Minimum number of required characters to send server side.</p>
+
+
+
+<h3><div class='default'>{}</div> <a name='postData'>postData</a> - <span class='type'>Object</span></h3>
+<p>Parameters that get passed to the server. The value defined by <a href='#postVar'>postVar</a> will be overidden by the users input.</p>
+
+
+
+<h3><div class='default'>'value'</div> <a name='postVar'>postVar</a> - <span class='type'>String</span></h3>
+<p>Name of the users input as it gets posted to the server.</p>
+
+
+
+<h3><div class='default'>false</div> <a name='preventEnterSubmit'>preventEnterSubmit</a> - <span class='type'>Boolean</span></h3>
+<p>Prevents form submission when user selects a value from the UL drop down list using the enter key.</p>
+
+
+
+<h3><div class='default'>'auto-complete-list-rollover'</div> <a name='rollover'>rollover</a> - <span class='type'>String</span></h3>
+<p>CSS Class toggled on li elements when mouseover or up/down events occur.</p>
+
+
+
+<h3><div class='default'>Below Input</div> <a name='top'>top</a> - <span class='type'>Float</span></h3>
+<p>Top offset alignment of UL drop down list. Defaults to right below the Input field<br>(Input's offset top+height)</p>
+
+
+
+<h3><div class='default'>true</div> <a name='useCache'>useCache</a> - <span class='type'>Boolean</span></h3>
+<p>Tell's autoComplete whether or not to use script level caching.</p>
+
+
+
+<h3><div class='default'>Input Width</div> <a name='width'>width</a> - <span class='type'>Float</span></h3>
+<p>Width of the UL drop down list. Default's to the width of the Input field</p>
+
+
+
+<h2>Events</h2>
+<h3><div class='default'>Empty Function</div> <a name='onBlur'>onBlur</a> - <span class='type'>Function(data, $li)</span></h3>
+<p>Callback function when the user loses focus on the input field. Has a 150 millisecond delay.</p>
+
+
+
+<h3><div class='default'>Empty Function</div> <a name='onMaxRequest'>onMaxRequest</a> - <span class='type'>Function()</span></h3>
+<p>Callback function when maximum number of ajax requests is reached. Will only fire if <a href='#maxRequests'>maxRequests</a> is not 0.</p>
+
+
+
+<h3><div class='default'>Empty Function</div> <a name='onSelect'>onSelect</a> - <span class='type'>Function(data, $li)</span></h3>
+<p>Callback function when the user select's an option from the UL drop down list.</p>
+
+
+
+<h3><div class='default'>Empty Function</div> <a name='onRollover'>onRollover</a> - <span class='type'>Function(data, $li)</span></h3>
+<p>Callback function when the user highlights one of the options of the UL drop down list.</p>
+</body>
+</html>

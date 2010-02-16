@@ -1,26 +1,18 @@
 /**
- * Auto Complete v2.1
- * June 11, 2009
+ * Auto Complete v3.0
+ * July 26, 2009
+ * Released under the MIT License @ http://www.codenothing.com/license
  * Corey Hart @ http://www.codenothing.com
- *
- * Auto Complete takes input from the user and runs a check through PHP to find what the user
- * is looking for. This test case runs a limited search on words that begin with the letter 'a'.
  */ 
-.auto-complete {
-	width: 415px;
-	margin-top: 50px;
-}
-
-.auto-complete ul {
+ul.auto-complete-list {
 	list-style-type: none;
 	margin: 0;
 	padding: 0;
 	position: absolute;
 	z-index: 100;
-	width: 300px;
 }
 
-.auto-complete li {
+ul.auto-complete-list li {
 	list-style-type: none;
 	margin: 0;
 	padding: 2px;
@@ -31,6 +23,6 @@
 	cursor: pointer;
 }
 
-.auto-complete li.select {
+ul.auto-complete-list li.auto-complete-list-rollover {
 	background-color: #c5c5c5;
 }

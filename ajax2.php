@@ -1,41 +1,34 @@
 <?
 /**
- * Auto Complete v2.1
- * June 11, 2009
+ * Auto Complete v3.0
+ * July 26, 2009
+ * Released under the MIT License @ http://www.codenothing.com/license
  * Corey Hart @ http://www.codenothing.com
- *
- * Auto Complete takes input from the user and runs a check through PHP to find what the user
- * is looking for. This test case runs a limited search on words that begin with the letter 'a'.
  */ 
 
 // Request Var
 $value = trim($_POST['value']);
 
-// Standard Values to search through
-$standard = array(
-	"balance" => 47,
-	"berries" => 33,
-	"bob" => 13,
-	"ball" => 06,
-	"bowl" => 99,
-	"bag" => 41,
-	"body" => 31,
-);
-
 // Ensure there is a value to search for
 if (!isset($value) || $value == '') exit;
+
+// Get list of random words
+$words = explode(',', file_get_contents('words.txt'));
 
 // Set up the send back array
 $found = array();
 // Search through each standard val and match it if possible
-foreach ($standard as $item => $num){
-	if (preg_match("/^$value/i", $item)){
+foreach ($words as $word){
+	if (preg_match("/^$value/i", $word)){
 		// Return Array
 		$arr = array(
-			"value" => $item, 
-			"display" => "<div style='float:right;'>$num Fake Results</div>$item",
+			// By only passing back the value attribute,
+			// it will be defaulted as the display
+			"value" => $word,
 		);
 		array_push($found, $arr);
+		if (count($found) >= 10)
+			break;
 	}
 }
 
