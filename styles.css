@@ -1,6 +1,6 @@
 /**
  * Auto Complete 3.1 - CSS Temp
- * August 22, 2009
+ * September 17, 2009
  * Corey Hart @ http://www.codenothing.com
  */ 
 
@@ -10,6 +10,8 @@ ul.auto-complete-list {
 	padding: 0;
 	position: absolute;
 	z-index: 100;
+	max-height: 250px;
+	overflow: auto;
 }
 
 ul.auto-complete-list li {

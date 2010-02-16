@@ -1,11 +1,25 @@
 /**
- * Auto Complete 3.1
- * August 22, 2009
+ * Auto Complete 3.2
+ * September 17, 2009
  * Corey Hart @ http://www.codenothing.com
  */ 
-;(function($){
-	var inputIndex = 0; // Input counter
-	$.fn.autoComplete = function(options){
+;(function($, undefined){
+	// Chaining Method
+	$.fn.autoComplete = function(options, keyCode, stick, ignore){
+		// If no number is provided, initiate the auto-complete function
+		if (keyCode === undefined || typeof keyCode !== 'number')
+			return ac.call(this, options);
+
+		// Create new event from jQuery and attach keycode
+		var event = $.Event('keyup');
+		event.keyCode = keyCode;
+
+		// Trigger auto complete and Don't break the chain!
+		return $(this).trigger(event, [options, stick, ignore]);
+	};
+
+	// Autocomplete function
+	var inputIndex = 0, ac = function(options){
 		return this.each(function(){
 			// Cache objects
 			var $input = $(this).attr('autocomplete', 'off'), $li, timeid, timeid2, blurid, 
@@ -51,9 +65,23 @@
 			var $ul = $('ul.'+settings.list)[0] ? $('ul.'+settings.list) : $('<ul/>').appendTo('body').addClass(settings.list).hide();
 
 			// Run on keyup
-			$input.keyup(function(e){
+			$input.keyup(function(e, s, stick, ignore){
 				var key = e.keyCode;
 				settings.mouseClick = false;
+
+				// Re-extend if settings are passed
+				if (s && typeof s === 'object'){
+					var oldSettings = $.extend(true, {}, settings);
+					// Go deep for single postData var change
+					settings = $.extend(true, settings, s);
+					// Ignore trigger if user specifies
+					if (ignore){
+						if (! stick) settings = oldSettings;
+						return false;
+					}
+				}
+				
+				// Keys
 				if (key == 13 && $li){ // Enter
 					settings.opt = -1;
 					// Ensure the select function only gets fired once
@@ -90,13 +118,23 @@
 					settings.opt = -1;
 					settings.inputval = $input.val();
 					if (settings.inputval.length >= settings.minChars){
-						// Send request on timer so fast typing doesn't send requests too fast
+						// Send request on timer so fast typing doesn't overload requests
 						if (timeid) clearTimeout(timeid);
-						timeid = setTimeout(function(){ sendRequest(); }, settings.delay);
+						timeid = setTimeout(function(){ 
+							sendRequest(settings);
+							// Remove temporary settings on timeout so they stick throughout the drop
+							if (oldSettings && ! stick) 
+								settings = oldSettings;
+							clearTimeout(timeid);
+						}, settings.delay);
 					} else if (key == 8) { // Remove list on backspace of small string
 						$ul.html('').hide();
 					}
 				}
+
+				// Remove temporary settings change unless specified not too
+				if (oldSettings && ! stick && ! timeid)
+					settings = oldSettings;
 			}).blur(function(){
 				settings.enter = true;
 				blurid = setTimeout(function(){
@@ -117,7 +155,7 @@
 			});
 	
 			// Ajax/Cache Request
-			function sendRequest(){
+			function sendRequest(settings){
 				// Check Max reqests first
 				if (settings.maxRequests && ++settings.requests >= settings.maxRequests)
 					return settings.requests > settings.maxRequests ?
@@ -125,7 +163,7 @@
 
 				// Load from cache if possible
 				if (settings.useCache && settings.cache[settings.inputval])
-					return loadResults(settings.cache[settings.inputval]);
+					return loadResults(settings.cache[settings.inputval], settings);
 
 				// Send request server side
 				settings.postData[settings.postVar] = settings.inputval
@@ -141,12 +179,12 @@
 						}
 					}
 					// Show the list if there is a return, else hide it
-					loadResults(json);
+					loadResults(json, settings);
 				}, 'json');
 			}
 
 			// List Functionality
-			function loadResults(list){
+			function loadResults(list, settings){
 				// Ensure there is a list
 				if (!list || list.length < 1)
 					return $ul.html('').hide();

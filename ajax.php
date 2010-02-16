@@ -1,21 +1,15 @@
 <?
 /**
- * Auto Complete 3.1
- * August 22, 2009
+ * Auto Complete 3.2
+ * September 17, 2009
  * Corey Hart @ http://www.codenothing.com
  */ 
 
 // Make request var preg safe
 $value = trim($_POST['value']);
-$value = str_replace('/', '\/', $value);
-$value = str_replace('[', '\[', $value);
-$value = str_replace(']', '\]', $value);
-$value = str_replace('{', '\{', $value);
-$value = str_replace('}', '\}', $value);
-$value = str_replace('"', '\"', $value);
 
 // Ensure there is a value to search for
-if (!isset($value) || $value == '') exit;
+if ((!isset($value) || $value == '') && ! $_POST['all']) exit;
 
 // Get list of random words
 $words = explode(',', file_get_contents('words.txt'));
@@ -26,13 +20,20 @@ $num = rand(1, 100);
 // Search through each standard val and match it if possible
 foreach ($words as $word){
 	if (!$word || $word == '') continue;
-	if (preg_match("/^$value/i", $word)){
+	// If all parameter is passed, load up all C values
+	if ($_POST['all'] && strtolower($word[0]) == 'c'){
 		// Return Array
-		$arr = array(
+		$found[] = array(
 			"value" => $word, 
 			"display" => "<div style='float:right;'>$num Fake Results</div>$word",
 		);
-		array_push($found, $arr);
+	}
+	else if (!$_POST['all'] && strpos($word, $value) === 0){
+		// Return Array
+		$found[] = array(
+			"value" => $word, 
+			"display" => "<div style='float:right;'>$num Fake Results</div>$word",
+		);
 		if (count($found) >= 10)
 			break;
 	}

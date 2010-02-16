@@ -1,6 +1,6 @@
 /**
- * Auto Complete 3.1
- * August 22, 2009
+ * Auto Complete 3.2
+ * September 17, 2009
  * Corey Hart @ http://www.codenothing.com
  */ 
 
@@ -38,6 +38,10 @@ h3 a {
 	color: white;
 }
 
+pre {
+	font-size: 9pt;
+}
+
 #header {
 	width: 600px;
 	font-size: 12pt;
@@ -62,9 +66,9 @@ h3 a {
 
 /* Floating Menu */
 ul#menu {
-	position: fixed;
+	position: absolute;
 	top: 30px;
-	margin-left: 800px;
+	left: 750px;
 	list-style-type: square;
 	list-style-position: inside;
 	padding: 5px;
