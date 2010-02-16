@@ -1,6 +1,6 @@
-/**
- * Auto Complete 3.2
- * September 17, 2009
+/*!
+ * Auto Complete 4.0
+ * September 28, 2009
  * Corey Hart @ http://www.codenothing.com
  */ 
 ;(function($, undefined){
@@ -18,6 +18,13 @@
 		return $(this).trigger(event, [options, stick, ignore]);
 	};
 
+	// bgiframe is needed to fix z-index problem for IE6 users.
+	$.fn.bgiframe = $.fn.bgiframe ? $.fn.bgiframe : $.fn.bgIframe ? $.fn.bgIframe : function(){
+		// For applications that don't have bgiframe plugin installed, create a useless 
+		// function that doesn't break the chain
+		return this;
+	};
+
 	// Autocomplete function
 	var inputIndex = 0, ac = function(options){
 		return this.each(function(){
@@ -27,12 +34,14 @@
 				settings = $.extend({
 					// Inner Function Defaults (Best to leave alone)
 					opt: -1,
-					inputval: '',
+					inputval: undefined,
 					mouseClick: false,
 					dataName: 'ac-data',
 					inputIndex: ++inputIndex,
 					// Server Script Path
 					ajax: 'ajax.php',
+					dataSupply: [],
+					dataFn: undefined,
 					// Drop List CSS
 					list: 'auto-complete-list',
 					rollover: 'auto-complete-list-rollover',
@@ -42,7 +51,9 @@
 					postData: {},
 					// Limitations
 					minChars: 1,
+					maxItems: -1,
 					maxRequests: 0,
+					requestType: 'post',
 					requests: 0, // Inner Function Default
 					// Events
 					onMaxRequest: function(){},
@@ -59,13 +70,15 @@
 					cacheLimit: 50,
 					cacheLength: 0, // Inner Function Default
 					cache: {} // Inner Function Default
-				}, options||{}, $.metadata ? $input.metadata() : {});
+				}, options||{}, $.metadata ? $input.metadata() : {}),
 
-			// Create the drop list (Use an existing one if possible)
-			var $ul = $('ul.'+settings.list)[0] ? $('ul.'+settings.list) : $('<ul/>').appendTo('body').addClass(settings.list).hide();
+				// Create the drop list (Use an existing one if possible)
+				$ul = $('ul.'+settings.list)[0] ?
+					$('ul.'+settings.list).bgiframe() :
+					$('<ul/>').appendTo('body').addClass(settings.list).bgiframe().hide();
 
 			// Run on keyup
-			$input.keyup(function(e, s, stick, ignore){
+			$input.bind('keyup.autoComplete', function(e, s, stick, ignore){
 				var key = e.keyCode;
 				settings.mouseClick = false;
 
@@ -135,7 +148,7 @@
 				// Remove temporary settings change unless specified not too
 				if (oldSettings && ! stick && ! timeid)
 					settings = oldSettings;
-			}).blur(function(){
+			}).bind('blur.autoComplete', function(){
 				settings.enter = true;
 				blurid = setTimeout(function(){
 					if (settings.mouseClick)
@@ -144,13 +157,13 @@
 					settings.onBlur.call($input[0], settings.inputval, $ul);
 					$ul.hide();
 				}, 150);
-			}).focus(function(){
+			}).bind('focus.autoComplete', function(){
 				settings.enter = false;
 				// If ul is not associated with current input, clear it
 				if (settings.inputIndex != $ul.data('ac-input-index'))
 					$ul.html('').hide();
 				settings.onFocus.call($input[0], $ul);
-			}).parents('form').eq(0).submit(function(){
+			}).parents('form').eq(0).bind('submit.autoComplete', function(){
 				return settings.preventEnterSubmit ? settings.enter : true;
 			});
 	
@@ -165,9 +178,13 @@
 				if (settings.useCache && settings.cache[settings.inputval])
 					return loadResults(settings.cache[settings.inputval], settings);
 
+				// Use user supplied data when defined
+				if (settings.dataSupply.length)
+					return userSuppliedData(settings);
+
 				// Send request server side
 				settings.postData[settings.postVar] = settings.inputval
-				$.post(settings.ajax, settings.postData, function(json){
+				$[settings.requestType](settings.ajax, settings.postData, function(json){
 					// Store results into the cache if need be
 					if (settings.useCache){
 						settings.cacheLength++;
@@ -181,6 +198,26 @@
 					// Show the list if there is a return, else hide it
 					loadResults(json, settings);
 				}, 'json');
+			}
+
+			// Parse User Supplied Data
+			function userSuppliedData(settings){
+				var json = [], fn = $.isFunction(settings.dataFn), regex = new RegExp('^'+settings.inputval, 'i'), k = 0, entry, i;
+				// Loop through each entry and find matches
+				for (i in settings.dataSupply){
+					entry = settings.dataSupply[i];
+					// Force object
+					entry = typeof entry === 'object' ? entry : {value: entry};
+					// If user supplied function, use that, otherwise test with default regex
+					if ((fn && settings.dataFn.call($input, settings.inputval, entry.value, json, i, settings.dataSupply)) || 
+							(!fn && entry.value.match(regex))){
+						// Reduce browser load by breaking on limit if it exists
+						if (settings.maxItems > -1 && ++k > settings.maxItems)
+							break;
+						json.push(entry);
+					}
+				}
+				loadResults(json, settings);
 			}
 
 			// List Functionality
@@ -198,24 +235,28 @@
 				});
 
 				// Add new rows to the list
-				var aci = 0, i; // Index list items
-				for (i in list)
-					if (list[i].value)
+				var aci=0,k=0,i; // Index list items
+				for (i in list){
+					if (list[i].value){
+						if (settings.maxItems > -1 && ++k > settings.maxItems)
+							break;
 						$('<li/>').appendTo($ul).html(list[i].display||list[i].value)
 							.data(settings.dataName, list[i]).data('ac-index', aci++);
+					}
+				}
 
 				// Return orignal val when not hovering, and add mouse actions to list
-				$ul.show().mouseout(function(){
+				$ul.show().bind('mouseout.autoComplete', function(){
 					$('li.'+settings.rollover, $ul).removeClass(settings.rollover);
 					if (! settings.mouseClick && settings.selectFuncFire)
 						$input.val(settings.inputval);
-				}).children('li').mouseover(function(){
+				}).children('li').bind('mouseover.autoComplete', function(){
 					$li = $(this);
 					$('li.'+settings.rollover, $ul).removeClass(settings.rollover);
 					$input.val( $li.addClass(settings.rollover).data(settings.dataName).value );
 					settings.onRollover.call($input[0], $li.data(settings.dataName), $li, $ul);
 					settings.opt = $li.data('ac-index');
-				}).click(function(){
+				}).bind('click.autoComplete', function(){
 					settings.mouseClick = true;
 					if (blurid) clearTimeout(blurid);
 					settings.onSelect.call($input[0], $li.data(settings.dataName), $li, $ul);

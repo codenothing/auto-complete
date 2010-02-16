@@ -3,7 +3,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-	<title>Auto Complete 3.1</title>
+	<title>Auto Complete 4.0</title>
 	<link rel='stylesheet' type='text/css' href='docs.css' />
 	<script type='text/javascript' src='jquery-1.3.2.min.js'></script>
 	<script type='text/javascript' src='jquery.history.js'></script>
@@ -17,27 +17,31 @@ $(function(){
 </script>
 </head>
 <body>
-
 <!--
-Auto Complete 3.2
-September 17, 2009
+Auto Complete 4.0
+September 28, 2009
 Corey Hart @ http://www.codenothing.com
 -->
 
-<h1>Auto Complete 3.2 Options</h1>
+
+<h1>Auto Complete 4.0 Options</h1>
 
 
 <ul id='menu'>
 	<li class='title'>Options</li>
 	<li><a href='#ajax'>ajax</a></li>
 	<li><a href='#cacheLimit'>cacheLimit</a></li>
+	<li><a href='#dataFn'>dataFn</a></li>
+	<li><a href='#dataSupply'>dataSupply</a></li>
 	<li><a href='#delay'>delay</a></li>
 	<li><a href='#list'>list</a></li>
+	<li><a href='#maxItems'>maxItems</a></li>
 	<li><a href='#maxRequests'>maxRequests</a></li>
 	<li><a href='#minChars'>minChars</a></li>
 	<li><a href='#postData'>postData</a></li>
 	<li><a href='#postVar'>postVar</a></li>
 	<li><a href='#preventEnterSubmit'>preventEnterSubmit</a></li>
+	<li><a href='#requestType'>requestType</a></li>
 	<li><a href='#rollover'>rollover</a></li>
 	<li><a href='#useCache'>useCache</a></li>
 	<li><a href='#width'>width</a></li>
@@ -68,12 +72,31 @@ Corey Hart @ http://www.codenothing.com
 	Name - Type
 </div>
 <h3><div class='default'>'ajax.php'</div> <a name='ajax'>ajax</a> - <span class='type'>String</span></h3>
-<p>URL of the server side script.</p>
+<p>URL of the server side script.<br><br>
+<b>Note*:</b> When dataSupply has a length greater than 0, no ajax request is sent.</p>
 
 
 
 <h3><div class='default'>50</div> <a name='cacheLimit'>cacheLimit</a> - <span class='type'>Integer</span></h3>
 <p>Limit's the number of entries stored in cache. </p>
+
+
+
+<h3><div class='default'>undefined</div> <a name='dataFn'>dataFn</a> - <span class='type'>Function(inputval, value, currentList, i, dataSupply)</span></h3>
+<p>Personal function to use in place of default pattern matching. Return true for correct match, false for incorrect. Function Params:<br><br>
+-<b>inputval:</b> Current value within the textbox that is in focus.<br>
+-<b>value:</b> Value of the entry in the dataSupply array.<br>
+-<b>currentList:</b> Holds the current values that have passed this functions pattern match.<br>
+-<b>i:</b> Current index of the dataSupply array.<br>
+-<b>dataSupply:</b> The complete array passed to the autoComplete function<br>
+<br><br>
+<b>Note*:</b> The <span style='color:blue;'>this</span> object references the input currently in focus.
+</p>
+
+
+
+<h3><div class='default'>[]</div> <a name='dataSupply'>dataSupply</a> - <span class='type'>Array</span></h3>
+<p>Array of values/objects to run auto-complete as local instead of ajax requests. Default pattern match is: "/^<i>(input value)</i>/i"</p>
 
 
 
@@ -84,6 +107,11 @@ Corey Hart @ http://www.codenothing.com
 
 <h3><div class='default'>'auto-complete-list'</div> <a name='list'>list</a> - <span class='type'>String</span></h3>
 <p>CSS Class that will be attached to the UL created.</p>
+
+
+
+<h3><div class='default'>-1</div> <a name='maxItems'>maxItems</a> - <span class='type'>Number</span></h3>
+<p>Limits the number of values added to the drop down list. When -1, no limit is imposed.</p>
 
 
 
@@ -109,6 +137,11 @@ Corey Hart @ http://www.codenothing.com
 
 <h3><div class='default'>false</div> <a name='preventEnterSubmit'>preventEnterSubmit</a> - <span class='type'>Boolean</span></h3>
 <p>Prevents form submission when user selects a value from the UL drop down list using the enter key.</p>
+
+
+
+<h3><div class='default'>'post'</div> <a name='requestType'>requestType</a> - <span class='type'>String / jQuery Fn</span></h3>
+<p>Type of request during ajax calls. Only use 'get' or 'post'.</p>
 
 
 
@@ -166,7 +199,7 @@ that you would like applied, along with a
 <a href='http://www.aspdotnetfaq.com/Faq/What-is-the-list-of-KeyCodes-for-JavaScript-KeyDown-KeyPress-and-KeyUp-events.aspx'>keyCode</a>
 of your choice (or -1). Ex:
 <pre>
-	$('selector of input').autoComplete({...New Options...}, -1);
+	$('selector of input').autoComplete({...New Options...}, keyCode, stick, nofire);
 </pre>
 </div>
 
