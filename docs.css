@@ -1,7 +1,6 @@
 /**
- * Auto Complete v3.0
- * July 26, 2009
- * Released under the MIT License @ http://www.codenothing.com/license
+ * Auto Complete 3.1
+ * August 22, 2009
  * Corey Hart @ http://www.codenothing.com
  */ 
 
@@ -19,6 +18,10 @@ h3 {
 	margin: 0;
 	padding: 5px;
 	width: 600px;
+}
+
+h3.focus {
+	background-color: #D03535;
 }
 
 p {

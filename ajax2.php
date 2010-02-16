@@ -1,13 +1,18 @@
 <?
 /**
- * Auto Complete v3.0
- * July 26, 2009
- * Released under the MIT License @ http://www.codenothing.com/license
+ * Auto Complete 3.1
+ * August 22, 2009
  * Corey Hart @ http://www.codenothing.com
  */ 
 
-// Request Var
+// Make request var preg safe
 $value = trim($_POST['value']);
+$value = str_replace('/', '\/', $value);
+$value = str_replace('[', '\[', $value);
+$value = str_replace(']', '\]', $value);
+$value = str_replace('{', '\{', $value);
+$value = str_replace('}', '\}', $value);
+$value = str_replace('"', '\"', $value);
 
 // Ensure there is a value to search for
 if (!isset($value) || $value == '') exit;

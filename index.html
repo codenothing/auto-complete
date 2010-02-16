@@ -3,10 +3,10 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-	<title>Auto Complete v3.0</title>
+	<title>Auto Complete 3.1</title>
 	<script type='text/javascript' src='jquery-1.3.1.min.js'></script>
 	<script type='text/javascript' src='jquery.metadata.js'></script>
-	<script type='text/javascript' src='jquery.auto-complete.pack.js'></script>
+	<script type='text/javascript' src='jquery.auto-complete.js'></script>
 	<link rel='stylesheet' type='text/css' href='styles.css' />
 <style type='text/css'>
 body > div {
@@ -19,7 +19,7 @@ $(document).ready(function(){
 	$('input[name=search1]').autoComplete();
 	$('input[name=search2]').autoComplete({
 		preventEnterSubmit: true,
-		onSelect: function(data, $li){
+		onSelect: function(data){
 			alert('You have selected ' + data.value);
 		}
 	});
@@ -32,8 +32,9 @@ $(document).ready(function(){
 		}
 	});
 	$('input[name=search4]').autoComplete({
-		onMaxRequest: function(){
-			alert('Sorry, but you have used up the maximum number of reqests allowed');
+		onMaxRequest: function(val){
+			$(this).css('background-color', 'red');
+			alert('Sorry, but you have used up the maximum number of reqests allowed, and ' + val + ' was not processed');
 		}
 	});
 });
@@ -42,19 +43,18 @@ $(document).ready(function(){
 <body>
 
 <!--
-Auto Complete v3.0
-July 26, 2009
-Released under the MIT License @ http://www.codenothing.com/license
+Auto Complete 3.1
+August 22, 2009
 Corey Hart @ http://www.codenothing.com
 -->
 
-<h1>Auto Complete v3.0</h1>
+<h1>Auto Complete 3.1</h1>
 
 
 <div>
 Auto Complete sends input from a user to a script server side, and creates a drop down with the
 JSON data returned. It supports the <a href='http://docs.jquery.com/Plugins/Metadata'>metadata plugin</a>, 
-as well as script level caching. A few examples are included on this page, but check out the <a href='#'>docs</a> 
+as well as script level caching. A few examples are included on this page, but check out the <a href='docs.html'>docs</a> 
 for a full list of features.
 </div>
 
@@ -89,7 +89,7 @@ $('input[name=search2]').autoComplete({
 	}
 });
 </pre>
-<form action='index.php' method='GET'>
+<form action='index.html' method='GET'>
 <input type='text' name='search2' style='width:300px;' value='' />
 <input type='submit' value='Do Something' />
 </form>
@@ -124,8 +124,9 @@ $('input[name=search3]').autoComplete({
 <b>Use the metadata plugin to set limitations on a per input basis.</b>
 <pre>
 $('input[name=search4]').autoComplete({
-	onMaxRequest: function(){
-		alert('Sorry, but you have used up the maximum number of reqests allowed');
+	onMaxRequest: function(val){
+		$(this).css('background-color', 'red');
+		alert('Sorry, but you have used up the maximum number of reqests allowed, and ' + val + ' was not processed');
 	}
 });
 &lt;input type='text' name='search4' style='width:300px;' class='someclass {minChars: 2, maxRequests: 10}' value='' /&gt;
