@@ -1,6 +1,6 @@
 /*!
- * Auto Complete 5.0
- * November 22, 2009
+ * Auto Complete 5.1
+ * February 16, 2010
  * Corey Hart @ http://www.codenothing.com
  */ 
 jQuery(function($){

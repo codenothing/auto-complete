@@ -1,111 +1,25 @@
 ###
-### Auto Complete 5.0 Change Log
-### November 22, 2009
+### Auto Complete 5.1 Change Log
+### February 15, 2010
 ### Corey Hart @ http://www.codenothing.com
 ###
 
 # New Features
 
--jQuery.autoComplete: object attached to the base jQuery object. Globalized defaults
-and a few other methods outlined in the docs are contained in the autoComplete object.
-
--Paging and Scrolling on the drop list.
-
--Auto filling of input words.
-
--Removed timer dependency, and moved completely to event based tracking. It is
-still somewhat of a hack as flags are attached to event objects, but will be
-more accurate than using timeout/interval.
-
--The drop down list takes advantage of event delegation to track mouse events.
-
+-Added postFormat option
 
 
 
 # New Settings
 
--ajaxCache: Boolean value to pass along with the ajax request,
-prevents/enables browsers to cache requests made. Defaults to jQuery's native
-settings
--autoFill: Completes and highlights the input with the rest of active list
-item.
--maxHeight: A way to implement the max-height css property on the drop down
-list through js.
--multiple: Allows for multiple word searches on the same input
--multipleSeparater: Separator for multiple words
--newList: Creates a new UL Drop Down list for each instance
--nonInput: Array of keyCodes not allowed to be searched with.
--striped: CSS Class to add to every other list item.
-
-
+-postFormat: Ability to format the post data object/string being sent server
+side
 
 
 # New Callbacks
 
--onHide: Called when the drop down list is hidden.
--onLoad: Called after a list of entries is finalized, and before it's loaded
-into the drop down list. Basically one last line to check the list before it's
-loaded. If defined, it must return an array with the entries in the correct
-format.
--onShow:  Called when the drop down list is shown.
--onSubmit: Called when the parent form wrapper of the input submission is
-triggered. It only gets called if autoComplete deems it's ok to submit the form.
--spinner: Called when a spinner should be activated/deactivated.
-
-
-
+none.
 
 # New Methods
 
--direct-supply: By passes list error checks and formatting. Data array
-passed/stored in dataSupply must be formatted correctly.
--disable: Disables the autoComplete functionality, but doesn't destroy it.
--enable: Enables a previously disabled autoComplete functionality.
--option: Way to access/set single values to keys in the settings.
--search: Quick way to trigger a search with a custom string.
-
-
-
-
-
-###
-### Auto Complete 5.0 Changes
-###
-
-
-# keydown/keypress
-
-Key triggers (such as enter and d-pad keys) are tracked through a keydown
-event (keypress in opera) instead of a keyup, while input acceptable keys are
-ran through a keyup event.
-
-
-
-# event callbacks
-
-Without the backwardsCompatible flag set, event callbacks are passed two
-parameters, the event object that was initially triggered, and an ui object
-containing key-value pairs needed. This change was made to conform to jQuery
-ui callback standards, and to allow for future additions can just add to the
-object, instead of more parameters.
-
-With the backwardsComplatible flag set, the old parameters are passed, along
-with the new ones defined on each function added as extra params.
-
-Both versions of parameters are defined on each function within the docs.
-
-
-
-# Document Event
-
-A click event for each instance of autoComplete was added to the document to
-track mouse-clicks and operate blur event's accordingly.
-
-
-
-# Button Method Namespaces
-
-The button.ajax and button.supply namespaces have been switched to button-ajax
-and button-supply namespaces respectively. This was a flaw in logic on my
-part, as jQuery doesn't support deep namespacing. A hook was added to replace
-all '.' in namespaces to '-' to conform to the new methods.
+none.

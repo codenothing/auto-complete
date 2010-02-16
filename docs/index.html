@@ -3,7 +3,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-	<title>Auto Complete 5.0</title>
+	<title>Auto Complete 5.1</title>
 	<link rel='stylesheet' type='text/css' href='styles.css' />
 	<script type='text/javascript' src='../jquery/jquery-1.3.2.js'></script>
 	<script type='text/javascript' src='../jquery/jquery.history.js'></script>
@@ -27,8 +27,8 @@ $(function(){
 </head>
 <body>
 <!--
-Auto Complete 5.0 Docs
-November 22, 2009
+Auto Complete 5.1 Docs
+February 16, 2010
 Corey Hart @ http://www.codenothing.com
 -->
 
@@ -68,6 +68,7 @@ Corey Hart @ http://www.codenothing.com
 	<li><a href='#newList'>newList</a></li>
 	<li><a href='#nonInput'>nonInput</a></li>
 	<li><a href='#postData'>postData</a></li>
+	<li><a href='#postFormat'>postFormat</a></li>
 	<li><a href='#postVar'>postVar</a></li>
 	<li><a href='#preventEnterSubmit'>preventEnterSubmit</a></li>
 	<li><a href='#requestType'>requestType</a></li>
@@ -362,6 +363,21 @@ not characters.</p>
 <h3><div class='default'>{}</div> <a name='postData'>postData</a> - <span class='type'>Object</span></h3>
 <p>Parameters that get passed to the server. The value defined by <a href='#postVar'>postVar</a> will be overridden by the users input.</p>
 
+
+
+<h3><div class='default'>undefined</div> <a name='postFormat'>postFormat</a> - <span class='type'>Function (event, ui)</span></h3>
+<p>Format the data to be passed with the <a href='http://api.jquery.com/jQuery.ajax/'>jQuery.ajax</a> function when defined.</p>
+<ul class='ui'>
+	<li class='title'>The ui object</li>
+	<li><b>data:</b> The data object that would be sent with the ajax function.</li>
+	<li><b>search:</b> The input value being searched</li>
+	<li><b>val:</b> The full string value of the input</li>
+	<li><b>ul:</b> Cached $ul jQuery object of the drop down list.</li>
+</ul>
+<p class='notes'>
+	<b>Note*:</b> The function defined must return either an object or a string that conforms to the data option in 
+	<a href='http://api.jquery.com/jQuery.ajax/'>jQuery.ajax</a>.
+</p>
 
 
 <h3><div class='default'>'value'</div> <a name='postVar'>postVar</a> - <span class='type'>String</span></h3>

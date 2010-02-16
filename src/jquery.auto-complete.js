@@ -1,6 +1,6 @@
 /*!
- * Auto Complete 5.0
- * November 22, 2009
+ * Auto Complete 5.1
+ * February 16, 2010
  * Corey Hart @ http://www.codenothing.com
  */ 
 (function($, undefined){
@@ -57,7 +57,7 @@
 
 	// Current timestamp
 	function now(){
-		return (new Date).getTime();
+		return (new Date()).getTime();
 	}
 
 
@@ -121,7 +121,7 @@ var
 		},
 
 		defaults: {
-			// To smooth upgrade process to 5.0, set backwardsCompatible to true
+			// To smooth upgrade process to 5.x, set backwardsCompatible to true
 			backwardsCompatible: FALSE,
 			// Server Script Path
 			ajax: 'ajax.php',
@@ -140,6 +140,7 @@ var
 			// Post Data
 			postVar: 'value',
 			postData: {},
+			postFormat: undefined,
 			// Limitations
 			minChars: 1,
 			maxItems: -1,
@@ -681,7 +682,9 @@ var
 				return xhr = $.ajax({
 					type: settings.requestType,
 					url: settings.ajax,
-					data: settings.postData,
+					data: settings.postFormat ?
+						settings.postFormat.call(self, event, {data: settings.postData, search: cache.val, val: inputval, ul: $ul}) :
+						settings.postData,
 					dataType: 'json',
 					cache: settings.ajaxCache,
 					success: function(list){

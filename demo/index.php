@@ -1,7 +1,7 @@
 <?php
 /**
- * Auto Complete 5.0
- * November 22, 2009
+ * Auto Complete 5.1
+ * February 16, 2010
  * Corey Hart @ http://www.codenothing.com
  *
  *
@@ -15,7 +15,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-	<title>Auto Complete 5.0</title>
+	<title>Auto Complete 5.1</title>
 	<script type='text/javascript' src='../jquery/jquery-1.3.2.js'></script>
 	<script type='text/javascript' src='http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js'></script>
 	<script type='text/javascript' src='../jquery/jquery.metadata.js'></script>
@@ -28,7 +28,7 @@
 
 
 
-<h1>Auto Complete 5.0</h1>
+<h1>Auto Complete 5.1</h1>
 
 
 <div>
