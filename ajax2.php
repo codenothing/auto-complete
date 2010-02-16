@@ -1,7 +1,7 @@
 <?
 /**
- * Auto Complete 4.0
- * September 28, 2009
+ * Auto Complete 4.1
+ * October 5, 2009
  * Corey Hart @ http://www.codenothing.com
  */ 
 

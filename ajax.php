@@ -1,7 +1,7 @@
 <?
 /**
- * Auto Complete 4.0
- * September 28, 2009
+ * Auto Complete 4.1
+ * October 5, 2009
  * Corey Hart @ http://www.codenothing.com
  */ 
 
@@ -20,8 +20,8 @@ $num = rand(1, 100);
 // Search through each standard val and match it if possible
 foreach ($words as $word){
 	if (!$word || $word == '') continue;
-	// If all parameter is passed, load up all C values
-	if ($_POST['all'] && strtolower($word[0]) == 'c'){
+	// If all parameter is passed, load up all C/D values
+	if ($_POST['all'] && (($_POST['letter'] == 'c' && strtolower($word[0]) == 'c') || ($_POST['letter'] == 'd' && strtolower($word[0]) == 'd'))){
 		// Return Array
 		$found[] = array(
 			"value" => $word, 

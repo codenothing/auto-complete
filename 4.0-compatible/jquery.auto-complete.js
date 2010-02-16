@@ -2,20 +2,54 @@
  * Auto Complete 4.1
  * October 5, 2009
  * Corey Hart @ http://www.codenothing.com
+ *
+ * NOTE*: This is the 4.0 compatible version, please
+ * change your code asap to work with the new 4.1 version
  */ 
 ;(function($, undefined){
+	/*
+	 * Arguments List (Internal Notes for 4.0 Only)
+	 * 0: trigger
+	 * 1: options
+	 * 2: keyCode
+	 * 3: stick
+	 * 4: ignore
+	 * 5: deep
+	 */ 
 	// Expose autoComplete to the jQuery chain
 	$.fn.autoComplete = function(){
-		// Force array of arguments
-		var args = Array.prototype.slice.call(arguments);
+		var a = Array.prototype.slice.call(arguments), args = [], i;
+		if (typeof a[0] === 'object'){
+			// Hacked unshift method 
+			// (unshift() doesn't work in IE?)
+			args.push(undefined);
+			for (i in a) args.push(a[i]);
+		}else{ args = a; }
 
 		// Autocomplete special triggers
 		if (typeof args[0] === 'string')
 			// Trigger the requested function, and dont break the chain!
 			return $(this).trigger('autoComplete.'+args.shift(), args);
 
-		// Initiate the autocomplete
-		return autoComplete.call(this, args[0]);
+		// If no number is provided, initiate the auto-complete function
+		if (args[2] === undefined || typeof args[2] !== 'number')
+			return autoComplete.call(this, args[1]);
+
+		/*
+		 * Base trigger section is left for backwards compatibility with 4.0
+		 * release, and will be phased out with future releases.
+		 *
+		 * PLEASE WORK ON TRANSFERING CODE LOGIC TO PREDEFINED EVENTS
+		 */ 
+		// Create new jQuery event (but only trigger the autoComplete function) and attach keycode
+		var event = $.Event('keyup.autoComplete');
+		event.keyCode = args[2];
+
+		// Ensure deep action is boolean
+		if (typeof args[5] !== 'boolean') args[5] = true;
+
+		// Trigger auto complete and Don't break the chain!
+		return $(this).trigger(event, args);
 	};
 
 	// bgiframe is needed to fix z-index problem for IE6 users.
@@ -85,12 +119,25 @@
 			// Input Events
 			$input.data('ac-input-index', settings.inputIndex) // Attach input index
 			// Central autoComplete specific function
-			.bind('keyup.autoComplete', function(event){
+			.bind('keyup.autoComplete', function(event, trigger, opts, keyCode, stick, ignore, deep){
 				var key = event.keyCode;
 				settings.mouseClick = false;
+
+				// Re-extend if settings are passed
+				if (opts && typeof opts === 'object'){
+					// Make a safe copy of the old settings
+					var oldSettings = $.extend(true, {}, settings);
+					// Go deep for single postData var change
+					settings = $.extend(deep, {}, settings, opts);
+					// Ignore trigger if user specifies
+					if (ignore){
+						if (! stick) settings = oldSettings;
+						return true;
+					}
+				}
 				
-				// Enter Key
-				if (key == 13 && $li){
+				// Keys
+				if (key == 13 && $li){ // Enter
 					settings.opt = -1;
 					// Ensure the select function only gets fired once
 					if (settings.selectFuncFire) {
@@ -101,8 +148,7 @@
 					}
 					$ul.hide();
 				}
-				// Up Arrow
-				else if (key == 38){
+				else if (key == 38){ // Up arrow
 					if (settings.opt > 0){
 						settings.opt--;
 						$li = $('li', $ul).removeClass(settings.rollover).eq(settings.opt).addClass(settings.rollover);
@@ -114,8 +160,7 @@
 						$ul.hide();
 					}
 				}
-				// Down Arrow
-				else if (key == 40){
+				else if (key == 40){ // Down arrow
 					if (settings.opt < $('li', $ul).length-1){
 						settings.opt++;
 						$li = $('li', $ul.show()).removeClass(settings.rollover).eq(settings.opt).addClass(settings.rollover);
@@ -131,11 +176,21 @@
 					if (cache.val.length >= settings.minChars){
 						// Send request on timer so fast typing doesn't overload requests
 						if (timeid) clearTimeout(timeid);
-						timeid = setTimeout(function(){ sendRequest(settings, cache); clearTimeout(timeid); }, settings.delay);
+						timeid = setTimeout(function(){ 
+							sendRequest(settings, cache);
+							// Remove temporary settings on timeout so they stick throughout the drop
+							if (oldSettings && ! stick) 
+								settings = oldSettings;
+							clearTimeout(timeid);
+						}, settings.delay);
 					} else if (key == 8) { // Remove list on backspace of small string
 						$ul.html('').hide();
 					}
 				}
+
+				// Remove temporary settings change unless specified not too
+				if (oldSettings && ! stick && ! timeid)
+					settings = oldSettings;
 			})
 			// Bind specific Blur Actions
 			.bind('blur.autoComplete', function(){
@@ -233,7 +288,7 @@
 
 			// Back to normal events
 			// Prevent form submission if defined in settings
-			.parents('form').eq(0).bind('submit.autoComplete.'+settings.inputIndex, function(){
+			.parents('form').eq(0).bind('submit.autoComplete', function(){
 				return settings.preventEnterSubmit ? settings.enter : true;
 			});
 	
