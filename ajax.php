@@ -1,7 +1,7 @@
 <?
 /**
- * Auto Complete v2.0
- * June 10, 2009
+ * Auto Complete v2.1
+ * June 11, 2009
  * Corey Hart @ http://www.codenothing.com
  *
  * Auto Complete takes input from the user and runs a check through PHP to find what the user
@@ -23,7 +23,7 @@ $standard = array(
 );
 
 // Ensure there is a value to search for
-if (!$value || $value == '') exit;
+if (!isset($value) || $value == '') exit;
 
 // Set up the send back array
 $found = array();

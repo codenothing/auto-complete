@@ -1,6 +1,6 @@
 <html>
 <head>
-	<title>Auto Complete v2.0</title>
+	<title>Auto Complete v2.1</title>
 	<script type='text/javascript' src='jquery-1.3.1.min.js'></script>
 	<script type='text/javascript' src='jquery.auto-complete.pack.js'></script>
 	<link rel='stylesheet' type='text/css' href='styles.css' />
@@ -8,8 +8,8 @@
 <body>
 
 <!--
-Auto Complete v2.0
-June 10, 2009
+Auto Complete v2.1
+June 11, 2009
 Corey Hart @ http://www.codenothing.com
 -->
 

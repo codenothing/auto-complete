@@ -1,13 +1,12 @@
 /**
- * Auto Complete v2.0
- * June 10, 2009
+ * Auto Complete v2.1
+ * June 11, 2009
  * Corey Hart @ http://www.codenothing.com
  *
  * Auto Complete takes input from the user and runs a check through PHP to find what the user
  * is looking for. This test case runs a limited search on words that begin with the letter 'a'.
  *
- * @selclass: Optional class for arrow up/down's, defaults to 'non-404'
- * @ajaxscript: Script name for ajax request, defaults to ajax.php
+ * @css: Optional class for list rollovers, defaults to 'non-404'
  */ 
 ;(function($){
 	$.fn.autoComplete = function(css){
@@ -25,7 +24,7 @@
 			// Run on keyup
 			$input.keyup(function(e){
 				var key = e.keyCode;
-				if ((key > 48 && key < 90) || key == 8){
+				if ((key > 47 && key < 91) || key == 8){
 					settings.opt = -1;
 					settings.inputval = $input.val();
 					sendRequest(settings.inputval);
@@ -49,6 +48,9 @@
 						if (val) $input.val(val);
 					}
 				}
+			}).blur(function(){
+				settings.opt = -1;
+				$('ul', $obj).html('');
 			});
 	
 			// Ajax Request
@@ -82,11 +84,6 @@
 				// Return orignal val when not hovering
 				$('ul', $obj).mouseout(function(){
 					$input.val(settings.inputval);
-				});
-	
-				// Clear the list when user clicks outside the form
-				$(document).click(function(){
-					$('ul', $obj).html('');
 				});
 			}
 		});
