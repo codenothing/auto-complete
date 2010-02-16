@@ -1,0 +1,35 @@
+/**
+ * Auto Complete
+ * June 5, 2009
+ * Corey Hart @ http://www.codenothing.com
+ *
+ * Auto Complete takes input from the user and runs a check through PHP to find what the user
+ * is looking for. This test case runs a limited search on words that begin with the letter 'a'.
+ */ 
+#auto-complete {
+	width: 415px;
+	margin-top: 50px;
+}
+
+#auto-complete ul{
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	position: absolute;
+	z-index: 100;
+	width: 300px;
+}
+
+#auto-complete li {
+	list-style-type: none;
+	margin: 0;
+	padding: 2px;
+	border-bottom: 1px solid black;
+	border-right: 1px solid black;
+	border-left: 1px solid black;
+	cursor: pointer;
+}
+
+#auto-complete li.select {
+	background-color: #c5c5c5;
+}
