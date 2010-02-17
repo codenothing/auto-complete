@@ -162,6 +162,7 @@ var
 			onShow: undefined,
 			onSubmit: function(){return TRUE;},
 			spinner: undefined,
+			onListFormat: undefined,
 			preventEnterSubmit: TRUE,
 			delay: 0,
 			// Caching Options
@@ -871,27 +872,32 @@ var
 				// Refocus list element
 				liFocus = -1;
 
-				// Initialize Vars together (save bytes)
-				var offset = $input.offset(), // Input position
-				    container = [], // Container for list elements
-				    aci=0,k=0,i=-1,even=FALSE,length=currentList.length; // Loop Items
+				if (settings.onListFormat)
+					settings.onListFormat.call(self, event, {list: currentList, settings: settings, cache: cache, ul: $ul});
+				else {
+					// Initialize Vars together (save bytes)
+					var offset = $input.offset(), // Input position
+					    container = [], // Container for list elements
+					    aci=0,k=0,i=-1,even=FALSE,length=currentList.length; // Loop Items
 
-				// Push items onto container
-				for (; ++i < length; ){
-					if (currentList[i].value){
-						if (settings.maxItems > -1 && ++aci > settings.maxItems)
-							break;
-						container.push(
-							settings.striped && even ? '<li class="'+settings.striped+'">' : '<li>',
-							currentList[i].display||currentList[i].value,
-							'</li>'
-						);
-						even = !even;
+					// Push items onto container
+					for (; ++i < length; ){
+						if (currentList[i].value){
+							if (settings.maxItems > -1 && ++aci > settings.maxItems)
+								break;
+							container.push(
+								settings.striped && even ? '<li class="'+settings.striped+'">' : '<li>',
+								currentList[i].display||currentList[i].value,
+								'</li>'
+							);
+							even = !even;
+						}
 					}
+					$ul.html( container.join('') );
 				}
 
-				// Load items into list
-				$elems = $ul.html( container.join('') ).children('li');
+				// Cache the list items
+				$elems = $ul.children('li');
 
 				// Autofill input with first entry
 				if (settings.autoFill && ! backSpace){

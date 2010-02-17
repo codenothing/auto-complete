@@ -138,6 +138,13 @@ $('input[name=search3]').autoComplete({
 		hook1: 'Do something on hook1',
 		hook2: 1942,
 		hook3: 'Do something with hook3'
+	},
+	postFormat: function(event, ui){
+		// Add the current timestamp to each request
+		ui.data.requestTimestamp = (new Date()).getTime();
+
+		// Return the data object to be passed with the ajax function
+		return ui.data;
 	}
 });
 </pre>

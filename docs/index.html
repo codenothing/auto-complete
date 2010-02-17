@@ -81,6 +81,7 @@ Corey Hart @ http://www.codenothing.com
 	<li><a href='#onBlur'>onBlur</a></li>
 	<li><a href='#onFocus'>onFocus</a></li>
 	<li><a href='#onHide'>onHide</a></li>
+	<li><a href='#onListFormat'>onListFormat</a></li>
 	<li><a href='#onLoad'>onLoad</a></li>
 	<li><a href='#onMaxRequest'>onMaxRequest</a></li>
 	<li><a href='#onRollover'>onRollover</a></li>
@@ -455,6 +456,21 @@ not characters.</p>
 	<li class='title'>The ui object</li>
 	<li><b>ul:</b> Cached $ul jQuery object of the drop down list.</li>
 </ul>
+
+
+
+<h3><div class='default'>undefined</div> <a name='onListFormat'>onListFormat</a> - <span class='type'>Function(event, ui)</span></h3>
+<p>Callback function to format the list elements into the ul dropdown.</p>
+<ul class='ui'>
+	<li class='title'>The ui object</li>
+	<li><b>list:</b> Current list array that should be loaded into the list</li>
+	<li><b>settings:</b> Current settings attached to the input in focus</li>
+	<li><b>cache:</b> Current cache attached to the input in focus</li>
+	<li><b>ul:</b> Cached $ul jQuery object of the drop down list.</li>
+</ul>
+<p class='notes'>
+<b>Note*:</b> You must <i>populate</i> the drop down list when defining this function.
+</p>
 
 
 

@@ -9,7 +9,7 @@ body {
 	padding: 2px;
 }
 
-body > div {
+body > div, pre {
 	font-size: 9pt;
 	width: 600px;
 }
