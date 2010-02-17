@@ -129,7 +129,6 @@ var
 			// Data Configuration
 			dataSupply: [],
 			dataFn: undefined,
-			dataName: 'ac-data',
 			// Drop List CSS
 			list: 'auto-complete-list',
 			rollover: 'auto-complete-list-rollover',
@@ -185,6 +184,8 @@ var
 			LastEvent = {},
 			// String of current input value
 			inputval = '',
+			// Holds the current list
+			currentList = [],
 			// Place holder for all list elements
 			$elems = {length:0},
 			// Place holder for the list element in focus
@@ -747,7 +748,7 @@ var
 				if ($li) $li.removeClass(settings.rollover);
 				$ul.show(event);
 				$li = $elems.eq(liFocus).addClass(settings.rollover);
-				liData = $li.data(settings.dataName);
+				liData = currentList[liFocus];
 				if (!$li.length || !liData) return FALSE;
 				autoFill( liData.value||'' );
 				if (settings.onRollover) settings.onRollover.apply(self, settings.backwardsCompatible ? 
@@ -766,7 +767,7 @@ var
 				if ($li) $li.removeClass(settings.rollover);
 				$ul.show(event);
 				$li = $elems.eq( liFocus ).addClass( settings.rollover );
-				liData = $li.data( settings.dataName );
+				liData = currentList[liFocus]
 				if (!$li.length || !liData) return FALSE;
 				autoFill( liData.value||'' );
 				// Scrolling
@@ -848,7 +849,8 @@ var
 			// List Functionality
 			function loadResults(event, list, settings, cache, backSpace){
 				// Allow another level of result handling
-				if (settings.onLoad) list = settings.onLoad.call(self, event, {list: list, settings: settings, cache: cache, ul: $ul});
+				currentList = settings.onLoad ?
+					settings.onLoad.call(self, event, {list: list, settings: settings, cache: cache, ul: $ul}) : list;
 				// Pass spinner killer as wait time is done in javascript processing
 				if (settings.spinner) settings.spinner.call(self, event, {active: FALSE, ul: $ul});
 				// Store results into the cache if allowed
@@ -863,7 +865,7 @@ var
 				}
 
 				// Ensure there is a list
-				if (!list || list.length < 1)
+				if (!currentList || currentList.length < 1)
 					return $ul.html('').hide(event);
 
 				// Refocus list element
@@ -872,16 +874,16 @@ var
 				// Initialize Vars together (save bytes)
 				var offset = $input.offset(), // Input position
 				    container = [], // Container for list elements
-				    aci=0,k=0,i=0,even=FALSE,length=list.length; // Loop Items
+				    aci=0,k=0,i=-1,even=FALSE,length=currentList.length; // Loop Items
 
 				// Push items onto container
-				for (; i < length; i++){
-					if (list[i].value){
+				for (; ++i < length; ){
+					if (currentList[i].value){
 						if (settings.maxItems > -1 && ++aci > settings.maxItems)
 							break;
 						container.push(
 							settings.striped && even ? '<li class="'+settings.striped+'">' : '<li>',
-							list[i].display||list[i].value,
+							currentList[i].display||currentList[i].value,
 							'</li>'
 						);
 						even = !even;
@@ -890,16 +892,11 @@ var
 
 				// Load items into list
 				$elems = $ul.html( container.join('') ).children('li');
-				for ( length = $elems.length; k < length; k++ ){
-					$.data( $elems[k], settings.dataName, list[k] );
-					$.data( $elems[k], 'ac-index', k );
-				}
-
 
 				// Autofill input with first entry
 				if (settings.autoFill && ! backSpace){
 					liFocus = 0;
-					liData = list[0];
+					liData = currentList[0];
 					autoFill( liData.value||'' );
 					$li = $elems.eq(0).addClass( settings.rollover );
 				}
@@ -919,8 +916,9 @@ var
 					if ($li.length < 1) return FALSE;
 					// Remove hover class from last rollover
 					$elems.filter('.'+settings.rollover).removeClass(settings.rollover);
-					liFocus = $li.addClass(settings.rollover).data('ac-index');
-					liData = $li.data( settings.dataName );
+					liFocus = $elems.index( $li[0] );
+					liData = currentList[liFocus];
+					$li.addClass(settings.rollover);
 					if (settings.onRollover) settings.onRollover.apply(self, settings.backwardsCompatible ? 
 						[liData, $li, $ul, event] : [event, {data: liData, li: $li, ul: $ul}]);
 				})
@@ -928,7 +926,6 @@ var
 				.bind('click.autoComplete', function(event){
 					// Refocus the input box and pass flag to prevent inner focus events
 					$input.trigger('focus', [$.expando + '_autoComplete']);
-					liData = $li.data(settings.dataName);
 					// Check against separator for input value
 					$input.val( inputval = separator ? 
 						inputval.substr( 0, inputval.length-inputval.split(separator).pop().length ) + liData.value + separator :

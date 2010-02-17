@@ -9,7 +9,6 @@
 -Added postFormat option
 
 
-
 # New Settings
 
 -postFormat: Ability to format the post data object/string being sent server
@@ -23,3 +22,8 @@ none.
 # New Methods
 
 none.
+
+
+# Breakages
+
+-Removed dataName setting, now based off global list cache
