@@ -9,6 +9,7 @@
  * that the browser never uses a cached version of the plugin or the
  * css file included
  */ 
+date_default_timezone_set("US/Central");
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
