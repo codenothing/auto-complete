@@ -35,7 +35,7 @@
 
 			// Initiate the autocomplete on each element (Only takes a single argument, the options object)
 			self.each(function(){
-				AutoCompleteFunction.call( this, first );
+				AutoCompleteFunction( this, first );
 			});
 	};
 
@@ -93,7 +93,7 @@ var
 		hasFocus: FALSE,
 
 		getFocus: function(){
-			return this.order[0] ? this.stack[ this.order[0] ] : undefined;
+			return AutoComplete.order[0] ? AutoComplete.stack[ AutoComplete.order[0] ] : undefined;
 		},
 
 		getPrevious: function(){
@@ -182,13 +182,13 @@ var
 	},
 
 	// Autocomplete function
-	AutoCompleteFunction = function( options ){
+	AutoCompleteFunction = function( self, options ){
 		// Start with counters as they are used within declarations
 		AutoComplete.length++;
 		AutoComplete.counter++;
 
 		// Input specific vars
-		var self = this, $input = $(self).attr( 'autocomplete', 'off' ),
+		var $input = $(self).attr( 'autocomplete', 'off' ),
 			// autoComplete enabled/disabled
 			Active = TRUE,
 			// Track every event triggered
@@ -198,7 +198,7 @@ var
 			// Holds the current list
 			currentList = [],
 			// Place holder for all list elements
-			$elems = {length:0},
+			$elems = { length: 0 },
 			// Place holder for the list element in focus
 			$li,
 			// View and heights for scrolling
@@ -235,18 +235,19 @@ var
 			// Create the drop list (Use an existing one if possible)
 			$ul = ! settings.newList && $( 'ul.' + settings.list )[0] ?
 				$( 'ul.' + settings.list ).eq(0).bgiframe().data( 'autoComplete', TRUE ) :
-				$('<ul/>').appendTo('body').addClass(settings.list).bgiframe().hide().data({ 'ac-selfmade': TRUE, 'autoComplete': TRUE }),
+				$('<ul/>').appendTo('body').addClass( settings.list ).bgiframe().hide()
+					.data({ 'ac-selfmade': TRUE, 'autoComplete': TRUE }),
 
 			// Attach document click to force blur event
-			$doc = $(document).bind( 'click.autoComplete-' + inputIndex, function( event ) {
+			$doc = $( document ).bind( 'click.autoComplete-' + inputIndex, function( event ) {
 				var $target;
 				if ( Active && ulOpen &&
 					// Double check the event timestamps to ensure there isn't a delayed reaction from a button
 					( ! LastEvent || event.timeStamp - LastEvent.timeStamp > 200 ) && 
 					// Check the target after all other checks are passed (less processing)
-					( $target = $(event.target) ).closest('ul').data('ac-input-index') !== inputIndex &&
+					( $target = $( event.target ) ).closest( 'ul' ).data( 'ac-input-index' ) !== inputIndex &&
 					// Also ensure that the input it's being clicked on either
-					$target.data('ac-input-index') !== inputIndex ) {
+					$target.data( 'ac-input-index' ) !== inputIndex ) {
 						$ul.hide( event );
 						$input.blur();
 				}
@@ -299,13 +300,13 @@ var
 					up( event );
 				} else {
 					liFocus = -1;
-					$input.val(inputval);
+					$input.val( inputval );
 					$ul.hide( event );
 				}
 			}
 			// Down Arrow
 			else if ( key === KEY.down ) {
-				if ( liFocus < $elems.length-1 ) {
+				if ( liFocus < $elems.length - 1 ) {
 					liFocus++;
 					down( event );
 				}
@@ -324,18 +325,18 @@ var
 			}
 			// Page Down
 			else if ( key === KEY.pagedown ) {
-				if ( liFocus < $elems.length-1 ) {
+				if ( liFocus < $elems.length - 1 ) {
 					liFocus += liPerView;
 
 					if ( liFocus > $elems.length - 1 ) {
-						liFocus = $elems.length-1;
+						liFocus = $elems.length - 1;
 					}
 
 					down( event );
 				}
 			}
 			// Check for non input values defined by user
-			else if ( settings.nonInput && $.inArray(key, settings.nonInput) ) {
+			else if ( settings.nonInput && $.inArray( key, settings.nonInput ) ) {
 				$ul.html('').hide( event );
 			}
 			// Everything else is considered possible input, so
@@ -362,24 +363,24 @@ var
 				 * allow for regular text searching
 				 */
 				inputval = $input.val();
-				var key = (LastEvent = event).keyCode,
-					val = separator ? inputval.split(separator).pop() : inputval;
+				var key = ( LastEvent = event ).keyCode,
+					val = separator ? inputval.split( separator ).pop() : inputval;
 
 				// Still check to make sure 'enter' wasn't pressed
 				if ( key != KEY.enter ) {
 
 					// Caching key value
 					cache.val = settings.inputControl === undefined ? val : 
-						settings.inputControl.apply(self, settings.backwardsCompatible ? 
-							[val, key, $ul, event] : [event, {val: val, key: key, ul: $ul}]);
+						settings.inputControl.apply( self, settings.backwardsCompatible ? 
+							[ val, key, $ul, event ] : [ event, { val: val, key: key, ul: $ul } ] );
 
 					// Only send request if character length passes
 					if ( cache.val.length >= settings.minChars ) {
-						sendRequest(event, settings, cache, ( key === KEY.backspace || key === KEY.space ));
+						sendRequest( event, settings, cache, ( key === KEY.backspace || key === KEY.space ) );
 					}
 					// Remove list on backspace of small string
 					else if ( key == KEY.backspace ) {
-						$ul.html('').hide(event);
+						$ul.html('').hide( event );
 					}
 				}
 			},
@@ -407,15 +408,15 @@ var
 				$ul.hide( event );
 				// Trigger blur callback last
 				if (settings.onBlur){
-					settings.onBlur.apply(self, settings.backwardsCompatible ?
-					 [inputval, $ul, event] : [event, {val: inputval, ul: $ul}]);
+					settings.onBlur.apply( self, settings.backwardsCompatible ?
+					 [ inputval, $ul, event ] : [ event, { val: inputval, ul: $ul } ] );
 				}
 			},
 
 			'focus.autoComplete': function( event, flag ){
 				if ( ! Active || 
 					// Prevent inner focus events if caused by autoComplete inner functionality
-					(AutoComplete.focus === inputIndex && flag === ExpandoFlag ) || 
+					( AutoComplete.focus === inputIndex && flag === ExpandoFlag ) || 
 					// Because IE triggers focus AND closes the drop list before form submission,
 					// prevent inner function focus functionality & pass on the select flag
 					LastEvent[ ExpandoFlag + '_enter' ] ) {
@@ -425,7 +426,7 @@ var
 				LastEvent = event;
 
 				if ( inputIndex != $ul.data( 'ac-input-index' ) ) {
-					$ul.html('').hide(event);
+					$ul.html('').hide( event );
 				}
 
 				// Overwrite undefined index pushed on by the blur event
@@ -446,10 +447,10 @@ var
 
 				// Expose/Trigger focus
 				AutoComplete.hasFocus = TRUE;
-				$input.data('ac-hasFocus', TRUE);
+				$input.data( 'ac-hasFocus', TRUE );
 				if ( settings.onFocus ) {
 					settings.onFocus.apply( self, 
-						settings.backwardsCompatible ? [ $ul, event ] : [ event, {ul: $ul} ]
+						settings.backwardsCompatible ? [ $ul, event ] : [ event, { ul: $ul } ]
 					);
 				}
 			},
@@ -505,7 +506,7 @@ var
 				}
 
 				cache = { length: 0, val: undefined, list: {} };
-				return (LastEvent = event);
+				return ( LastEvent = event );
 			},
 
 			// External button trigger for ajax requests
@@ -514,7 +515,7 @@ var
 					return TRUE;
 				}
 
-				if ( typeof postData === 'string' ){
+				if ( typeof postData === 'string' ) {
 					cacheName = postData;
 					postData = {};
 				}
@@ -540,7 +541,7 @@ var
 					return TRUE;
 				}
 
-				if ( typeof data === 'string' ){
+				if ( typeof data === 'string' ) {
 					cacheName = data;
 					data = undefined;
 				}
@@ -558,7 +559,7 @@ var
 
 				return sendRequest(
 					event,
-					$.extend( TRUE, {}, settings, { maxItems: -1, dataSupply: data, dataFn: function(){ return TRUE; } }), 
+					$.extend( TRUE, {}, settings, { maxItems: -1, dataSupply: data, dataFn: function(){ return TRUE; } } ), 
 					cache
 				);
 			},
@@ -569,7 +570,7 @@ var
 					return TRUE;
 				}
 
-				if ( typeof data === 'string' ){
+				if ( typeof data === 'string' ) {
 					cacheName = data;
 					data = undefined;
 				}
@@ -610,7 +611,7 @@ var
 					return TRUE;
 				}
 
-				var args = Slice.call(arguments), length = args.length;
+				var args = Slice.call( arguments ), length = args.length;
 				LastEvent = event;
 
 				if ( length === 3 ) {
@@ -634,14 +635,14 @@ var
 			// Add enabling event (only applicable after disable)
 			'autoComplete.enable': function( event ) {
 				$input.data( 'ac-active', Active = TRUE );
-				return (LastEvent = event);
+				return ( LastEvent = event );
 			},
 
 			// Add disable event
 			'autoComplete.disable': function( event ){
 				$input.data( 'ac-active', Active = FALSE );
 				$ul.html('').hide( event );
-				return (LastEvent = event);
+				return ( LastEvent = event );
 			},
 
 			// Add a destruction function
@@ -651,15 +652,15 @@ var
 				// Break down the input
 				$input
 					// Remove all autoComplete Specific Data
-					.removeData('autoComplete')
-					.removeData('ac-input-index')
-					.removeData('ac-initial-settings')
-					.removeData('ac-settings')
-					.removeData('ac-active')
+					.removeData( 'autoComplete' )
+					.removeData( 'ac-input-index' )
+					.removeData( 'ac-initial-settings' )
+					.removeData( 'ac-settings' )
+					.removeData( 'ac-active' )
 					// Remove all autoComplete specific events
-					.unbind('.autoComplete autoComplete')
+					.unbind( '.autoComplete autoComplete' )
 					// Unbind the form submission event
-					.closest('form').unbind( 'submit.autoComplete-' + inputIndex );
+					.closest( 'form' ).unbind( 'submit.autoComplete-' + inputIndex );
 
 
 				$doc.unbind( 'click.autoComplete-' + inputIndex );
@@ -684,7 +685,7 @@ var
 			}
 		})
 		// Prevent form submission if defined in settings
-		.closest('form').bind( 'submit.autoComplete-' + inputIndex, function( event ){
+		.closest( 'form' ).bind( 'submit.autoComplete-' + inputIndex, function( event ){
 			if ( ! Active ) {
 				return TRUE;
 			}
@@ -700,7 +701,7 @@ var
 
 		// Ajax/Cache Request
 		function sendRequest( event, settings, cache, backSpace, timeout ){
-			if (settings.spinner) {
+			if ( settings.spinner ) {
 				settings.spinner.call( self, event, { active: TRUE, ul: $ul } );
 			}
 
@@ -734,7 +735,7 @@ var
 
 			// Check Max requests first before sending request
 			if ( settings.maxRequests && ++requests >= settings.maxRequests ) {
-				$ul.html('').hide(event);
+				$ul.html('').hide( event );
 
 				if ( settings.spinner ) {
 					settings.spinner.call( self, event, { active: FALSE, ul: $ul } );
@@ -785,7 +786,7 @@ var
 			for ( ; ++i < l ; ) {
 				// Force object wrapper for entry
 				entry = settings.dataSupply[i];
-				entry = typeof entry === 'object' && entry.value ? entry : {value: entry};
+				entry = typeof entry === 'object' && entry.value ? entry : { value: entry };
 
 				// Setup arguments for dataFn in a backwards compatible way if needed
 				args = settings.backwardsCompatible ? 
@@ -811,11 +812,11 @@ var
 			// Ensure the select function only gets fired when list of open
 			if ( ulOpen ) {
 				if ( settings.onSelect ) {
-					settings.onSelect.apply(self, settings.backwardsCompatible ? 
+					settings.onSelect.apply( self, settings.backwardsCompatible ? 
 						[ liData, $li, $ul, event ] : [ event, { data: liData, li: $li, ul: $ul } ] );
 				}
 
-				autoFill( undefined );
+				autoFill();
 				inputval = $input.val();
 
 				// Because IE triggers focus AND closes the drop list before form submission
@@ -843,7 +844,7 @@ var
 				return FALSE;
 			}
 
-			autoFill( liData.value || '' );
+			autoFill( liData.value );
 			if (settings.onRollover) {
 				settings.onRollover.apply( self, settings.backwardsCompatible ? 
 					[ liData, $li, $ul, event ] : [ event, { data: liData, li: $li, ul: $ul } ] );
@@ -873,7 +874,7 @@ var
 				return FALSE;
 			}
 
-			autoFill( liData.value || '' );
+			autoFill( liData.value );
 
 			// Scrolling
 			var v = ( liFocus + 1 ) * liHeight;
@@ -882,7 +883,7 @@ var
 			}
 
 			if ( settings.onRollover ) {
-				settings.onRollover.apply(self, settings.backwardsCompatible ? 
+				settings.onRollover.apply( self, settings.backwardsCompatible ? 
 					[ liData, $li, $ul, event ] : [ event, { data: liData, li: $li, ul: $ul } ] );
 			}
 
@@ -928,11 +929,11 @@ var
 			var start, end, range;
 
 			// Set starting and ending points based on values
-			if ( val === undefined ) {
+			if ( val === undefined || val === '' ) {
 				start = end = $input.val().length;
 			} else {
 				if ( separator ) {
-					val = inputval.substr( 0, inputval.length-inputval.split( separator ).pop().length ) + val + separator;
+					val = inputval.substr( 0, inputval.length - inputval.split( separator ).pop().length ) + val + separator;
 				}
 
 				start = inputval.length;
@@ -1014,8 +1015,8 @@ var
 						}
 
 						container.push(
-							settings.striped && even ? '<li class="'+settings.striped+'">' : '<li>',
-							currentList[i].display||currentList[i].value,
+							settings.striped && even ? '<li class="' + settings.striped + '">' : '<li>',
+							currentList[i].display || currentList[i].value,
 							'</li>'
 						);
 
@@ -1032,22 +1033,19 @@ var
 			if ( settings.autoFill && ! backSpace ) {
 				liFocus = 0;
 				liData = currentList[0];
-				autoFill( liData.value || '' );
+				autoFill( liData.value );
 				$li = $elems.eq(0).addClass( settings.rollover );
 			}
 
 			// Clear off old events and attach new ones
 			$ul.unbind( '.autoComplete' )
-			// Attach input index in focus
 			.data( 'ac-input-index', inputIndex )
-			// Remove focus elements hover class
-			.delegate('li', 'mouseleave.autoComplete', function(){
+			.delegate( 'li', 'mouseleave.autoComplete', function(){
 				if ( $li ) {
 					$li.removeClass( settings.rollover );
 				}
 			})
-			// Mouseover using event delegation
-			.delegate('li', 'mouseenter.autoComplete', function( event ){
+			.delegate( 'li', 'mouseenter.autoComplete', function( event ){
 				// Remove hover class from last rollover
 				if ( $li ) {
 					$li.removeClass( settings.rollover );
@@ -1063,22 +1061,22 @@ var
 				}
 			})
 			// Click event using target from mouseover
-			.bind('click.autoComplete', function(event){
+			.bind( 'click.autoComplete', function( event ) {
 				// Refocus the input box and pass flag to prevent inner focus events
-				$input.trigger('focus', [ ExpandoFlag ]);
+				$input.trigger( 'focus', [ ExpandoFlag ] );
 
 				// Check against separator for input value
 				$input.val( inputval = separator ? 
-					inputval.substr( 0, inputval.length-inputval.split(separator).pop().length ) + liData.value + separator :
+					inputval.substr( 0, inputval.length - inputval.split(separator).pop().length ) + liData.value + separator :
 					liData.value 
 				);
 
-				$ul.hide(event);
-				autoFill(undefined);
+				$ul.hide( event );
+				autoFill();
 
 				if ( settings.onSelect ) {
-					settings.onSelect.apply(self, settings.backwardsCompatible ? 
-						[liData, $li, $ul, event] : [event, {data: liData, li: $li, ul: $ul}]);
+					settings.onSelect.apply( self, settings.backwardsCompatible ? 
+						[ liData, $li, $ul, event ] : [ event, { data: liData, li: $li, ul: $ul } ] );
 				}
 			})
 			// Reposition list
