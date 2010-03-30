@@ -1,3 +1,8 @@
+/*
+ * Auto Complete [VERSION]
+ * [DATE]
+ * Corey Hart @ http://www.codenothing.com
+ */
 (function(h,T,i){function L(){if(L.flag!==true){L.flag=true;W.bind("click.autoComplete",function(f){h(j.getFocus()).trigger("autoComplete.document-click",[f])})}}function ba(){if(L.flag===true&&j.length===0){L.flag=false;W.unbind("click.autoComplete")}}h.fn.autoComplete=function(){var f=X.call(arguments),x=this,q=f.shift(),P=typeof q==="string";if(P)q=q.replace(".","-");f=q==="button-supply"||q==="direct-supply"?h.isArray(f[0])&&h.isArray(f[0][0])?f[0]:f:f[1]===i&&h.isArray(f[0])?f[0]:f;return P?
 x[q==="option"&&f.length<2?"triggerHandler":"trigger"]("autoComplete."+q,f):q&&q[h.expando]?x.trigger(q,f):x.each(function(){ca(this,q)})};h.fn.bgiframe=h.fn.bgiframe?h.fn.bgiframe:h.fn.bgIframe?h.fn.bgIframe:function(){return this};var g=true,r=false,X=Array.prototype.slice,W=h(T.document),w=h.expando+"_autoComplete",E={backspace:8,tab:9,enter:13,space:32,pageup:33,pagedown:34,up:38,down:40},j=h.autoComplete={version:"[VERSION]",counter:0,length:0,stack:{},order:[],hasFocus:r,getFocus:function(){return j.order[0]?
 j.stack[j.order[0]]:i},getPrevious:function(){for(var f=0,x=j.order.length;++f<x;)if(j.order[f])return j.stack[j.order[f]];return i},remove:function(f){for(var x=-1,q=j.order.length;++x<q;)if(j.order[x]===f)j.order[x]=i;j.stack[f]=i;j.length--;delete j.stack[f]},getAll:function(){for(var f=-1,x=j.counter,q=[];++f<x;)j.stack[f]&&q.push(j.stack[f]);return h(q)},defaults:{backwardsCompatible:r,ajax:"ajax.php",ajaxCache:h.ajaxSettings.cache,dataSupply:[],dataFn:i,formatSupply:i,list:"auto-complete-list",
