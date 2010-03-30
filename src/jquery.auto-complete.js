@@ -819,9 +819,6 @@ var
 
 				error: function(){
 					$ul.html('').hide( event );
-				}
-
-				complete: function(){
 					if ( settings.spinner ) {
 						settings.spinner.call( self, event, { active: FALSE, settings: settings, cache: cache, ul: $ul } );
 					}
@@ -1070,6 +1067,11 @@ var
 			// Allow another level of result handling
 			currentList = settings.onLoad ?
 				settings.onLoad.call( self, event, { list: list, settings: settings, cache: cache, ul: $ul } ) : list;
+
+			// Tell spinner function to stop if set
+			if ( settings.spinner ) {
+				settings.spinner.call( self, event, { active: FALSE, settings: settings, cache: cache, ul: $ul } );
+			}
 
 			// Store results into the cache if allowed
 			if ( settings.useCache && cache.list[ cache.val ] === undefined ) {
