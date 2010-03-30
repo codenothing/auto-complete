@@ -46,6 +46,24 @@
 		return this;
 	};
 
+	// Attaches a single global click event for all autoComplete inputs to the document
+	function setup(){
+		if ( setup.flag !== true ) {
+			setup.flag = true;
+			rootjQuery.bind( 'click.autoComplete', function( event ){
+				$( AutoComplete.getFocus() ).trigger( 'autoComplete.document-click', [ event ] );
+			});
+		}
+	}
+
+	// Removes the single autoComplete document click event
+	function teardown(){
+		if ( setup.flag === true && AutoComplete.length === 0 ) {
+			setup.flag = false;
+			rootjQuery.unbind( 'click.autoComplete' );
+		}
+	}
+
 
 
 // Internals
@@ -56,6 +74,9 @@ var
 
 	// Copy of the slice prototype
 	Slice = Array.prototype.slice,
+
+	// Make a copy of the document element for caching
+	rootjQuery = $( window.document ),
 
 	// Event flag that gets passed around
 	ExpandoFlag = $.expando + '_autoComplete',
@@ -139,6 +160,7 @@ var
 			// Data Configuration
 			dataSupply: [],
 			dataFn: undefined,
+			formatSupply: undefined,
 			// Drop List CSS
 			list: 'auto-complete-list',
 			rollover: 'auto-complete-list-rollover',
@@ -236,23 +258,7 @@ var
 			$ul = ! settings.newList && $( 'ul.' + settings.list )[0] ?
 				$( 'ul.' + settings.list ).eq(0).bgiframe().data( 'autoComplete', TRUE ) :
 				$('<ul/>').appendTo('body').addClass( settings.list ).bgiframe().hide()
-					.data({ 'ac-selfmade': TRUE, 'autoComplete': TRUE }),
-
-			// Attach document click to force blur event
-			$doc = $( document ).bind( 'click.autoComplete-' + inputIndex, function( event ) {
-				var $target;
-				if ( Active && ulOpen &&
-					// Double check the event timestamps to ensure there isn't a delayed reaction from a button
-					( ! LastEvent || event.timeStamp - LastEvent.timeStamp > 200 ) && 
-					// Check the target after all other checks are passed (less processing)
-					( $target = $( event.target ) ).closest( 'ul' ).data( 'ac-input-index' ) !== inputIndex &&
-					// Also ensure that the input it's being clicked on either
-					$target.data( 'ac-input-index' ) !== inputIndex ) {
-						$ul.hide( event );
-						$input.blur();
-				}
-				LastEvent = event;
-			});
+					.data({ 'ac-selfmade': TRUE, 'autoComplete': TRUE });
 
 		/**
 		 * Input Central
@@ -372,7 +378,15 @@ var
 					// Caching key value
 					cache.val = settings.inputControl === undefined ? val : 
 						settings.inputControl.apply( self, settings.backwardsCompatible ? 
-							[ val, key, $ul, event ] : [ event, { val: val, key: key, ul: $ul } ] );
+							[ val, key, $ul, event, settings, cache ] :
+							[ event, {
+								val: val,
+								key: key,
+								settings: settings,
+								cache: cache,
+								ul: $ul
+							}]
+						);
 
 					// Only send request if character length passes
 					if ( cache.val.length >= settings.minChars ) {
@@ -409,7 +423,13 @@ var
 				// Trigger blur callback last
 				if (settings.onBlur){
 					settings.onBlur.apply( self, settings.backwardsCompatible ?
-					 [ inputval, $ul, event ] : [ event, { val: inputval, ul: $ul } ] );
+						[ inputval, $ul, event, settings, cache ] : [ event, {
+							val: inputval,
+							settings: settings,
+							cache: cache,
+							ul: $ul
+						}]
+					);
 				}
 			},
 
@@ -450,7 +470,11 @@ var
 				$input.data( 'ac-hasFocus', TRUE );
 				if ( settings.onFocus ) {
 					settings.onFocus.apply( self, 
-						settings.backwardsCompatible ? [ $ul, event ] : [ event, { ul: $ul } ]
+						settings.backwardsCompatible ? [ $ul, event, settings, cache ] : [ event, {
+							settings: settings,
+							cache: cache,
+							ul: $ul
+						}]
 					);
 				}
 			},
@@ -458,6 +482,22 @@ var
 			/**
 			 * Autocomplete Methods (Extensions off autoComplete event)
 			 */ 
+			// Catches document click events from the global scope
+			'autoComplete.document-click' : function( e, event ){
+				var $target;
+				if ( Active && ulOpen &&
+					// Double check the event timestamps to ensure there isn't a delayed reaction from a button
+					( ! LastEvent || event.timeStamp - LastEvent.timeStamp > 200 ) && 
+					// Check the target after all other checks are passed (less processing)
+					( $target = $( event.target ) ).closest( 'ul' ).data( 'ac-input-index' ) !== inputIndex &&
+					// Also ensure that the input it's being clicked on either
+					$target.data( 'ac-input-index' ) !== inputIndex ) {
+						$ul.hide( event );
+						LastEvent = event;
+						$input.blur();
+				}
+			},
+
 			// Allow for change of settings at any point
 			'autoComplete.settings': function( event, newSettings ) {
 				if ( ! Active ) {
@@ -471,7 +511,7 @@ var
 					);
 
 					// Allow for extending of settings/cache based off function return values
-					if ( $.isArray(ret) && ret[0] !== undefined ) {
+					if ( $.isArray( ret ) && ret[0] !== undefined ) {
 						settings = $.extend( TRUE, {}, settings, ret[0] || settings );
 						cache = $.extend( TRUE, {}, cache, ret[1] || cache );
 					}
@@ -484,12 +524,12 @@ var
 					! settings.newList && $( 'ul.' + settings.list )[0] ? 
 						$( 'ul.' + settings.list ).bgiframe().data( 'autoComplete', TRUE ) :
 						$('<ul/>').appendTo('body').addClass( settings.list ).bgiframe().hide()
-							.data({ 'ac-selfmade': TRUE, 'autoComplete': TRUE });
+							.data( { 'ac-selfmade': TRUE, 'autoComplete': TRUE } );
 
 				newUl();
 				settings.requestType = settings.requestType.toUpperCase();
 				separator = settings.multiple ? settings.multipleSeparator : undefined;
-				$input.data('ac-settings', settings);
+				$input.data( 'ac-settings', settings );
 
 				// Return & Store event
 				return (LastEvent = event);
@@ -663,8 +703,8 @@ var
 					.closest( 'form' ).unbind( 'submit.autoComplete-' + inputIndex );
 
 
-				$doc.unbind( 'click.autoComplete-' + inputIndex );
 				AutoComplete.remove( inputIndex );
+				teardown();
 				Active = FALSE;
 				list[ inputIndex ] = undefined;
 				LastEvent = event;
@@ -676,7 +716,7 @@ var
 					}
 				}
 
-				// Remove the element from the DOM if self created no other input is using it
+				// Remove the element from the DOM if self created
 				if ( $ul.data( 'ac-selfmade' ) === TRUE ) {
 					$ul.remove();
 				}
@@ -690,19 +730,17 @@ var
 				return TRUE;
 			}
 
-			// Because IE triggers focus AND closes the drop list before form submission, store the flag if any
-			var flag = LastEvent[ ExpandoFlag + '_enter' ] || FALSE;
 			LastEvent = event;
 
-			return settings.preventEnterSubmit ?
-				( ulOpen || flag ) ? FALSE : settings.onSubmit.call( self, event, { form: this, ul: $ul } ) :
-				settings.onSubmit.call( self, event, { form: this, ul: $ul } );
+			// Because IE triggers focus AND closes the drop list before form submission, tracking is set on the keydown event
+			return settings.preventEnterSubmit && ( ulOpen || LastEvent[ ExpandoFlag + '_enter' ] ) ?
+				FALSE : settings.onSubmit.call( self, event, { form: this, settings: settings, cache: cache, ul: $ul } );
 		});
 
 		// Ajax/Cache Request
 		function sendRequest( event, settings, cache, backSpace, timeout ){
 			if ( settings.spinner ) {
-				settings.spinner.call( self, event, { active: TRUE, ul: $ul } );
+				settings.spinner.call( self, event, { active: TRUE, settings: settings, cache: cache, ul: $ul } );
 			}
 
 			if ( timeid ) {
@@ -738,12 +776,19 @@ var
 				$ul.html('').hide( event );
 
 				if ( settings.spinner ) {
-					settings.spinner.call( self, event, { active: FALSE, ul: $ul } );
+					settings.spinner.call( self, event, { active: FALSE, settings: settings, cache: cache, ul: $ul } );
 				}
 
 				if ( settings.onMaxRequest && requests === settings.maxRequests ) {
 					return settings.onMaxRequest.apply( self, settings.backwardsCompatible ? 
-						[ cache.val, $ul, event, inputval ] : [ event, { search: cache.val, val: inputval, ul: $ul } ]
+						[ cache.val, $ul, event, inputval, settings, cache ] : 
+						[ event, {
+							search: cache.val,
+							val: inputval,
+							settings: settings,
+							cache: cache,
+							ul: $ul
+						}]
 					);
 				}
 				
@@ -758,7 +803,14 @@ var
 				dataType: 'json',
 
 				data: settings.postFormat ?
-					settings.postFormat.call( self, event, { data: settings.postData, search: cache.val, val: inputval, ul: $ul } ) :
+					settings.postFormat.call( self, event, {
+						data: settings.postData,
+						search: cache.val,
+						val: inputval,
+						settings: settings,
+						cache: cache,
+						ul: $ul
+					}) :
 					settings.postData,
 
 				success: function( list ) {
@@ -767,8 +819,11 @@ var
 
 				error: function(){
 					$ul.html('').hide( event );
+				}
+
+				complete: function(){
 					if ( settings.spinner ) {
-						settings.spinner.call( self, event, { active: FALSE, ul: $ul } );
+						settings.spinner.call( self, event, { active: FALSE, settings: settings, cache: cache, ul: $ul } );
 					}
 				}
 			});
@@ -783,23 +838,42 @@ var
 				regex = fn ? undefined : new RegExp('^'+cache.val, 'i'),
 				k = 0, entry, i = -1, l = settings.dataSupply.length;
 
-			for ( ; ++i < l ; ) {
-				// Force object wrapper for entry
-				entry = settings.dataSupply[i];
-				entry = typeof entry === 'object' && entry.value ? entry : { value: entry };
+			if ( settings.formatSupply ) {
+				list = settings.formatSupply.call( self, event, {
+					search: cache.val,
+					supply: settings.dataSupply,
+					settings: settings,
+					cache: cache,
+					ul: $ul
+				});
+			} else {
+				for ( ; ++i < l ; ) {
+					// Force object wrapper for entry
+					entry = settings.dataSupply[i];
+					entry = typeof entry === 'object' && entry.value ? entry : { value: entry };
 
-				// Setup arguments for dataFn in a backwards compatible way if needed
-				args = settings.backwardsCompatible ? 
-					[ cache.val, entry.value, list, i, settings.dataSupply, $ul, event ] :
-					[ event, { val: cache.val, entry: entry.value, list: list, i: i, supply: settings.dataSupply, ul: $ul } ];
+					// Setup arguments for dataFn in a backwards compatible way if needed
+					args = settings.backwardsCompatible ? 
+						[ cache.val, entry.value, list, i, settings.dataSupply, $ul, event, settings, cache ] :
+						[ event, {
+							search: cache.val,
+							entry: entry.value,
+							list: list,
+							i: i,
+							supply: settings.dataSupply,
+							settings: settings,
+							cache: cache,
+							ul: $ul
+						}];
 
-				// If user supplied function, use that, otherwise test with default regex
-				if ( ( fn && settings.dataFn.apply( self, args ) ) || ( ! fn && entry.value.match( regex ) ) ) {
-					// Reduce browser load by breaking on limit if it exists
-					if ( settings.maxItems > -1 && ++k > settings.maxItems ) {
-						break;
+					// If user supplied function, use that, otherwise test with default regex
+					if ( ( fn && settings.dataFn.apply( self, args ) ) || ( ! fn && entry.value.match( regex ) ) ) {
+						// Reduce browser load by breaking on limit if it exists
+						if ( settings.maxItems > -1 && ++k > settings.maxItems ) {
+							break;
+						}
+						list.push( entry );
 					}
-					list.push( entry );
 				}
 			}
 
@@ -813,7 +887,15 @@ var
 			if ( ulOpen ) {
 				if ( settings.onSelect ) {
 					settings.onSelect.apply( self, settings.backwardsCompatible ? 
-						[ liData, $li, $ul, event ] : [ event, { data: liData, li: $li, ul: $ul } ] );
+						[ liData, $li, $ul, event, settings, cache ] :
+						[ event, {
+							data: liData,
+							li: $li,
+							settings: settings,
+							cache: cache,
+							ul: $ul
+						}]
+					);
 				}
 
 				autoFill();
@@ -847,7 +929,15 @@ var
 			autoFill( liData.value );
 			if (settings.onRollover) {
 				settings.onRollover.apply( self, settings.backwardsCompatible ? 
-					[ liData, $li, $ul, event ] : [ event, { data: liData, li: $li, ul: $ul } ] );
+					[ liData, $li, $ul, event, settings, cache ] :
+					[ event, {
+						data: liData,
+						li: $li,
+						settings: settings,
+						cache: cache,
+						ul: $ul
+					}]
+				);
 			}
 
 			// Scrolling
@@ -884,7 +974,14 @@ var
 
 			if ( settings.onRollover ) {
 				settings.onRollover.apply( self, settings.backwardsCompatible ? 
-					[ liData, $li, $ul, event ] : [ event, { data: liData, li: $li, ul: $ul } ] );
+					[ liData, $li, $ul, event, settings, cache ] : [ event, {
+						data: liData,
+						li: $li,
+						settings: settings,
+						cache: cache,
+						ul: $ul
+					}]
+				);
 			}
 
 			return $li;
@@ -898,8 +995,7 @@ var
 			if ( ! $ul[ ExpandoFlag ] ) {
 				$ul.hide = function( event, speed, callback ) {
 					if ( settings.onHide && ulOpen ) {
-						settings.onHide.call( self, event, { ul: $ul } );
-						LastEvent[ ExpandoFlag + '_hide' ] = TRUE;
+						settings.onHide.call( self, event, { ul: $ul, settings: settings, cache: cache } );
 					}
 
 					ulOpen = FALSE;
@@ -908,8 +1004,9 @@ var
 
 				$ul.show = function( event, speed, callback ) {
 					if ( settings.onShow && ! ulOpen ) {
-						settings.onShow.call( self, event, { ul: $ul } );
+						settings.onShow.call( self, event, { ul: $ul, settings: settings, cache: cache } );
 					}
+
 					ulOpen = TRUE;
 					return show.call( $ul, speed, callback );
 				};
@@ -973,11 +1070,6 @@ var
 			// Allow another level of result handling
 			currentList = settings.onLoad ?
 				settings.onLoad.call( self, event, { list: list, settings: settings, cache: cache, ul: $ul } ) : list;
-
-			// Pass spinner killer as wait time is done in javascript processing
-			if ( settings.spinner ) {
-				settings.spinner.call( self, event, { active: FALSE, ul: $ul } );
-			}
 
 			// Store results into the cache if allowed
 			if ( settings.useCache && cache.list[ cache.val ] === undefined ) {
@@ -1057,7 +1149,15 @@ var
 
 				if ( settings.onRollover ) {
 					settings.onRollover.apply( self, settings.backwardsCompatible ? 
-						[ liData, $li, $ul, event ] : [ event, { data: liData, li: $li, ul: $ul } ] );
+						[ liData, $li, $ul, event, settings, cache ] : 
+						[ event, {
+							data: liData,
+							li: $li,
+							settings: settings,
+							cache: cache,
+							ul: $ul
+						}]
+					);
 				}
 			})
 			// Click event using target from mouseover
@@ -1066,7 +1166,7 @@ var
 				$input.trigger( 'focus', [ ExpandoFlag ] );
 
 				// Check against separator for input value
-				$input.val( inputval = separator ? 
+				$input.val( inputval === separator ? 
 					inputval.substr( 0, inputval.length - inputval.split(separator).pop().length ) + liData.value + separator :
 					liData.value 
 				);
@@ -1076,7 +1176,15 @@ var
 
 				if ( settings.onSelect ) {
 					settings.onSelect.apply( self, settings.backwardsCompatible ? 
-						[ liData, $li, $ul, event ] : [ event, { data: liData, li: $li, ul: $ul } ] );
+						[ liData, $li, $ul, event, settings, cache ] :
+						[ event, {
+							data: liData,
+							li: $li,
+							settings: settings,
+							cache: cache,
+							ul: $ul
+						}]
+					);
 				}
 			})
 			// Reposition list
@@ -1120,6 +1228,7 @@ var
 		settings.requestType = settings.requestType.toUpperCase();
 		separator = settings.multiple ? settings.multipleSeparator : undefined;
 		AutoComplete.stack[ inputIndex ] = self;
+		setup();
 	};
 
 })( jQuery, window || this );

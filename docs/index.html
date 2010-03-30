@@ -57,6 +57,7 @@ Corey Hart @ http://www.codenothing.com
 	<li><a href='#dataFn'>dataFn</a></li>
 	<li><a href='#dataSupply'>dataSupply</a></li>
 	<li><a href='#delay'>delay</a></li>
+	<li><a href='#formatSupply'>formatSupply</a></li>
 	<li><a href='#inputControl'>inputControl</a></li>
 	<li><a href='#list'>list</a></li>
 	<li><a href='#maxItems'>maxItems</a></li>
@@ -250,7 +251,7 @@ From 5.0 and on, autoComplete will be using this style so new feature's can easi
 <h3><div class='default'>'ajax.php'</div> <a name='ajax'>ajax</a> - <span class='type'>String</span></h3>
 <p>URL of the server side script.<br><br>
 <p class='notes'>
-<b>Note*:</b> When dataSupply has a length greater than 0, no ajax request is sent.</p>
+	<b>Note*:</b> When dataSupply has a length greater than 0, no ajax request is sent.</p>
 </p>
 
 
@@ -279,12 +280,14 @@ From 5.0 and on, autoComplete will be using this style so new feature's can easi
 	<li><b>list:</b> Holds the current values that have passed this functions pattern match.</li>
 	<li><b>i:</b> Current index of the array being searched.</li>
 	<li><b>supply:</b> The complete array currently being searched.</li>
+	<li><b>settings:</b> Current settings attached to the input in focus</li>
+	<li><b>cache:</b> Current cache attached to the input in focus</li>
 	<li><b>ul:</b> Cached $ul jQuery object of the drop down list.</li>
 </ul><br>
 <p class='notes'>
-<b>Note*:</b> with the <a href='#backwardsCompatible'>backwardsCompatible</a> flag enabled, the params are:<br>
-	Function(search, entry, list, i, supply, ul, event).
-	</p>
+	<b>Note*:</b> with the <a href='#backwardsCompatible'>backwardsCompatible</a> flag enabled, the params are:<br>
+	Function(search, entry, list, i, supply, ul, event, settings, cache).
+</p>
 
 
 <h3><div class='default'>[]</div> <a name='dataSupply'>dataSupply</a> - <span class='type'>Array</span></h3>
@@ -297,19 +300,38 @@ From 5.0 and on, autoComplete will be using this style so new feature's can easi
 
 
 
+<h3><div class='default'>undefined</div> <a name='formatSupply'>formatSupply</a> - <span class='type'>Function(event, ui)</span></h3>
+<p>Gives full access to formatting a supplied set of data into a list to be displayed.</p>
+<ul class='ui'>
+	<li class='title'>The ui object</li>
+	<li><b>search:</b> Current value to be searching with.</li>
+	<li><b>supply:</b> The complete array currently being searched.</li>
+	<li><b>settings:</b> Current settings attached to the input in focus</li>
+	<li><b>cache:</b> Current cache attached to the input in focus</li>
+	<li><b>ul:</b> Cached $ul jQuery object of the drop down list.</li>
+</ul><br>
+<p class='notes'>
+	<b>Note*:</b> An array of objects must be returned (Same array of objects format sent back from an ajax request).
+</p>
+
+
+
 <h3><div class='default'>undefined</div> <a name='inputControl'>inputControl</a> - <span class='type'>Function(event, ui)</span></h3>
 <p>inputControl provides access to changing the name for cache storage. When doing pattern matching, or sending requests, the string returned by this function is used.</p>
 <ul class='ui'>
 	<li class='title'>The ui object</li>
 	<li><b>val:</b> Current inputval going to be used in search.</li>
 	<li><b>key:</b> The keyCode logged on the keyup event</li>
+	<li><b>settings:</b> Current settings attached to the input in focus</li>
+	<li><b>cache:</b> Current cache attached to the input in focus</li>
 	<li><b>ul:</b> Cached $ul jQuery object of the drop down list.</li>
 </ul>
 
 
 <p class='notes'>
-<b>Note*:</b> This function must return a string, which is either the 'val' key of the ui object or a modification of it.<br>
-<b>Note2*:</b> with the <a href='#backwardsCompatible'>backwardsCompatible</a> flag enabled, the params are:<br>Function(val, key, ul, event).
+	<b>Note*:</b> This function must return a string, which is either the 'val' key of the ui object or a modification of it.<br>
+	<b>Note2*:</b> with the <a href='#backwardsCompatible'>backwardsCompatible</a> flag enabled, the params are:<br>
+	Function(val, key, ul, event, settings, cache).
 </p>
 
 
@@ -372,7 +394,9 @@ not characters.</p>
 	<li class='title'>The ui object</li>
 	<li><b>data:</b> The data object that would be sent with the ajax function.</li>
 	<li><b>search:</b> The input value being searched</li>
-	<li><b>val:</b> The full string value of the input</li>
+	<li><b>val:</b> The current full string value of the input (only differs when <a href='#multiple'>multiple</a> is true)</li>
+	<li><b>settings:</b> Current settings attached to the input in focus</li>
+	<li><b>cache:</b> Current cache attached to the input in focus</li>
 	<li><b>ul:</b> Cached $ul jQuery object of the drop down list.</li>
 </ul>
 <p class='notes'>
@@ -429,11 +453,14 @@ not characters.</p>
 <p>Callback function when the user loses focus on the input field.</p>
 <ul class='ui'>
 	<li class='title'>The ui object</li>
-	<li><b>val:</b> Last value you stored from the input.</li>
+	<li><b>val:</b> The current full string value of the input (only differs when <a href='#multiple'>multiple</a> is true)</li>
+	<li><b>settings:</b> Current settings attached to the input in focus</li>
+	<li><b>cache:</b> Current cache attached to the input in focus</li>
 	<li><b>ul:</b> Cached $ul jQuery object of the drop down list.</li>
 </ul>
 <p class='notes'>
-<b>Note*:</b> with the <a href='#backwardsCompatible'>backwardsCompatible</a> flag enabled, the params are:<br>Function(val, ul, event).
+	<b>Note*:</b> with the <a href='#backwardsCompatible'>backwardsCompatible</a> flag enabled, the params are:<br>
+	Function(val, ul, event, settings, cache).
 </p>
 
 
@@ -442,10 +469,13 @@ not characters.</p>
 <p>Callback function when the user focuses on the input field.</p>
 <ul class='ui'>
 	<li class='title'>The ui object</li>
+	<li><b>settings:</b> Current settings attached to the input in focus</li>
+	<li><b>cache:</b> Current cache attached to the input in focus</li>
 	<li><b>ul:</b> Cached $ul jQuery object of the drop down list.</li>
 </ul>
 <p class='notes'>
-<b>Note*:</b> with the <a href='#backwardsCompatible'>backwardsCompatible</a> flag enabled, the params are:<br>Function(ul).
+	<b>Note*:</b> with the <a href='#backwardsCompatible'>backwardsCompatible</a> flag enabled, the params are:<br>
+	Function(ul, event, settings, cache).
 </p>
 
 
@@ -454,6 +484,8 @@ not characters.</p>
 <p>Callback function whenever the drop down list is closed.</p>
 <ul class='ui'>
 	<li class='title'>The ui object</li>
+	<li><b>settings:</b> Current settings attached to the input in focus</li>
+	<li><b>cache:</b> Current cache attached to the input in focus</li>
 	<li><b>ul:</b> Cached $ul jQuery object of the drop down list.</li>
 </ul>
 
@@ -469,7 +501,7 @@ not characters.</p>
 	<li><b>ul:</b> Cached $ul jQuery object of the drop down list.</li>
 </ul>
 <p class='notes'>
-<b>Note*:</b> You must <i>populate</i> the drop down list when defining this function.
+	<b>Note*:</b> You must <i>populate</i> the drop down list when defining this function.
 </p>
 
 
@@ -484,7 +516,7 @@ not characters.</p>
 	<li><b>ul:</b> Cached $ul jQuery object of the drop down list.</li>
 </ul>
 <p class='notes'>
-<b>Note*:</b> You must return the list array, with or without modifications made. 
+	<b>Note*:</b> You must return the list array, with or without modifications made. 
 </p>
 
 
@@ -494,10 +526,14 @@ not characters.</p>
 <ul class='ui'>
 	<li class='title'>The ui object</li>
 	<li><b>search:</b> Value of the string that was going to be used in the search.</li>
+	<li><b>val:</b> The current full value of the input (only differs when <a href='#multiple'>multiple</a> is true)</li>
+	<li><b>settings:</b> Current settings attached to the input in focus</li>
+	<li><b>cache:</b> Current cache attached to the input in focus</li>
 	<li><b>ul:</b> Cached $ul jQuery object of the drop down list.</li>
 </ul>
 <p class='notes'>
-<b>Note*:</b> with the <a href='#backwardsCompatible'>backwardsCompatible</a> flag enabled, the params are:<br>Function(search, ul, event, inputval).
+	<b>Note*:</b> with the <a href='#backwardsCompatible'>backwardsCompatible</a> flag enabled, the params are:<br>
+	Function(search, ul, event, val, settings, cache).
 </p>
 
 
@@ -508,10 +544,13 @@ not characters.</p>
 	<li class='title'>The ui object</li>
 	<li><b>data:</b> Data attached to that entry</li>
 	<li><b>li:</b> Cached $li jQuery object of the entry within the drop down list</li>
+	<li><b>settings:</b> Current settings attached to the input in focus</li>
+	<li><b>cache:</b> Current cache attached to the input in focus</li>
 	<li><b>ul:</b> Cached $ul jQuery object of the drop down list.</li>
 </ul>
 <p class='notes'>
-<b>Note*:</b> with the <a href='#backwardsCompatible'>backwardsCompatible</a> flag enabled, the params are:<br>Function(data, li, ul, event).
+	<b>Note*:</b> with the <a href='#backwardsCompatible'>backwardsCompatible</a> flag enabled, the params are:<br>
+	Function(data, li, ul, event, settings, cache).
 </p>
 
 
@@ -522,11 +561,14 @@ not characters.</p>
 	<li class='title'>The ui object</li>
 	<li><b>data:</b> Data attached to that entry</li>
 	<li><b>li:</b> Cached $li jQuery object of the entry within the drop down list</li>
+	<li><b>settings:</b> Current settings attached to the input in focus</li>
+	<li><b>cache:</b> Current cache attached to the input in focus</li>
 	<li><b>ul:</b> Cached $ul jQuery object of the drop down list.</li>
 </ul>
 <br><br>
 <p class='notes'>
-<b>Note*:</b> with the <a href='#backwardsCompatible'>backwardsCompatible</a> flag enabled, the params are:<br>Function(data, li, ul, event).
+	<b>Note*:</b> with the <a href='#backwardsCompatible'>backwardsCompatible</a> flag enabled, the params are:<br>
+	Function(data, li, ul, event, settings, cache).
 </p>
 
 
@@ -535,6 +577,8 @@ not characters.</p>
 <p>Callback function when the drop down list is opened.</p>
 <ul class='ui'>
 	<li class='title'>The ui object</li>
+	<li><b>settings:</b> Current settings attached to the input in focus</li>
+	<li><b>cache:</b> Current cache attached to the input in focus</li>
 	<li><b>ul:</b> Cached $ul jQuery object of the drop down list.</li>
 </ul>
 
@@ -545,6 +589,8 @@ not characters.</p>
 <ul class='ui'>
 	<li class='title'>The ui object</li>
 	<li><b>form:</b> Contains the parent form element of the input in focus.</li>
+	<li><b>settings:</b> Current settings attached to the input in focus</li>
+	<li><b>cache:</b> Current cache attached to the input in focus</li>
 	<li><b>ul:</b> Cached $ul jQuery object of the drop down list.</li>
 </ul>
 
@@ -555,6 +601,8 @@ not characters.</p>
 <ul class='ui'>
 	<li class='title'>The ui object</li>
 	<li><b>active:</b> Current state of activity. True when spinner needs to be activated, false when spinner needs to be deactivated.</li>
+	<li><b>settings:</b> Current settings attached to the input in focus</li>
+	<li><b>cache:</b> Current cache attached to the input in focus</li>
 	<li><b>ul:</b> Cached $ul jQuery object of the drop down list.</li>
 </ul>
 
@@ -649,8 +697,8 @@ The option method provides a way to get/set single settings.<br><br>
 -Passing no name or value parameter's will return the entire settings object.<br><br>
 </p>
 <p class='notes'>
-<b>Note*:</b> Not passing the value parameter breaks the chain, as it utilizes jQuery's
-<a href='http://docs.jquery.com/Events/triggerHandler'>triggerHandler</a> option to return the value return from the event function.
+	<b>Note*:</b> Not passing the value parameter breaks the chain, as it utilizes jQuery's
+	<a href='http://docs.jquery.com/Events/triggerHandler'>triggerHandler</a> option to return the value return from the event function.
 </p>
 
 
@@ -672,8 +720,8 @@ and use the settings method to attach special parameters to each input's autoCom
 </p>
 
 <p class='notes'>
-<b>Extra Functionality*:</b> If a function is passed as the newSettings var, the inputs current settings and cache
-are passed to the function as parameters. Just return the array [newSettings, cache]. Here's the format:
+	<b>Extra Functionality*:</b> If a function is passed as the newSettings var, the inputs current settings and cache
+	are passed to the function as parameters. Just return the array [newSettings, cache]. Here's the format:
 </p>
 
 <pre>
