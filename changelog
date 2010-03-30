@@ -7,12 +7,15 @@
 # New Features
 
 -Added postFormat option
+-Added formatSupply
+-All callbacks have the settings and cache object passed into them
 
 
 # New Settings
 
 -postFormat: Ability to format the post data object/string being sent server
 side
+-formatSupply: Ability to format the supplied list, which overwrites the slower internal function.
 
 
 # New Callbacks
