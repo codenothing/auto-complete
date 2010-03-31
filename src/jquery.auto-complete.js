@@ -79,7 +79,7 @@ var
 	rootjQuery = $( window.document ),
 
 	// Event flag that gets passed around
-	ExpandoFlag = $.expando + '_autoComplete',
+	ExpandoFlag = 'autoComplete_' + $.expando,
 
 	// Key Codes
 	KEY = {
@@ -353,14 +353,14 @@ var
 
 			// Prevent autoComplete keyup event's from triggering by
 			// attaching a flag to the last event
-			LastEvent[ ExpandoFlag + '_keydown' ] = TRUE;
+			LastEvent[ 'keydown_' + ExpandoFlag ] = TRUE;
 			return enter;
 		})
 		.bind({
 			'keyup.autoComplete': function(event){
 				// If autoComplete has been disabled or keyup prevention 
 				// flag has be set, prevent input events
-				if ( ! Active || LastEvent[ ExpandoFlag + '_keydown' ] ) {
+				if ( ! Active || LastEvent[ 'keydown_' + ExpandoFlag ] ) {
 					return TRUE;
 				}
 
@@ -421,7 +421,7 @@ var
 				AutoComplete.hasFocus = FALSE;
 				$ul.hide( event );
 				// Trigger blur callback last
-				if (settings.onBlur){
+				if ( settings.onBlur ) {
 					settings.onBlur.apply( self, settings.backwardsCompatible ?
 						[ inputval, $ul, event, settings, cache ] : [ event, {
 							val: inputval,
@@ -439,7 +439,7 @@ var
 					( AutoComplete.focus === inputIndex && flag === ExpandoFlag ) || 
 					// Because IE triggers focus AND closes the drop list before form submission,
 					// prevent inner function focus functionality & pass on the select flag
-					LastEvent[ ExpandoFlag + '_enter' ] ) {
+					LastEvent[ 'enter_' + ExpandoFlag ] ) {
 						return TRUE;
 				}
 
@@ -566,7 +566,7 @@ var
 				$input.trigger( 'focus', [ ExpandoFlag ] );
 
 				// If no cache name is given, supply a non-common word
-				cache.val = cacheName || ExpandoFlag + '_button-ajax';
+				cache.val = cacheName || 'button-ajax_' + ExpandoFlag;
 
 				return sendRequest(
 					event, 
@@ -592,14 +592,14 @@ var
 				$input.trigger( 'focus', [ ExpandoFlag ] );
 
 				// If no cache name is given, supply a non-common word
-				cache.val = cacheName || ExpandoFlag + '_button-supply';
+				cache.val = cacheName || 'button-supply_' + ExpandoFlag;
 
 				// If no data is supplied, use data in settings
 				data = $.isArray( data ) && data.length ? data : settings.dataSupply;
 
 				return sendRequest(
 					event,
-					$.extend( TRUE, {}, settings, { maxItems: -1, dataSupply: data, dataFn: function(){ return TRUE; } } ), 
+					$.extend( TRUE, {}, settings, { maxItems: -1, dataSupply: data, dataFn: function(){ return TRUE; } } ),
 					cache
 				);
 			},
@@ -621,7 +621,7 @@ var
 				$input.trigger( 'focus', [ ExpandoFlag ] );
 
 				// If no cache name is given, supply a non-common word
-				cache.val = cacheName || ExpandoFlag + '_direct-supply';
+				cache.val = cacheName || 'direct-supply_' + ExpandoFlag;
 
 				// If no data is supplied, use data in settings
 				data = $.isArray( data ) && data.length ? data : settings.dataSupply;
@@ -733,7 +733,7 @@ var
 			LastEvent = event;
 
 			// Because IE triggers focus AND closes the drop list before form submission, tracking is set on the keydown event
-			return settings.preventEnterSubmit && ( ulOpen || LastEvent[ ExpandoFlag + '_enter' ] ) ?
+			return settings.preventEnterSubmit && ( ulOpen || LastEvent[ 'enter_' + ExpandoFlag ] ) ?
 				FALSE : settings.onSubmit.call( self, event, { form: this, settings: settings, cache: cache, ul: $ul } );
 		});
 
@@ -901,7 +901,7 @@ var
 				// Because IE triggers focus AND closes the drop list before form submission
 				// attach a flag on 'enter' selection
 				if ( LastEvent.type === 'keydown' ) {
-					LastEvent[ ExpandoFlag + '_enter' ] = TRUE;
+					LastEvent[ 'enter_' + ExpandoFlag ] = TRUE;
 				}
 			}
 
@@ -1140,11 +1140,6 @@ var
 				}
 			})
 			.delegate( 'li', 'mouseenter.autoComplete', function( event ){
-				// Remove hover class from last rollover
-				if ( $li ) {
-					$li.removeClass( settings.rollover );
-				}
-
 				$li = $(this).addClass( settings.rollover );
 				liFocus = $elems.index( $li[0] );
 				liData = currentList[ liFocus ];
