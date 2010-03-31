@@ -47,21 +47,60 @@
 	};
 
 	// Attaches a single global click event for all autoComplete inputs to the document
-	function setup(){
-		if ( setup.flag !== true ) {
-			setup.flag = true;
+	function setup( $input, inputIndex ){
+		if ( setup.flag !== TRUE ) {
+			setup.flag = TRUE;
 			rootjQuery.bind( 'click.autoComplete', function( event ){
 				$( AutoComplete.getFocus() ).trigger( 'autoComplete.document-click', [ event ] );
+			});
+		}
+
+		var $form = $input.closest( 'form' ), formList = $form.data( 'ac-inputs' ) || [], $el;
+
+		formList[ inputIndex ] = TRUE;
+		$form.data( 'ac-inputs', formList );
+
+		if ( $form.data( 'autoComplete' ) !== TRUE ) {
+			$form.bind( 'submit.autoComplete', function( event ){
+				return ( $el = $( AutoComplete.getFocus() ) ).length ?
+					$el.triggerHandler( 'autoComplete.form-submit', [ event ] ) :
+					TRUE;
 			});
 		}
 	}
 
 	// Removes the single autoComplete document click event
-	function teardown(){
-		if ( setup.flag === true && AutoComplete.length === 0 ) {
-			setup.flag = false;
+	function teardown( $input, inputIndex ){
+		if ( setup.flag === TRUE && AutoComplete.length === 0 ) {
+			setup.flag = FALSE;
 			rootjQuery.unbind( 'click.autoComplete' );
 		}
+
+		var $form = $input.closest( 'form' ), formList = $form.data( 'ac-inputs' ), i = -1, l = ( formList || [] ).length;
+
+		formList[ inputIndex ] = FALSE;
+		for ( ; ++i < l ; ) {
+			if ( formList[ i ] === TRUE ) {
+				return;
+			}
+		}
+
+		$form.unbind( 'submit.autoComplete' );
+	}
+
+	// Default function for adding all supply items to the list
+	function allSupply( event, ui ){
+		if ( ! $.isArray( ui.supply ) ) {
+			return [];
+		}
+
+		for ( var i = -1, l = ui.supply.length, ret = [], entry ; ++i < l ; ) {
+			entry = ui.supply[ i ];
+			entry = entry && entry.value ? entry : { value: entry };
+			ret.push( entry );
+		}
+
+		return ret;
 	}
 
 
@@ -445,7 +484,7 @@ var
 
 				LastEvent = event;
 
-				if ( inputIndex != $ul.data( 'ac-input-index' ) ) {
+				if ( inputIndex !== $ul.data( 'ac-input-index' ) ) {
 					$ul.html('').hide( event );
 				}
 
@@ -483,19 +522,29 @@ var
 			 * Autocomplete Methods (Extensions off autoComplete event)
 			 */ 
 			// Catches document click events from the global scope
-			'autoComplete.document-click' : function( e, event ){
-				var $target;
+			'autoComplete.document-click': function( e, event ){
 				if ( Active && ulOpen &&
 					// Double check the event timestamps to ensure there isn't a delayed reaction from a button
 					( ! LastEvent || event.timeStamp - LastEvent.timeStamp > 200 ) && 
 					// Check the target after all other checks are passed (less processing)
-					( $target = $( event.target ) ).closest( 'ul' ).data( 'ac-input-index' ) !== inputIndex &&
-					// Also ensure that the input it's being clicked on either
-					$target.data( 'ac-input-index' ) !== inputIndex ) {
+					$( event.target ).closest( 'ul' ).data( 'ac-input-index' ) !== inputIndex ) {
 						$ul.hide( event );
 						LastEvent = event;
 						$input.blur();
 				}
+			},
+
+			// Catches form submission ( so only one event is attached to the form )
+			'autoComplete.form-submit': function( e, event ) {
+				if ( ! Active ) {
+					return TRUE;
+				}
+
+				LastEvent = event;
+
+				// Because IE triggers focus AND closes the drop list before form submission, tracking enter is set on the keydown event
+				return settings.preventEnterSubmit && ( ulOpen || LastEvent[ 'enter_' + ExpandoFlag ] ) ?
+					FALSE : settings.onSubmit.call( self, event, { form: this, settings: settings, cache: cache, ul: $ul } );
 			},
 
 			// Allow for change of settings at any point
@@ -504,9 +553,11 @@ var
 					return TRUE;
 				}
 
+				var ret, $el;
+
 				// Give access to current settings and cache
 				if ( $.isFunction( newSettings ) ) {
-					var ret = newSettings.apply(self, settings.backwardsCompatible ? 
+					ret = newSettings.apply(self, settings.backwardsCompatible ? 
 						[ settings, cache, $ul, event ] : [ event, { settings: settings, cache: cache, ul: $ul } ]
 					);
 
@@ -521,8 +572,8 @@ var
 
 				// Change the drop down if dev want's a differen't class attached
 				$ul = ! settings.newList && $ul.hasClass( settings.list ) ? $ul : 
-					! settings.newList && $( 'ul.' + settings.list )[0] ? 
-						$( 'ul.' + settings.list ).bgiframe().data( 'autoComplete', TRUE ) :
+					! settings.newList && ( $el = $( 'ul.' + settings.list ).eq(0) ).length ? 
+						$el.bgiframe().data( 'autoComplete', TRUE ) :
 						$('<ul/>').appendTo('body').addClass( settings.list ).bgiframe().hide()
 							.data( { 'ac-selfmade': TRUE, 'autoComplete': TRUE } );
 
@@ -599,7 +650,7 @@ var
 
 				return sendRequest(
 					event,
-					$.extend( TRUE, {}, settings, { maxItems: -1, dataSupply: data, dataFn: function(){ return TRUE; } } ),
+					$.extend( TRUE, {}, settings, { maxItems: -1, dataSupply: data, formatSuppy: allSupply } ),
 					cache
 				);
 			},
@@ -630,7 +681,7 @@ var
 				return loadResults(
 					event,
 					data,
-					$.extend( TRUE, {}, settings, { maxItems: -1, dataSupply: data, dataFn: function(){ return TRUE; } }), 
+					$.extend( TRUE, {}, settings, { maxItems: -1, dataSupply: data, formatSuppy: allSupply }), 
 					cache
 				);
 			},
@@ -704,7 +755,7 @@ var
 
 
 				AutoComplete.remove( inputIndex );
-				teardown();
+				teardown( $input, inputIndex );
 				Active = FALSE;
 				list[ inputIndex ] = undefined;
 				LastEvent = event;
@@ -716,6 +767,10 @@ var
 					}
 				}
 
+				if ( $ul.data('ac-input-index') === inputIndex ) {
+					$ul.removeData('ac-input-index');
+				}
+
 				// Remove the element from the DOM if self created
 				if ( $ul.data( 'ac-selfmade' ) === TRUE ) {
 					$ul.remove();
@@ -723,18 +778,6 @@ var
 
 				return LastEvent;
 			}
-		})
-		// Prevent form submission if defined in settings
-		.closest( 'form' ).bind( 'submit.autoComplete-' + inputIndex, function( event ){
-			if ( ! Active ) {
-				return TRUE;
-			}
-
-			LastEvent = event;
-
-			// Because IE triggers focus AND closes the drop list before form submission, tracking is set on the keydown event
-			return settings.preventEnterSubmit && ( ulOpen || LastEvent[ 'enter_' + ExpandoFlag ] ) ?
-				FALSE : settings.onSubmit.call( self, event, { form: this, settings: settings, cache: cache, ul: $ul } );
 		});
 
 		// Ajax/Cache Request
@@ -905,8 +948,7 @@ var
 				}
 			}
 
-			$ul.hide( event );
-			return $li;
+			return $ul.hide( event );
 		}
 
 		// Key direction up
@@ -924,7 +966,7 @@ var
 			}
 
 			autoFill( liData.value );
-			if (settings.onRollover) {
+			if ( settings.onRollover ) {
 				settings.onRollover.apply( self, settings.backwardsCompatible ? 
 					[ liData, $li, $ul, event, settings, cache ] :
 					[ event, {
@@ -1131,7 +1173,10 @@ var
 				$li = $elems.eq(0).addClass( settings.rollover );
 			}
 
-			// Clear off old events and attach new ones
+			// Currently unbind removes both normal and live event handlers, although it is
+			// not documented as doing so. For future reference, if live handlers ever
+			// have to be removed specifically through die (in this case undelegate), just
+			// add .undelegate( '.autoComplete' )
 			$ul.unbind( '.autoComplete' )
 			.data( 'ac-input-index', inputIndex )
 			.delegate( 'li', 'mouseleave.autoComplete', function(){
@@ -1225,7 +1270,7 @@ var
 		settings.requestType = settings.requestType.toUpperCase();
 		separator = settings.multiple ? settings.multipleSeparator : undefined;
 		AutoComplete.stack[ inputIndex ] = self;
-		setup();
+		setup( $input, inputIndex );
 	};
 
 })( jQuery, window || this );
