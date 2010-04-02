@@ -9,12 +9,12 @@
 -Added postFormat option
 -Added formatSupply
 -All callbacks have the settings and cache object passed into them
+-There is only a single event that gets bound to both the document and the drop down list. These event's get transfered to the input's in focus.
 
 
 # New Settings
 
--postFormat: Ability to format the post data object/string being sent server
-side
+-postFormat: Ability to format the post data object/string being sent server side
 -formatSupply: Ability to format the supplied list, which overwrites the slower internal function.
 
 

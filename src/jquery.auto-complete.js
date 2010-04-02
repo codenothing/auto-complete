@@ -51,7 +51,7 @@
 		if ( setup.flag !== TRUE ) {
 			setup.flag = TRUE;
 			rootjQuery.bind( 'click.autoComplete', function( event ){
-				$( AutoComplete.getFocus() ).trigger( 'autoComplete.document-click', [ event ] );
+				AutoComplete.getFocus( TRUE ).trigger( 'autoComplete.document-click', [ event ] );
 			});
 		}
 
@@ -62,7 +62,7 @@
 
 		if ( $form.data( 'autoComplete' ) !== TRUE ) {
 			$form.bind( 'submit.autoComplete', function( event ){
-				return ( $el = $( AutoComplete.getFocus() ) ).length ?
+				return ( $el = AutoComplete.getFocus( TRUE ) ).length ?
 					$el.triggerHandler( 'autoComplete.form-submit', [ event ] ) :
 					TRUE;
 			});
@@ -146,14 +146,20 @@ var
 		// Storage of elements
 		stack: {},
 
+		// jQuery object versions of the storage elements
+		jqStack: {},
+
 		// Storage order of uid's
 		order: [],
 
 		// Global access to elements in use
 		hasFocus: FALSE,
 
-		getFocus: function(){
-			return AutoComplete.order[0] ? AutoComplete.stack[ AutoComplete.order[0] ] : undefined;
+		// Allow access to jquery cached object versions of the elements
+		getFocus: function( jqStack ){
+			return ! AutoComplete.order[0] ? undefined :
+				jqStack ? AutoComplete.jqStack[ AutoComplete.order[0] ] :
+				AutoComplete.stack[ AutoComplete.order[0] ];
 		},
 
 		getPrevious: function(){
@@ -295,9 +301,8 @@ var
 
 			// Create the drop list (Use an existing one if possible)
 			$ul = ! settings.newList && $( 'ul.' + settings.list )[0] ?
-				$( 'ul.' + settings.list ).eq(0).bgiframe().data( 'autoComplete', TRUE ) :
-				$('<ul/>').appendTo('body').addClass( settings.list ).bgiframe().hide()
-					.data({ 'ac-selfmade': TRUE, 'autoComplete': TRUE });
+				$( 'ul.' + settings.list ).eq(0).bgiframe() :
+				$('<ul/>').appendTo('body').addClass( settings.list ).bgiframe().hide().data( 'ac-selfmade', TRUE );
 
 		/**
 		 * Input Central
@@ -542,9 +547,66 @@ var
 
 				LastEvent = event;
 
-				// Because IE triggers focus AND closes the drop list before form submission, tracking enter is set on the keydown event
+				// Because IE triggers focus AND closes the drop list before form submission,
+				// tracking enter is set on the keydown event
 				return settings.preventEnterSubmit && ( ulOpen || LastEvent[ 'enter_' + ExpandoFlag ] ) ?
 					FALSE : settings.onSubmit.call( self, event, { form: this, settings: settings, cache: cache, ul: $ul } );
+			},
+
+			// Catch mouseovers on the drop down list
+			'autoComplete.ul-mouseenter': function( e, event, el ){
+				if ( $li ) {
+					$li.removeClass( settings.rollover );
+				}
+
+				$li = $(el).addClass( settings.rollover );
+				liFocus = $elems.index( $li[0] );
+				liData = currentList[ liFocus ];
+
+				if ( settings.onRollover ) {
+					settings.onRollover.apply( self, settings.backwardsCompatible ? 
+						[ liData, $li, $ul, event, settings, cache ] : 
+						[ event, {
+							data: liData,
+							li: $li,
+							settings: settings,
+							cache: cache,
+							ul: $ul
+						}]
+					);
+				}
+
+				return ( LastEvent = event );
+			},
+
+			// Catch click events on the drop down
+			'autoComplete.ul-click': function( e, event ){
+				// Refocus the input box and pass flag to prevent inner focus events
+				$input.trigger( 'focus', [ ExpandoFlag ] );
+
+				// Check against separator for input value
+				$input.val( inputval === separator ? 
+					inputval.substr( 0, inputval.length - inputval.split(separator).pop().length ) + liData.value + separator :
+					liData.value 
+				);
+
+				$ul.hide( event );
+				autoFill();
+
+				if ( settings.onSelect ) {
+					settings.onSelect.apply( self, settings.backwardsCompatible ? 
+						[ liData, $li, $ul, event, settings, cache ] :
+						[ event, {
+							data: liData,
+							li: $li,
+							settings: settings,
+							cache: cache,
+							ul: $ul
+						}]
+					);
+				}
+
+				return ( LastEvent = event );
 			},
 
 			// Allow for change of settings at any point
@@ -573,9 +635,8 @@ var
 				// Change the drop down if dev want's a differen't class attached
 				$ul = ! settings.newList && $ul.hasClass( settings.list ) ? $ul : 
 					! settings.newList && ( $el = $( 'ul.' + settings.list ).eq(0) ).length ? 
-						$el.bgiframe().data( 'autoComplete', TRUE ) :
-						$('<ul/>').appendTo('body').addClass( settings.list ).bgiframe().hide()
-							.data( { 'ac-selfmade': TRUE, 'autoComplete': TRUE } );
+						$el.bgiframe() :
+						$('<ul/>').appendTo('body').addClass( settings.list ).bgiframe().hide().data( 'ac-selfmade', TRUE );
 
 				newUl();
 				settings.requestType = settings.requestType.toUpperCase();
@@ -681,7 +742,7 @@ var
 				return loadResults(
 					event,
 					data,
-					$.extend( TRUE, {}, settings, { maxItems: -1, dataSupply: data, formatSuppy: allSupply }), 
+					$.extend( TRUE, {}, settings, { maxItems: -1, dataSupply: data, formatSuppy: allSupply } ),
 					cache
 				);
 			},
@@ -697,25 +758,25 @@ var
 			},
 
 			// Add jquery-ui like option access
-			'autoComplete.option': function( event ) {
+			'autoComplete.option': function( event, name, value ) {
 				if ( ! Active ) {
 					return TRUE;
 				}
 
-				var args = Slice.call( arguments ), length = args.length;
+				var length = Slice.call( arguments ).length;
 				LastEvent = event;
 
 				if ( length === 3 ) {
-					settings[ args[1] ] = args[2];
-					return args[2];
+					settings[ name ] = value;
+					return value;
 				}
 				else if ( length === 2 ) {
-					switch ( args[1] ) {
+					switch ( name ) {
 						case 'ul': return $ul;
 						case 'cache': return cache;
 						case 'xhr': return xhr;
 						case 'input': return $input;
-						default: return settings[ args[1] ] || undefined;
+						default: return settings[ name ] || undefined;
 					}
 				}
 				else {
@@ -749,9 +810,7 @@ var
 					.removeData( 'ac-settings' )
 					.removeData( 'ac-active' )
 					// Remove all autoComplete specific events
-					.unbind( '.autoComplete autoComplete' )
-					// Unbind the form submission event
-					.closest( 'form' ).unbind( 'submit.autoComplete-' + inputIndex );
+					.unbind( '.autoComplete autoComplete' );
 
 
 				AutoComplete.remove( inputIndex );
@@ -767,14 +826,15 @@ var
 					}
 				}
 
-				if ( $ul.data('ac-input-index') === inputIndex ) {
-					$ul.removeData('ac-input-index');
-				}
-
 				// Remove the element from the DOM if self created
 				if ( $ul.data( 'ac-selfmade' ) === TRUE ) {
 					$ul.remove();
 				}
+				// Kill all data associated with autoComplete and return a cleaned drop down list
+				else {
+					$ul.removeData( 'autoComplete' ).removeData( 'ac-input-index' ).removeData( 'ac-inputs' );
+				}
+
 
 				return LastEvent;
 			}
@@ -794,7 +854,6 @@ var
 			if ( settings.delay > 0 && timeout === undefined ) {
 				timeid = window.setTimeout(function(){
 					sendRequest( event, settings, cache, backSpace, TRUE );
-					timeid = clearTimeout( timeid );
 				}, settings.delay );
 				return timeid;
 			}
@@ -1054,6 +1113,18 @@ var
 				$ul[ ExpandoFlag ] = TRUE;
 			}
 
+			// Attach global handlers for event delegation (So there is not more loss time in unbinding and rebinding)
+			if ( $ul.data('autoComplete') !== TRUE ) {
+				$ul.data( 'autoComplete', TRUE )
+				.delegate('li', 'mouseenter.autoComplete', function( event ){
+					AutoComplete.getFocus( TRUE ).trigger( 'autoComplete.ul-mouseenter', [ event, this ] );
+				})
+				.bind( 'click.autoComplete', function( event ){
+					AutoComplete.getFocus( TRUE ).trigger( 'autoComplete.ul-click', [ event ] );
+					return FALSE;
+				});
+			}
+
 			list[ inputIndex ] = TRUE;
 			return $ul.data( 'ac-inputs', list );
 		}
@@ -1137,8 +1208,8 @@ var
 
 			// Initialize Vars together (save bytes)
 			var offset = $input.offset(), // Input position
-			    container = [], // Container for list elements
-			    aci = 0, k = 0, i = -1, even = FALSE, length = currentList.length; // Loop Items
+				container = [], // Container for list elements
+				aci = 0, k = 0, i = -1, even = FALSE, length = currentList.length; // Loop Items
 
 			if ( settings.onListFormat ) {
 				settings.onListFormat.call( self, event, { list: currentList, settings: settings, cache: cache, ul: $ul } );
@@ -1173,70 +1244,12 @@ var
 				$li = $elems.eq(0).addClass( settings.rollover );
 			}
 
-			// Currently unbind removes both normal and live event handlers, although it is
-			// not documented as doing so. For future reference, if live handlers ever
-			// have to be removed specifically through die (in this case undelegate), just
-			// add .undelegate( '.autoComplete' )
-			$ul.unbind( '.autoComplete' )
-			.data( 'ac-input-index', inputIndex )
-			.delegate( 'li', 'mouseleave.autoComplete', function(){
-				if ( $li ) {
-					$li.removeClass( settings.rollover );
-				}
-			})
-			.delegate( 'li', 'mouseenter.autoComplete', function( event ){
-				$li = $(this).addClass( settings.rollover );
-				liFocus = $elems.index( $li[0] );
-				liData = currentList[ liFocus ];
-
-				if ( settings.onRollover ) {
-					settings.onRollover.apply( self, settings.backwardsCompatible ? 
-						[ liData, $li, $ul, event, settings, cache ] : 
-						[ event, {
-							data: liData,
-							li: $li,
-							settings: settings,
-							cache: cache,
-							ul: $ul
-						}]
-					);
-				}
-			})
-			// Click event using target from mouseover
-			.bind( 'click.autoComplete', function( event ) {
-				// Refocus the input box and pass flag to prevent inner focus events
-				$input.trigger( 'focus', [ ExpandoFlag ] );
-
-				// Check against separator for input value
-				$input.val( inputval === separator ? 
-					inputval.substr( 0, inputval.length - inputval.split(separator).pop().length ) + liData.value + separator :
-					liData.value 
-				);
-
-				$ul.hide( event );
-				autoFill();
-
-				if ( settings.onSelect ) {
-					settings.onSelect.apply( self, settings.backwardsCompatible ? 
-						[ liData, $li, $ul, event, settings, cache ] :
-						[ event, {
-							data: liData,
-							li: $li,
-							settings: settings,
-							cache: cache,
-							ul: $ul
-						}]
-					);
-				}
-			})
-			// Reposition list
-			.css({
+			// Align the drop down list
+			$ul.data( 'ac-input-index', inputIndex ).scrollTop(0).css({
 				top: offset.top + $input.outerHeight(),
 				left: offset.left,
 				width: settings.width
-			})
-			// Scroll to the top
-			.scrollTop(0);
+			});
 
 			// Log li height for less computation
 			liHeight = $elems.eq(0).outerHeight();
@@ -1270,6 +1283,7 @@ var
 		settings.requestType = settings.requestType.toUpperCase();
 		separator = settings.multiple ? settings.multipleSeparator : undefined;
 		AutoComplete.stack[ inputIndex ] = self;
+		AutoComplete.jqStack[ inputIndex ] = $input;
 		setup( $input, inputIndex );
 	};
 

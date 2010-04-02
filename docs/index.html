@@ -196,6 +196,7 @@ Corey Hart @ http://www.codenothing.com
 <h3><div class='default'>Function</div> <a name='getFocus'>getFocus</a></h3>
 <p>
 	Returns the element that is currently in focus.
+	Passing true as an argument returns the jquery cached version of that element
 </p>
 
 
@@ -221,6 +222,7 @@ Corey Hart @ http://www.codenothing.com
 
 	<b>-counter:</b> Index counter. Gives a unique id to each element internally.<br>
 	<b>-stack:</b> Object containing all element's with autoComplete attached to them, referenced by their unique id.<br>
+	<b>-jqStack:</b> Object containing all cached jQuery element's with autoComplete attached to them, referenced by their unique id.<br>
 	<b>-order:</b> Array containing list order of each element focus event.<br>
 	<b>-remove:</b> Function that removes an input from the stack, takes the element's unique id as the parameter.<br>
 </p>
@@ -725,7 +727,7 @@ and use the settings method to attach special parameters to each input's autoCom
 </p>
 
 <pre>
-$('input selector').autoComplete('settings', function(settings, cache){
+$('input').autoComplete('settings', function(settings, cache){
 	// ...Check or make changes to the current settings and cache here...
 	return [settings, cache];
 });
