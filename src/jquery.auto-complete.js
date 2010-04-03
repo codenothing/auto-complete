@@ -3,54 +3,61 @@
  * [DATE]
  * Corey Hart @ http://www.codenothing.com
  */ 
-(function( $, window, undefined ){
+(function( $, window, undefined ) {
 
 	// Expose autoComplete to the jQuery chain
-	$.fn.autoComplete = function(){
+	$.fn.autoComplete = function() {
 		// Force array of arguments
 		var args = Slice.call( arguments ),
 			self = this, 
 			first = args.shift(),
-			isMethod = typeof first === 'string';
+			isMethod = typeof first === 'string',
+			handler, el;
 
 		// Deep namespacing is not supported in jQuery, a mistake I made in v4.1
 		if ( isMethod ) {
-			first = first.replace('.', '-');
+			first = first.replace( rdot, '-' );
 		}
 		
 		// Allow for passing array of arguments, or multiple arguments
 		// Eg: .autoComplete('trigger', [arg1, arg2, arg3...]) or .autoComplete('trigger', arg1, arg2, arg3...)
 		// Mainly to allow for .autoComplete('trigger', arguments) to work
 		// Note*: button.supply passes an array as the first param, so check against that first
-		args = first === 'button-supply' || first === 'direct-supply' ? $.isArray( args[0] ) && $.isArray( args[0][0] ) ? args[0] : args :
-			args[1] === undefined && $.isArray( args[0] ) ? args[0] : args;
+		args = ( AutoComplete.arrayMethods[ first ] === TRUE && $.isArray( args[0] ) && $.isArray( args[0][0] ) ) || 
+			( args.length === 1 && $.isArray( args[0] ) ) ? 
+				args[0] : args;
+
+		// Check method against handlers that need to use triggerHandler 
+		handler = isMethod && ( AutoComplete.handlerMethods[ first ] === -1 || args.length < ( AutoComplete.handlerMethods[ first ] || 0 ) ) ? 
+			'triggerHandler' : 'trigger';
 
 		return isMethod ?
-			// The only chain breaking operation is option, which gets passed back the
-			// settings/value it requested, otherwise trigger the event and don't break the chain!
-			self[ first === 'option' && args.length < 2 ? 'triggerHandler' : 'trigger' ]( 'autoComplete.' + first, args ) :
+			self[ handler ]( 'autoComplete.' + first, args ) :
 
 			// Allow passing a jquery event special object {from $.Event()}
-			first && first[ $.expando ] ? self.trigger( first, args ) :
+			first && first.preventDefault !== undefined ? self.trigger( first, args ) :
 
 			// Initiate the autocomplete on each element (Only takes a single argument, the options object)
 			self.each(function(){
-				AutoCompleteFunction( this, first );
+				if ( $( el = this ).data( 'autoComplete' ) !== TRUE ) {
+					AutoCompleteFunction( el, first );
+				}
 			});
 	};
 
 	// bgiframe is needed to fix z-index problem for IE6 users.
-	$.fn.bgiframe = $.fn.bgiframe ? $.fn.bgiframe : $.fn.bgIframe ? $.fn.bgIframe : function(){
+	$.fn.bgiframe = $.fn.bgiframe ? $.fn.bgiframe : $.fn.bgIframe ? $.fn.bgIframe : function() {
 		// For applications that don't have bgiframe plugin installed, create a useless 
 		// function that doesn't break the chain
 		return this;
 	};
 
-	// Attaches a single global click event for all autoComplete inputs to the document
-	function setup( $input, inputIndex ){
+	// Allows for single event binding to document and forms associated with the autoComplete inputs
+	// by deferring the event to the input in focus
+	function setup( $input, inputIndex ) {
 		if ( setup.flag !== TRUE ) {
 			setup.flag = TRUE;
-			rootjQuery.bind( 'click.autoComplete', function( event ){
+			rootjQuery.bind( 'click.autoComplete', function( event ) {
 				AutoComplete.getFocus( TRUE ).trigger( 'autoComplete.document-click', [ event ] );
 			});
 		}
@@ -61,7 +68,7 @@
 		$form.data( 'ac-inputs', formList );
 
 		if ( $form.data( 'autoComplete' ) !== TRUE ) {
-			$form.bind( 'submit.autoComplete', function( event ){
+			$form.data( 'autoComplete', TRUE ).bind( 'submit.autoComplete', function( event ) {
 				return ( $el = AutoComplete.getFocus( TRUE ) ).length ?
 					$el.triggerHandler( 'autoComplete.form-submit', [ event ] ) :
 					TRUE;
@@ -69,8 +76,8 @@
 		}
 	}
 
-	// Removes the single autoComplete document click event
-	function teardown( $input, inputIndex ){
+	// Removes the single events attached to the document and respective input form
+	function teardown( $input, inputIndex ) {
 		if ( setup.flag === TRUE && AutoComplete.length === 0 ) {
 			setup.flag = FALSE;
 			rootjQuery.unbind( 'click.autoComplete' );
@@ -89,12 +96,12 @@
 	}
 
 	// Default function for adding all supply items to the list
-	function allSupply( event, ui ){
+	function allSupply( event, ui ) {
 		if ( ! $.isArray( ui.supply ) ) {
 			return [];
 		}
 
-		for ( var i = -1, l = ui.supply.length, ret = [], entry ; ++i < l ; ) {
+		for ( var i = -1, l = ui.supply.length, ret = [], entry; ++i < l; ) {
 			entry = ui.supply[ i ];
 			entry = entry && entry.value ? entry : { value: entry };
 			ret.push( entry );
@@ -117,20 +124,14 @@ var
 	// Make a copy of the document element for caching
 	rootjQuery = $( window.document ),
 
+	// Also make a copy of an empty jQuery set for fast referencing
+	emptyjQuery = $(),
+
+	// regex's
+	rdot = /\./,
+
 	// Event flag that gets passed around
 	ExpandoFlag = 'autoComplete_' + $.expando,
-
-	// Key Codes
-	KEY = {
-		backspace: 8,
-		tab: 9,
-		enter: 13,
-		space: 32,
-		pageup: 33,
-		pagedown: 34,
-		up: 38,
-		down: 40
-	},
 
 	// Attach global aspects to jQuery itself
 	AutoComplete = $.autoComplete = {
@@ -155,39 +156,63 @@ var
 		// Global access to elements in use
 		hasFocus: FALSE,
 
+		// Key Codes
+		keys: {
+			backspace: 8,
+			tab: 9,
+			enter: 13,
+			space: 32,
+			pageup: 33,
+			pagedown: 34,
+			up: 38,
+			down: 40
+		},
+
+		// Methods whose first argument may contain an array
+		arrayMethods: {
+			'button-supply': TRUE,
+			'direct-supply': TRUE
+		},
+
+		// TODO: Describe this in a coherent way
+		handlerMethods: {
+			'option': 2
+		},
+
 		// Allow access to jquery cached object versions of the elements
-		getFocus: function( jqStack ){
-			return ! AutoComplete.order[0] ? undefined :
+		getFocus: function( jqStack ) {
+			return ! AutoComplete.order[0] ? jqStack ? emptyjQuery : undefined :
 				jqStack ? AutoComplete.jqStack[ AutoComplete.order[0] ] :
 				AutoComplete.stack[ AutoComplete.order[0] ];
 		},
 
-		getPrevious: function(){
+		getPrevious: function( jqStack ) {
 			// Removing elements cause some indexs on the order stack
 			// to become undefined, so loop until one is found
 			for ( var i = 0, l = AutoComplete.order.length; ++i < l; ) {
 				if ( AutoComplete.order[i] ) {
-					return AutoComplete.stack[ AutoComplete.order[i] ];
+					return jqStack ?
+						AutoComplete.jqStack[ AutoComplete.order[i] ] :
+						AutoComplete.stack[ AutoComplete.order[i] ];
 				}
 			}
 
-			return undefined;
+			return jqStack ? emptyjQuery : undefined;
 		},
 
-		remove: function( n ){
-			for ( var k = -1, l = AutoComplete.order.length; ++k < l; ) {
-				if ( AutoComplete.order[k] === n ) {
-					AutoComplete.order[k] = undefined;
+		remove: function( n ) {
+			for ( var i = -1, l = AutoComplete.order.length; ++i < l; ) {
+				if ( AutoComplete.order[i] === n ) {
+					AutoComplete.order[i] = undefined;
 				}
 			}
 
-			AutoComplete.stack[n] = undefined;
 			AutoComplete.length--;
 			delete AutoComplete.stack[n];
 		},
 
 		// Returns full stack in jQuery form
-		getAll: function(){
+		getAll: function() {
 			for ( var i = -1, l = AutoComplete.counter, stack = []; ++i < l; ) {
 				if ( AutoComplete.stack[i] ) {
 					stack.push( AutoComplete.stack[i] );
@@ -248,14 +273,17 @@ var
 		}
 	},
 
+	// Make a local copy of these keycodes for faster referencing
+	KEY = AutoComplete.keys,
+
 	// Autocomplete function
-	AutoCompleteFunction = function( self, options ){
+	AutoCompleteFunction = function( self, options ) {
 		// Start with counters as they are used within declarations
 		AutoComplete.length++;
 		AutoComplete.counter++;
 
 		// Input specific vars
-		var $input = $(self).attr( 'autocomplete', 'off' ),
+		var $input = $( self ).attr( 'autocomplete', 'off' ),
 			// autoComplete enabled/disabled
 			Active = TRUE,
 			// Track every event triggered
@@ -276,9 +304,9 @@ var
 			timeid,
 			// Ajax requests holder
 			xhr,
-			// li element in focus during key up/down, and its data
+			// li element in focus, and its data
 			liFocus = -1, liData,
-			// For multiple selections
+			// Fast referencing for multiple selections
 			separator,
 			// Index of current input
 			inputIndex = AutoComplete.counter,
@@ -315,7 +343,7 @@ var
 			'ac-settings': settings
 		})
 		// Opera uses keypress as it has problems with keydown
-		.bind( window.opera ? 'keypress.autoComplete' : 'keydown.autoComplete' , function( event ){
+		.bind( window.opera ? 'keypress.autoComplete' : 'keydown.autoComplete' , function( event ) {
 			// If autoComplete has been disabled, prevent input events
 			if ( ! Active ) {
 				return TRUE;
@@ -329,7 +357,7 @@ var
 				select( event );
 			}
 			// Enter Key
-			else if ( key === KEY.enter && $li ) {
+			else if ( key === KEY.enter ) {
 				// IE needs keydown to return false on 'enter' so the element doesn't
 				// lose focus. The problem with returning false is that it prevents bubbling,
 				// and most importantly, form submission. To allow for most flexibility,
@@ -340,8 +368,20 @@ var
 				// to affect as few implementations as possible, and the ones that need
 				// form submission on 'enter' can just set this flag to false for it to
 				// work as needed.
-				enter = settings.preventEnterSubmit && ulOpen ? FALSE : TRUE;
-				select( event );
+				//
+				// And lastly, when tracking whether to submit the form or not, we have
+				// to ensure that the user is actually selecting an element from the drop
+				// down list. It no element is selected, then hide the list and track form
+				// submission. If an element is selected, then track for submission first, 
+				// then hide the list.
+				if ( $li && $li.hasClass( settings.rollover ) ) {
+					enter = settings.preventEnterSubmit && ulOpen ? FALSE : TRUE;
+					select( event );
+				}
+				else if ( ulOpen ) { 
+					$ul.hide( event );
+					enter = settings.preventEnterSubmit && ulOpen ? FALSE : TRUE;
+				}
 			}
 			// Up Arrow
 			else if ( key === KEY.up ) {
@@ -386,7 +426,7 @@ var
 				}
 			}
 			// Check for non input values defined by user
-			else if ( settings.nonInput && $.inArray( key, settings.nonInput ) ) {
+			else if ( settings.nonInput && $.inArray( key, settings.nonInput ) > -1 ) {
 				$ul.html('').hide( event );
 			}
 			// Everything else is considered possible input, so
@@ -401,20 +441,17 @@ var
 			return enter;
 		})
 		.bind({
-			'keyup.autoComplete': function(event){
+			'keyup.autoComplete': function( event ) {
 				// If autoComplete has been disabled or keyup prevention 
 				// flag has be set, prevent input events
 				if ( ! Active || LastEvent[ 'keydown_' + ExpandoFlag ] ) {
 					return TRUE;
 				}
 
-				/**
-				 * If no special operations were run on keydown,
-				 * allow for regular text searching
-				 */
+				// If no special operations were run on keydown,
+				// allow for regular text searching
 				inputval = $input.val();
-				var key = ( LastEvent = event ).keyCode,
-					val = separator ? inputval.split( separator ).pop() : inputval;
+				var key = ( LastEvent = event ).keyCode, val = separator ? inputval.split( separator ).pop() : inputval;
 
 				// Still check to make sure 'enter' wasn't pressed
 				if ( key != KEY.enter ) {
@@ -443,7 +480,7 @@ var
 				}
 			},
 
-			'blur.autoComplete': function( event ){
+			'blur.autoComplete': function( event ) {
 				// If autoComplete has been disabled or the drop list
 				// is still open, prevent input events
 				if ( ! Active || ulOpen ) {
@@ -477,7 +514,7 @@ var
 				}
 			},
 
-			'focus.autoComplete': function( event, flag ){
+			'focus.autoComplete': function( event, flag ) {
 				if ( ! Active || 
 					// Prevent inner focus events if caused by autoComplete inner functionality
 					( AutoComplete.focus === inputIndex && flag === ExpandoFlag ) || 
@@ -512,6 +549,7 @@ var
 				// Expose/Trigger focus
 				AutoComplete.hasFocus = TRUE;
 				$input.data( 'ac-hasFocus', TRUE );
+
 				if ( settings.onFocus ) {
 					settings.onFocus.apply( self, 
 						settings.backwardsCompatible ? [ $ul, event, settings, cache ] : [ event, {
@@ -527,14 +565,13 @@ var
 			 * Autocomplete Methods (Extensions off autoComplete event)
 			 */ 
 			// Catches document click events from the global scope
-			'autoComplete.document-click': function( e, event ){
+			'autoComplete.document-click': function( e, event ) {
 				if ( Active && ulOpen &&
 					// Double check the event timestamps to ensure there isn't a delayed reaction from a button
 					( ! LastEvent || event.timeStamp - LastEvent.timeStamp > 200 ) && 
 					// Check the target after all other checks are passed (less processing)
 					$( event.target ).closest( 'ul' ).data( 'ac-input-index' ) !== inputIndex ) {
-						$ul.hide( event );
-						LastEvent = event;
+						$ul.hide( LastEvent = event );
 						$input.blur();
 				}
 			},
@@ -554,13 +591,13 @@ var
 			},
 
 			// Catch mouseovers on the drop down list
-			'autoComplete.ul-mouseenter': function( e, event, el ){
+			'autoComplete.ul-mouseenter': function( e, event, el ) {
 				if ( $li ) {
 					$li.removeClass( settings.rollover );
 				}
 
-				$li = $(el).addClass( settings.rollover );
-				liFocus = $elems.index( $li[0] );
+				$li = $( el ).addClass( settings.rollover );
+				liFocus = $elems.index( el );
 				liData = currentList[ liFocus ];
 
 				if ( settings.onRollover ) {
@@ -580,13 +617,13 @@ var
 			},
 
 			// Catch click events on the drop down
-			'autoComplete.ul-click': function( e, event ){
+			'autoComplete.ul-click': function( e, event ) {
 				// Refocus the input box and pass flag to prevent inner focus events
 				$input.trigger( 'focus', [ ExpandoFlag ] );
 
 				// Check against separator for input value
 				$input.val( inputval === separator ? 
-					inputval.substr( 0, inputval.length - inputval.split(separator).pop().length ) + liData.value + separator :
+					inputval.substr( 0, inputval.length - inputval.split( separator ).pop().length ) + liData.value + separator :
 					liData.value 
 				);
 
@@ -619,17 +656,17 @@ var
 
 				// Give access to current settings and cache
 				if ( $.isFunction( newSettings ) ) {
-					ret = newSettings.apply(self, settings.backwardsCompatible ? 
+					ret = newSettings.apply( self, settings.backwardsCompatible ? 
 						[ settings, cache, $ul, event ] : [ event, { settings: settings, cache: cache, ul: $ul } ]
 					);
 
 					// Allow for extending of settings/cache based off function return values
 					if ( $.isArray( ret ) && ret[0] !== undefined ) {
-						settings = $.extend( TRUE, {}, settings, ret[0] || settings );
-						cache = $.extend( TRUE, {}, cache, ret[1] || cache );
+						$.extend( TRUE, settings, ret[0] || settings );
+						$.extend( TRUE, cache, ret[1] || cache );
 					}
 				} else {
-					settings = $.extend( TRUE, {}, settings, newSettings || {} );
+					$.extend( TRUE, settings, newSettings || {} );
 				}
 
 				// Change the drop down if dev want's a differen't class attached
@@ -638,13 +675,21 @@ var
 						$el.bgiframe() :
 						$('<ul/>').appendTo('body').addClass( settings.list ).bgiframe().hide().data( 'ac-selfmade', TRUE );
 
+				// Custom drop list modifications
 				newUl();
+
+				// Change case here so it doesn't have to be done on every request
 				settings.requestType = settings.requestType.toUpperCase();
+
+				// Local copy of the seperator for faster referencing
 				separator = settings.multiple ? settings.multipleSeparator : undefined;
+
+				// TODO: Do we need to re-store the settings object?
+				// Or does object referencing make the change for us?
 				$input.data( 'ac-settings', settings );
 
 				// Return & Store event
-				return (LastEvent = event);
+				return ( LastEvent = event );
 			},
 
 			// Clears the Cache & requests (requests can be blocked from clearing)
@@ -791,7 +836,7 @@ var
 			},
 
 			// Add disable event
-			'autoComplete.disable': function( event ){
+			'autoComplete.disable': function( event ) {
 				$input.data( 'ac-active', Active = FALSE );
 				$ul.html('').hide( event );
 				return ( LastEvent = event );
@@ -841,7 +886,7 @@ var
 		});
 
 		// Ajax/Cache Request
-		function sendRequest( event, settings, cache, backSpace, timeout ){
+		function sendRequest( event, settings, cache, backSpace, timeout ) {
 			if ( settings.spinner ) {
 				settings.spinner.call( self, event, { active: TRUE, settings: settings, cache: cache, ul: $ul } );
 			}
@@ -919,7 +964,7 @@ var
 					loadResults( event, list, settings, cache, backSpace );
 				},
 
-				error: function(){
+				error: function() {
 					$ul.html('').hide( event );
 					if ( settings.spinner ) {
 						settings.spinner.call( self, event, { active: FALSE, settings: settings, cache: cache, ul: $ul } );
@@ -931,10 +976,10 @@ var
 		}
 
 		// Parse User Supplied Data
-		function userSuppliedData( event, settings, cache, backSpace ){
+		function userSuppliedData( event, settings, cache, backSpace ) {
 			var list = [], args = [],
 				fn = $.isFunction( settings.dataFn ),
-				regex = fn ? undefined : new RegExp('^'+cache.val, 'i'),
+				regex = fn ? undefined : new RegExp( '^'+cache.val, 'i' ),
 				k = 0, entry, i = -1, l = settings.dataSupply.length;
 
 			if ( settings.formatSupply ) {
@@ -981,7 +1026,7 @@ var
 		}
 
 		// Key element Selection
-		function select( event ){
+		function select( event ) {
 			// Ensure the select function only gets fired when list of open
 			if ( ulOpen ) {
 				if ( settings.onSelect ) {
@@ -1011,7 +1056,7 @@ var
 		}
 
 		// Key direction up
-		function up( event ){
+		function up( event ) {
 			if ( $li ) {
 				$li.removeClass( settings.rollover );
 			}
@@ -1049,7 +1094,7 @@ var
 		}
 
 		// Key direction down
-		function down( event ){
+		function down( event ) {
 			if ( $li ) {
 				$li.removeClass( settings.rollover );
 			}
@@ -1085,9 +1130,9 @@ var
 			return $li;
 		}
 
-		// Attach new show/hide functionality to only the
-		// ul object (so not to infect all of jQuery)
-		function newUl(){
+		// Attach new show/hide functionality to only the ul object (so not to infect all of jQuery),
+		// And also attach event handlers if not already done so
+		function newUl() {
 			var hide = $ul.hide, show = $ul.show, list = $ul.data( 'ac-inputs' ) || {};
 
 			if ( ! $ul[ ExpandoFlag ] ) {
@@ -1114,12 +1159,12 @@ var
 			}
 
 			// Attach global handlers for event delegation (So there is not more loss time in unbinding and rebinding)
-			if ( $ul.data('autoComplete') !== TRUE ) {
+			if ( $ul.data( 'autoComplete' ) !== TRUE ) {
 				$ul.data( 'autoComplete', TRUE )
-				.delegate('li', 'mouseenter.autoComplete', function( event ){
+				.delegate( 'li', 'mouseenter.autoComplete', function( event ) {
 					AutoComplete.getFocus( TRUE ).trigger( 'autoComplete.ul-mouseenter', [ event, this ] );
 				})
-				.bind( 'click.autoComplete', function( event ){
+				.bind( 'click.autoComplete', function( event ) {
 					AutoComplete.getFocus( TRUE ).trigger( 'autoComplete.ul-click', [ event ] );
 					return FALSE;
 				});
@@ -1149,7 +1194,7 @@ var
 			}
 
 			// Create selection if allowed
-			if ( ! settings.autoFill || start > end ){
+			if ( ! settings.autoFill || start > end ) {
 				return FALSE;
 			}
 			else if ( self.createTextRange ) {
@@ -1215,7 +1260,7 @@ var
 				settings.onListFormat.call( self, event, { list: currentList, settings: settings, cache: cache, ul: $ul } );
 			} else {
 				// Push items onto container
-				for ( ; ++i < length; ){
+				for ( ; ++i < length; ) {
 					if ( currentList[i].value ) {
 						if ( settings.maxItems > -1 && ++aci > settings.maxItems ) {
 							break;
@@ -1278,12 +1323,20 @@ var
 			return $ul.show( event );
 		}
 
-		// Non-event initialization
+		// Custom modifications to the drop down list
 		newUl();
+
+		// Do case change on initialization so it's not run on every request
 		settings.requestType = settings.requestType.toUpperCase();
+
+		// Local quick copy of the seperator (so we don't have to run this check every time)
 		separator = settings.multiple ? settings.multipleSeparator : undefined;
+
+		// Expose copies of both the input element and the cached jQuery version
 		AutoComplete.stack[ inputIndex ] = self;
 		AutoComplete.jqStack[ inputIndex ] = $input;
+
+		// Form and Document event attachment
 		setup( $input, inputIndex );
 	};
 

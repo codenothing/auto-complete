@@ -47,6 +47,7 @@ Corey Hart @ http://www.codenothing.com
 	<li><a href='#getFocus'>getFocus</a></li>
 	<li><a href='#getPrevious'>getPrevious</a></li>
 	<li><a href='#getAll'>getAll</a></li>
+	<li><a href='#version'>version</a></li>
 	<li><a href='#other'>Other Internals</a></li>
 
 	<li class='title' style='margin-top: 20px;'>Settings</li>
@@ -195,15 +196,18 @@ Corey Hart @ http://www.codenothing.com
 
 <h3><div class='default'>Function</div> <a name='getFocus'>getFocus</a></h3>
 <p>
-	Returns the element that is currently in focus.
-	Passing true as an argument returns the jquery cached version of that element
+	Returns the element that is currently in focus. Passing true as an argument returns 
+	the jQuery cached version of that element. If no element is in focus, the function returns
+	an empty jQuery object if a true argument is passed in, otherwise it returns undefined.
 </p>
 
 
 
 <h3><div class='default'>Function</div> <a name='getPrevious'>getPrevious</a></h3>
 <p>
-	Returns the element that was previously in focus.
+	Returns the element that was previously in focus. Passing true as an argument returns
+	the jQuery cached version of that element. If no element was previously in focus, the function returns
+	an empty jQuery object if a true argument is passed in, otherwise it returns undefined.
 </p>
 
 
@@ -215,7 +219,14 @@ Corey Hart @ http://www.codenothing.com
 
 
 
-<h3><a name='other'>Other Inner Operation Key's</a></h3>
+<h3><div class='default'>String</div> <a name='version'>version</a></h3>
+<p>
+	Contains the current version of the autoComplete plugin
+</p>
+
+
+
+<h3><a name='other'>Other Inner Operation Methods</a></h3>
 <p>
 	The jQuery.autoComplete comes with a few more key variables that are operated on internally. Adjusting
 	these value's is generally a bad idea, but if required, here are the docs:<br><br>
@@ -224,6 +235,10 @@ Corey Hart @ http://www.codenothing.com
 	<b>-stack:</b> Object containing all element's with autoComplete attached to them, referenced by their unique id.<br>
 	<b>-jqStack:</b> Object containing all cached jQuery element's with autoComplete attached to them, referenced by their unique id.<br>
 	<b>-order:</b> Array containing list order of each element focus event.<br>
+	<b>-keys:</b> A list of keycodes used throughout the plugin.<br>
+	<b>-arrayMethods:</b> Object containing all methods that may take an array as their first argument.<br>
+	<!-- TODO: Get a better description -->
+	<b>-handlerMethods:</b> Object containing all methods that may use triggerHandler under the proper condition.<br>
 	<b>-remove:</b> Function that removes an input from the stack, takes the element's unique id as the parameter.<br>
 </p>
 
