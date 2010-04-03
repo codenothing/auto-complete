@@ -43,6 +43,8 @@ Corey Hart @ http://www.codenothing.com
 	<li class='title' style='margin-top: 20px;'>jQuery.autoComplete</li>
 	<li><a href='#defaults'>defaults</a></li>
 	<li><a href='#length'>length</a></li>
+	<li><a href='#focus'>focus</a></li>
+	<li><a href='#blur'>blur</a></li>
 	<li><a href='#hasFocus'>hasFocus</a></li>
 	<li><a href='#getFocus'>getFocus</a></li>
 	<li><a href='#getPrevious'>getPrevious</a></li>
@@ -183,6 +185,38 @@ Corey Hart @ http://www.codenothing.com
 <h3><div class='default'>Integer</div> <a name='length'>length</a></h3>
 <p>
 	Number of element's on the page that currently have autoComplete attached to them.
+</p>
+
+
+
+<h3><div class='default'>Function</div> <a name='focus'>focus</a></h3>
+<p>
+	This function gets triggered whenever one of the autoComplete inputs gains focus. It's treated
+	exactly like the instance specific focus event, only it tracks all inputs. The <span class='this'>this</span>
+	references the element currently in focus. The function gets two arguments passed in, the first is the event
+	object that was triggered, the second is a ui object.
+	<ul class='ui'>
+		<li class='title'>The ui object</li>
+		<li><b>settings:</b> Current settings attached to the input in focus</li>
+		<li><b>cache:</b> Current cache attached to the input in focus</li>
+		<li><b>ul:</b> Cached $ul jQuery object of the drop down list.</li>
+	</ul>
+</p>
+
+
+
+<h3><div class='default'>Function</div> <a name='blur'>blur</a></h3>
+<p>
+	This function gets triggered whenever one of the autoComplete inputs loses focus. It's treated
+	almost the same as the instance specific blur event, only it tracks all inputs. The <span class='this'>this</span>
+	references the element currently losing focus. The function gets two arguments passed in, the first is the event
+	object that was triggered, the second is a ui object.
+	<ul class='ui'>
+		<li class='title'>The ui object</li>
+		<li><b>settings:</b> Current settings attached to the input in focus</li>
+		<li><b>cache:</b> Current cache attached to the input in focus</li>
+		<li><b>ul:</b> Cached $ul jQuery object of the drop down list.</li>
+	</ul>
 </p>
 
 
@@ -393,11 +427,12 @@ From 5.0 and on, autoComplete will be using this style so new feature's can easi
 
 
 
-<h3><div class='default'>undefined</div> <a name='nonInput'>nonInput</a> - <span class='type'>Array</span></h3>
-<p>Array of character key codes not allowed. Remember to use 
-<a href='http://www.cambiaresearch.com/c4/702b8cd1-e5b0-42e6-83ac-25f0306e3e25/Javascript-Char-Codes-Key-Codes.aspx'>keyCode's</a>,
-not characters.</p>
-
+<h3><div class='default'>[ 16(shift), 37(left), 39(right) ]</div> <a name='nonInput'>nonInput</a> - <span class='type'>Array</span></h3>
+<p>
+	Array of character key codes not allowed. Remember to use 
+	<a href='http://www.cambiaresearch.com/c4/702b8cd1-e5b0-42e6-83ac-25f0306e3e25/Javascript-Char-Codes-Key-Codes.aspx'>keyCode's</a>,
+	not characters. By default, the shift, left arrow and right arrow keys are ignored.
+</p>
 
 
 <h3><div class='default'>{}</div> <a name='postData'>postData</a> - <span class='type'>Object</span></h3>

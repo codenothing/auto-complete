@@ -6,10 +6,10 @@
 
 # New Features
 
--Added postFormat option
--Added formatSupply
 -All callbacks have the settings and cache object passed into them
 -There is only a single event that gets bound to both the document and the drop down list. These event's get transfered to the input's in focus.
+-Forms only have a single autoComplete event attached to them as well, with the event being transfered to the input in focus
+-Filled in default nonInput array with shift, left arrow, and right arrow keys
 
 
 # New Settings
@@ -18,15 +18,22 @@
 -formatSupply: Ability to format the supplied list, which overwrites the slower internal function.
 
 
-# New Callbacks
-
-none.
-
 # New Methods
 
 none.
 
 
-# Breakages
+# jQuery.autoComplete
+
+-Added version to show current autoComplete version
+-Added global focus and blur events.
+-Now storing jQuery cached objects of autoComplete elements.
+-The getFocus and getPrevious methods can now take a single boolean argument to return jQuery cached object of the element desired.
+-Exposing arrayMethods and handlerMethods for custom method triggering
+-Exposed keycodes used throughout the plugin.
+
+
+# Possible Breakages
 
 -Removed dataName setting, now based off global list cache
+-The nonInput setting default is changed from undefined to an array fill with shift, left & right arrow key codes.

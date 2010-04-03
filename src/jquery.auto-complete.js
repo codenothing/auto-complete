@@ -78,6 +78,8 @@
 
 	// Removes the single events attached to the document and respective input form
 	function teardown( $input, inputIndex ) {
+		AutoComplete.remove( inputIndex );
+
 		if ( setup.flag === TRUE && AutoComplete.length === 0 ) {
 			setup.flag = FALSE;
 			rootjQuery.unbind( 'click.autoComplete' );
@@ -133,6 +135,21 @@ var
 	// Event flag that gets passed around
 	ExpandoFlag = 'autoComplete_' + $.expando,
 
+	// Make a copy of the key codes used throughout the plugin
+	KEY = {
+		backspace: 8,
+		tab: 9,
+		enter: 13,
+		shift: 16,
+		space: 32,
+		pageup: 33,
+		pagedown: 34,
+		left: 37,
+		up: 38,
+		right: 39,
+		down: 40
+	},
+
 	// Attach global aspects to jQuery itself
 	AutoComplete = $.autoComplete = {
 		// Autocomplete Version
@@ -156,17 +173,8 @@ var
 		// Global access to elements in use
 		hasFocus: FALSE,
 
-		// Key Codes
-		keys: {
-			backspace: 8,
-			tab: 9,
-			enter: 13,
-			space: 32,
-			pageup: 33,
-			pagedown: 34,
-			up: 38,
-			down: 40
-		},
+		// Expose the used keycodes
+		keys: KEY,
 
 		// Methods whose first argument may contain an array
 		arrayMethods: {
@@ -174,10 +182,15 @@ var
 			'direct-supply': TRUE
 		},
 
-		// TODO: Describe this in a coherent way
+		// TODO: Find a way to describe this
 		handlerMethods: {
 			'option': 2
 		},
+
+		// Events triggered whenever one of the autoComplete
+		// input's come into focus or blur out.
+		focus: undefined,
+		blur: undefined,
 
 		// Allow access to jquery cached object versions of the elements
 		getFocus: function( jqStack ) {
@@ -250,7 +263,7 @@ var
 			// Input
 			inputControl: undefined,
 			autoFill: FALSE,
-			nonInput: undefined,
+			nonInput: [ KEY.right, KEY.left, KEY.shift ],
 			multiple: FALSE,
 			multipleSeparator: ' ',
 			// Events
@@ -272,9 +285,6 @@ var
 			cacheLimit: 50
 		}
 	},
-
-	// Make a local copy of these keycodes for faster referencing
-	KEY = AutoComplete.keys,
 
 	// Autocomplete function
 	AutoCompleteFunction = function( self, options ) {
@@ -332,9 +342,8 @@ var
 				$( 'ul.' + settings.list ).eq(0).bgiframe() :
 				$('<ul/>').appendTo('body').addClass( settings.list ).bgiframe().hide().data( 'ac-selfmade', TRUE );
 
-		/**
-		 * Input Central
-		 */ 
+
+		// Start Binding
 		$input.data({
 			'autoComplete': TRUE,
 			'ac-input-index': inputIndex,
@@ -374,13 +383,13 @@ var
 				// down list. It no element is selected, then hide the list and track form
 				// submission. If an element is selected, then track for submission first, 
 				// then hide the list.
+				enter = TRUE;
 				if ( $li && $li.hasClass( settings.rollover ) ) {
 					enter = settings.preventEnterSubmit && ulOpen ? FALSE : TRUE;
 					select( event );
 				}
 				else if ( ulOpen ) { 
 					$ul.hide( event );
-					enter = settings.preventEnterSubmit && ulOpen ? FALSE : TRUE;
 				}
 			}
 			// Up Arrow
@@ -428,6 +437,7 @@ var
 			// Check for non input values defined by user
 			else if ( settings.nonInput && $.inArray( key, settings.nonInput ) > -1 ) {
 				$ul.html('').hide( event );
+				enter = TRUE;
 			}
 			// Everything else is considered possible input, so
 			// return before keyup prevention flag is set
@@ -501,7 +511,12 @@ var
 				// Expose focus
 				AutoComplete.hasFocus = FALSE;
 				$ul.hide( event );
-				// Trigger blur callback last
+
+				// Trigger both the global and element specific blur events
+				if ( AutoComplete.blur ) {
+					AutoComplete.blur.call( self, event, { settings: settings, cache: cache, ul: $ul } );
+				}
+
 				if ( settings.onBlur ) {
 					settings.onBlur.apply( self, settings.backwardsCompatible ?
 						[ inputval, $ul, event, settings, cache ] : [ event, {
@@ -546,9 +561,14 @@ var
 					AutoComplete.order.pop();
 				}
 
-				// Expose/Trigger focus
+				// Expose focus
 				AutoComplete.hasFocus = TRUE;
 				$input.data( 'ac-hasFocus', TRUE );
+
+				// Trigger both the global and element specific focus events
+				if ( AutoComplete.focus ) {
+					AutoComplete.focus.call( self, event, { settings: settings, cache: cache, ul: $ul } );
+				}
 
 				if ( settings.onFocus ) {
 					settings.onFocus.apply( self, 
@@ -756,7 +776,7 @@ var
 
 				return sendRequest(
 					event,
-					$.extend( TRUE, {}, settings, { maxItems: -1, dataSupply: data, formatSuppy: allSupply } ),
+					$.extend( TRUE, {}, settings, { maxItems: -1, dataSupply: data, formatSupply: allSupply } ),
 					cache
 				);
 			},
@@ -787,7 +807,7 @@ var
 				return loadResults(
 					event,
 					data,
-					$.extend( TRUE, {}, settings, { maxItems: -1, dataSupply: data, formatSuppy: allSupply } ),
+					$.extend( TRUE, {}, settings, { maxItems: -1, dataSupply: data, formatSupply: allSupply } ),
 					cache
 				);
 			},
@@ -858,7 +878,6 @@ var
 					.unbind( '.autoComplete autoComplete' );
 
 
-				AutoComplete.remove( inputIndex );
 				teardown( $input, inputIndex );
 				Active = FALSE;
 				list[ inputIndex ] = undefined;
@@ -949,6 +968,7 @@ var
 				cache: settings.ajaxCache,
 				dataType: 'json',
 
+				// Send personalised data
 				data: settings.postFormat ?
 					settings.postFormat.call( self, event, {
 						data: settings.postData,
@@ -1050,9 +1070,11 @@ var
 				if ( LastEvent.type === 'keydown' ) {
 					LastEvent[ 'enter_' + ExpandoFlag ] = TRUE;
 				}
+
+				$ul.hide( event );
 			}
 
-			return $ul.hide( event );
+			return ( $li = undefined );
 		}
 
 		// Key direction up

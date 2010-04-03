@@ -12,8 +12,6 @@ jQuery(function($){
 		$('input[name=search1]').autoComplete();
 		$('input[name=destroy-1]').attr('disabled', false);
 		$(this).attr('disabled', 'true');
-		// Rebind global focus
-		bindGlobalFocus();
 	});
 	// Add disabling feature
 	$('input[name=destroy-1]').click(function(){
@@ -107,30 +105,6 @@ jQuery(function($){
 
 
 
-
-	/**
-	 * Currently Focused Div
-	 */
-	function bindGlobalFocus(){
-		var $div = $('#AutoCompleteFocus');
-		// Clear last event and rebind it (to ensure this focus event always gets called last)
-		$('input[type=text]').unbind('focus.ac-example').bind('focus.ac-example', function(){
-			var f = $.autoComplete.getFocus(), p = $.autoComplete.getPrevious();
-			$div.find('.current span').html(
-				$.autoComplete.hasFocus ? 
-				'name=' + $(f).attr('name') + "'" :
-				'Nothing in Focus'
-			);
-			$div.find('.previous span').html(
-				p ? 
-				'name=' + $(p).attr('name') + "'" :
-				'Nothing previously in focus'
-			);
-		});
-	}
-	bindGlobalFocus();
-
-
 	// Hide/Show affect on code preview
 	var code = false;
 	var $div = $('#AutoCompleteFocus'); // Local copy
@@ -142,4 +116,17 @@ jQuery(function($){
 		code = !code;
 		return false;
 	});
+	$.autoComplete.focus = function(){
+		var f = $.autoComplete.getFocus(), p = $.autoComplete.getPrevious();
+		$div.find('.current span').html(
+			$.autoComplete.hasFocus ? 
+			'name=' + $(f).attr('name') + "'" :
+			'Nothing in Focus'
+		);
+		$div.find('.previous span').html(
+			p ? 
+			'name=' + $(p).attr('name') + "'" :
+			'Nothing previously in focus'
+		);
+	};
 });
