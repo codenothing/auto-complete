@@ -10,12 +10,14 @@
 -There is only a single event that gets bound to both the document and the drop down list. These event's get transfered to the input's in focus.
 -Forms only have a single autoComplete event attached to them as well, with the event being transfered to the input in focus
 -Filled in default nonInput array with shift, left arrow, and right arrow keys
+-Moved all input data to an object stored on the 'autoComplete' data namespace.
 
 
 # New Settings
 
 -postFormat: Ability to format the post data object/string being sent server side
 -formatSupply: Ability to format the supplied list, which overwrites the slower internal function.
+-bgiframe: Object of settings to be passed into the bgiframe plugin.
 
 
 # New Methods
@@ -37,3 +39,4 @@ none.
 
 -Removed dataName setting, now based off global list cache
 -The nonInput setting default is changed from undefined to an array fill with shift, left & right arrow key codes.
+-All data associated with the input has been moved to an object stored on the 'autoComplete' data namespace.

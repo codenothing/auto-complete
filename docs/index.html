@@ -56,6 +56,7 @@ Corey Hart @ http://www.codenothing.com
 	<li><a href='#ajax'>ajax</a></li>
 	<li><a href='#ajaxCache'>ajaxCache</a></li>
 	<li><a href='#autoFill'>autoFill</a></li>
+	<li><a href='#bgiframe'>bgiframe</a></li>
 	<li><a href='#cacheLimit'>cacheLimit</a></li>
 	<li><a href='#dataFn'>dataFn</a></li>
 	<li><a href='#dataSupply'>dataSupply</a></li>
@@ -174,9 +175,11 @@ Corey Hart @ http://www.codenothing.com
 	<div>Type</div>
 	Key
 </div>
+
+
 <h3><div class='default'>Object</div> <a name='defaults'>defaults</a></h3>
 <p>
-	Contains a global object of the autoComplete settings. Both settings passed into the autoComplete function 
+	Contains a global object of the autoComplete settings. Both of the settings passed into the autoComplete function 
 	as a parameter and defined through metadata solution overwrite these global defaults.
 </p>
 
@@ -292,38 +295,58 @@ Corey Hart @ http://www.codenothing.com
 	Name - Type
 </div>
 <h3><div class='default'>false</div> <a name='backwardsCompatible'>backwardsCompatible</a> - <span class='type'>Boolean</span></h3>
-<p>With version 5.0 and going forward, autoComplete will become more jqueryui standards compliant for event driven functions. With that,
-the parameter's passed to those functions have changed. To respect developers who are currently on 4.1, a backwardsCompatible setting
-has been implemented to ensure parameters passed to those functions remain constant. This is to ease the transition into 5.0 and beyond.<br><br>
-From 5.0 and on, autoComplete will be using this style so new feature's can easily be implemented while still be compatible with earlier versions.</p>
+<p>
+	With version 5.0 and going forward, autoComplete will become more jqueryui standards compliant for event driven functions. With that,
+	the parameter's passed to those functions have changed. To respect developers who are currently on 4.1, a backwardsCompatible setting
+	has been implemented to ensure parameters passed to those functions remain constant. This is to ease the transition into 5.0 and beyond.<br><br>
+	From 5.0 and on, autoComplete will be using this style so new feature's can easily be implemented while still be compatible with earlier versions.
+</p>
 
 
 
 <h3><div class='default'>'ajax.php'</div> <a name='ajax'>ajax</a> - <span class='type'>String</span></h3>
-<p>URL of the server side script.<br><br>
+<p>
+	URL of the server side script.
+</p>
 <p class='notes'>
-	<b>Note*:</b> When dataSupply has a length greater than 0, no ajax request is sent.</p>
+	<b>Note*:</b> When dataSupply has a length greater than 0, no ajax request is sent.
 </p>
 
 
 
 <h3><div class='default'>jQuery.ajaxSettings.cache</div> <a name='ajaxCache'>ajaxCache</a> - <span class='type'>Boolean</span></h3>
-<p>Whether to allow browsers to cache ajax requests. Default's to jQuery's native settings.</p>
+<p>
+	Whether to allow browsers to cache ajax requests. Default's to jQuery's native settings.
+</p>
 
 
 
 <h3><div class='default'>false</div> <a name='autoFill'>autoFill</a> - <span class='type'>Boolean</span></h3>
-<p>Automatically fills the input with the focused list item. Best to use with a <a href='#delay'>delay</a>, as it's prone to quirks with fast typers.</p>
+<p>
+	Automatically fills the input with the focused list item. Best to use with a <a href='#delay'>delay</a>,
+	as it's prone to quirks with fast typers.
+</p>
+
+
+
+<h3><div class='default'>undefined</div> <a name='bgiframe'>bgiframe</a> - <span class='type'>Object</span></h3>
+<p>
+	Only valid when bgiframe plugin is installed, this object gets passed as the settings argument into the bgiframe plugin.
+</p>
 
 
 
 <h3><div class='default'>50</div> <a name='cacheLimit'>cacheLimit</a> - <span class='type'>Integer</span></h3>
-<p>Limit's the number of entries stored in cache. </p>
+<p>
+	Limit's the number of entries stored in cache.
+</p>
 
 
 
 <h3><div class='default'>undefined</div> <a name='dataFn'>dataFn</a> - <span class='type'>Function(event, ui)</span></h3>
-<p>Personal function to use in place of default pattern matching. Return true for correct match, false for incorrect.</p>
+<p>
+	Personal function to use in place of default pattern matching. Return true for correct match, false for incorrect.
+</p>
 <ul class='ui'>
 	<li class='title'>The ui object</li>
 	<li><b>search:</b> Current value to be searching with.</li>
@@ -334,7 +357,7 @@ From 5.0 and on, autoComplete will be using this style so new feature's can easi
 	<li><b>settings:</b> Current settings attached to the input in focus</li>
 	<li><b>cache:</b> Current cache attached to the input in focus</li>
 	<li><b>ul:</b> Cached $ul jQuery object of the drop down list.</li>
-</ul><br>
+</ul>
 <p class='notes'>
 	<b>Note*:</b> with the <a href='#backwardsCompatible'>backwardsCompatible</a> flag enabled, the params are:<br>
 	Function(search, entry, list, i, supply, ul, event, settings, cache).
@@ -342,17 +365,23 @@ From 5.0 and on, autoComplete will be using this style so new feature's can easi
 
 
 <h3><div class='default'>[]</div> <a name='dataSupply'>dataSupply</a> - <span class='type'>Array</span></h3>
-<p>Array of values/objects to run auto-complete as local instead of ajax requests. Default pattern match is: "/^<i>(input value)</i>/i"</p>
+<p>
+	Array of values/objects to run auto-complete as local instead of ajax requests. Default pattern match is: "/^<i>(input value)</i>/i"
+</p>
 
 
 
 <h3><div class='default'>100</div> <a name='delay'>delay</a> - <span class='type'>Integer</span></h3>
-<p>Time delay of when to send the ajax requests in milliseconds.</p>
+<p>
+	Time delay of when to send the ajax requests in milliseconds.
+</p>
 
 
 
 <h3><div class='default'>undefined</div> <a name='formatSupply'>formatSupply</a> - <span class='type'>Function(event, ui)</span></h3>
-<p>Gives full access to formatting a supplied set of data into a list to be displayed.</p>
+<p>
+	Gives full access to formatting a supplied set of data into a list to be displayed.
+</p>
 <ul class='ui'>
 	<li class='title'>The ui object</li>
 	<li><b>search:</b> Current value to be searching with.</li>
@@ -368,7 +397,10 @@ From 5.0 and on, autoComplete will be using this style so new feature's can easi
 
 
 <h3><div class='default'>undefined</div> <a name='inputControl'>inputControl</a> - <span class='type'>Function(event, ui)</span></h3>
-<p>inputControl provides access to changing the name for cache storage. When doing pattern matching, or sending requests, the string returned by this function is used.</p>
+<p>
+	inputControl provides access to changing the name for cache storage. When doing pattern matching, or sending requests,
+	the string returned by this function is used.
+</p>
 <ul class='ui'>
 	<li class='title'>The ui object</li>
 	<li><b>val:</b> Current inputval going to be used in search.</li>
@@ -377,8 +409,6 @@ From 5.0 and on, autoComplete will be using this style so new feature's can easi
 	<li><b>cache:</b> Current cache attached to the input in focus</li>
 	<li><b>ul:</b> Cached $ul jQuery object of the drop down list.</li>
 </ul>
-
-
 <p class='notes'>
 	<b>Note*:</b> This function must return a string, which is either the 'val' key of the ui object or a modification of it.<br>
 	<b>Note2*:</b> with the <a href='#backwardsCompatible'>backwardsCompatible</a> flag enabled, the params are:<br>
@@ -388,42 +418,59 @@ From 5.0 and on, autoComplete will be using this style so new feature's can easi
 
 
 <h3><div class='default'>'auto-complete-list'</div> <a name='list'>list</a> - <span class='type'>String</span></h3>
-<p>CSS Class that will be attached to the UL created.</p>
+<p>
+	CSS Class that will be attached to the UL created.
+</p>
 
 
 
 <h3><div class='default'>-1</div> <a name='maxItems'>maxItems</a> - <span class='type'>Number</span></h3>
-<p>Limits the number of values added to the drop down list. When -1, no limit is imposed.</p>
+<p>
+	Limits the number of values added to the drop down list. When -1, no limit is imposed.
+</p>
 
 
 
 <h3><div class='default'>undefined</div> <a name='maxHeight'>maxHeight</a> - <span class='type'>Number</span></h3>
-<p>Applies the max-height logic programmatically for browser's that don't support that css property.</p>
+<p>
+	Applies the max-height logic programmatically for browser's that don't support that css property.
+</p>
 
 
 
 <h3><div class='default'>0</div> <a name='maxRequests'>maxRequests</a> - <span class='type'>Integer</span></h3>
-<p>Maximum number of ajax requests allowed within a scripts duration. If 0, no limit is applied</p>
+<p>
+	Maximum number of ajax requests allowed within a scripts duration. If 0, no limit is applied
+</p>
 
 
 
 <h3><div class='default'>1</div> <a name='minChars'>minChars</a> - <span class='type'>Integer</span></h3>
-<p>Minimum number of required characters to send a request.</p>
+<p>
+	Minimum number of required characters to send a request.
+</p>
 
 
 
 <h3><div class='default'>false</div> <a name='multiple'>multiple</a> - <span class='type'>Boolean</span></h3>
-<p>When true, multiple word inputs and word searching is allowed.</p>
+<p>
+	When true, multiple word inputs and word searching is allowed.
+</p>
 
 
 
 <h3><div class='default'>' '</div> <a name='multipleSeparator'>multipleSeparator</a> - <span class='type'>String</span></h3>
-<p>Separator used between multiple words. Default's to an empty space, and is only active when the <a href='#multiple'>multiple</a> option is true.</p>
+<p>
+	Separator used between multiple words. Default's to an empty space, and is only active when the
+	<a href='#multiple'>multiple</a> option is true.
+</p>
 
 
 
 <h3><div class='default'>false</div> <a name='newList'>newList</a> - <span class='type'>Boolean</span></h3>
-<p>Defines whether to create a new UL drop down list for this instance, or use an existing one.</p>
+<p>
+	Defines whether to create a new UL drop down list for this instance, or use an existing one.
+</p>
 
 
 
@@ -436,12 +483,16 @@ From 5.0 and on, autoComplete will be using this style so new feature's can easi
 
 
 <h3><div class='default'>{}</div> <a name='postData'>postData</a> - <span class='type'>Object</span></h3>
-<p>Parameters that get passed to the server. The value defined by <a href='#postVar'>postVar</a> will be overridden by the users input.</p>
+<p>
+	Parameters that get passed to the server. The value defined by <a href='#postVar'>postVar</a> will be overridden by the users input.
+</p>
 
 
 
 <h3><div class='default'>undefined</div> <a name='postFormat'>postFormat</a> - <span class='type'>Function (event, ui)</span></h3>
-<p>Format the data to be passed with the <a href='http://api.jquery.com/jQuery.ajax/'>jQuery.ajax</a> function when defined.</p>
+<p>
+	Format the data to be passed with the <a href='http://api.jquery.com/jQuery.ajax/'>jQuery.ajax</a> function when defined.
+</p>
 <ul class='ui'>
 	<li class='title'>The ui object</li>
 	<li><b>data:</b> The data object that would be sent with the ajax function.</li>
@@ -458,7 +509,9 @@ From 5.0 and on, autoComplete will be using this style so new feature's can easi
 
 
 <h3><div class='default'>'value'</div> <a name='postVar'>postVar</a> - <span class='type'>String</span></h3>
-<p>Name of the users input as it gets posted to the server.</p>
+<p>
+	Name of the users input as it gets posted to the server.
+</p>
 
 
 
@@ -472,27 +525,37 @@ From 5.0 and on, autoComplete will be using this style so new feature's can easi
 
 
 <h3><div class='default'>'POST'</div> <a name='requestType'>requestType</a> - <span class='type'>String</span></h3>
-<p>Type of request during ajax calls. Only use 'GET' or 'POST'.</p>
+<p>
+	Type of request during ajax calls. Only use 'GET' or 'POST'.
+</p>
 
 
 
 <h3><div class='default'>'auto-complete-list-rollover'</div> <a name='rollover'>rollover</a> - <span class='type'>String</span></h3>
-<p>CSS Class toggled on li elements when mouseover or up/down events occur.</p>
+<p>
+	CSS Class toggled on li elements when mouseover or up/down events occur.
+</p>
 
 
 
 <h3><div class='default'>undefined</div> <a name='striped'>striped</a> - <span class='type'>String</span></h3>
-<p>CSS Class toggled on alternating li elements to give a zebra striped look.</p>
+<p>
+	CSS Class toggled on alternating li elements to give a zebra striped look.
+</p>
 
 
 
 <h3><div class='default'>true</div> <a name='useCache'>useCache</a> - <span class='type'>Boolean</span></h3>
-<p>Tells autoComplete whether or not to use script level caching.</p>
+<p>
+	Tells autoComplete whether or not to use script level caching.
+</p>
 
 
 
 <h3><div class='default'>Input Width</div> <a name='width'>width</a> - <span class='type'>Float</span></h3>
-<p>Width of the UL drop down list. Default's to the width of the Input field</p>
+<p>
+	Width of the UL drop down list. Default's to the width of the Input field
+</p>
 
 
 
@@ -502,7 +565,9 @@ From 5.0 and on, autoComplete will be using this style so new feature's can easi
 </div>
 
 <h3><div class='default'>Empty Function</div> <a name='onBlur'>onBlur</a> - <span class='type'>Function(event, ui)</span></h3>
-<p>Callback function when the user loses focus on the input field.</p>
+<p>
+	Callback function when the user loses focus on the input field.
+</p>
 <ul class='ui'>
 	<li class='title'>The ui object</li>
 	<li><b>val:</b> The current full string value of the input (only differs when <a href='#multiple'>multiple</a> is true)</li>
@@ -518,7 +583,9 @@ From 5.0 and on, autoComplete will be using this style so new feature's can easi
 
 
 <h3><div class='default'>Empty Function</div> <a name='onFocus'>onFocus</a> - <span class='type'>Function(event, ui)</span></h3>
-<p>Callback function when the user focuses on the input field.</p>
+<p>
+	Callback function when the user focuses on the input field.
+</p>
 <ul class='ui'>
 	<li class='title'>The ui object</li>
 	<li><b>settings:</b> Current settings attached to the input in focus</li>
@@ -533,7 +600,9 @@ From 5.0 and on, autoComplete will be using this style so new feature's can easi
 
 
 <h3><div class='default'>undefined</div> <a name='onHide'>onHide</a> - <span class='type'>Function(event, ui)</span></h3>
-<p>Callback function whenever the drop down list is closed.</p>
+<p>
+	Callback function whenever the drop down list is closed.
+</p>
 <ul class='ui'>
 	<li class='title'>The ui object</li>
 	<li><b>settings:</b> Current settings attached to the input in focus</li>
@@ -544,7 +613,9 @@ From 5.0 and on, autoComplete will be using this style so new feature's can easi
 
 
 <h3><div class='default'>undefined</div> <a name='onListFormat'>onListFormat</a> - <span class='type'>Function(event, ui)</span></h3>
-<p>Callback function to format the list elements into the ul dropdown.</p>
+<p>
+	Callback function to format the list elements into the ul dropdown.
+</p>
 <ul class='ui'>
 	<li class='title'>The ui object</li>
 	<li><b>list:</b> Current list array that should be loaded into the list</li>
@@ -559,7 +630,9 @@ From 5.0 and on, autoComplete will be using this style so new feature's can easi
 
 
 <h3><div class='default'>undefined</div> <a name='onLoad'>onLoad</a> - <span class='type'>Function(event, ui)</span></h3>
-<p>Callback function before the drop down list is loaded.</p>
+<p>
+	Callback function before the drop down list is loaded.
+</p>
 <ul class='ui'>
 	<li class='title'>The ui object</li>
 	<li><b>list:</b> Current list array that is about to be loaded into the list</li>
@@ -574,7 +647,9 @@ From 5.0 and on, autoComplete will be using this style so new feature's can easi
 
 
 <h3><div class='default'>Empty Function</div> <a name='onMaxRequest'>onMaxRequest</a> - <span class='type'>Function(event, ui)</span></h3>
-<p>Callback function when maximum number of ajax requests is reached. Will only fire if <a href='#maxRequests'>maxRequests</a> is not 0.</p>
+<p>
+	Callback function when maximum number of ajax requests is reached. Will only fire if <a href='#maxRequests'>maxRequests</a> is not 0.
+</p>
 <ul class='ui'>
 	<li class='title'>The ui object</li>
 	<li><b>search:</b> Value of the string that was going to be used in the search.</li>
@@ -591,7 +666,9 @@ From 5.0 and on, autoComplete will be using this style so new feature's can easi
 
 
 <h3><div class='default'>Empty Function</div> <a name='onRollover'>onRollover</a> - <span class='type'>Function(event, ui)</span></h3>
-<p>Callback function when the user focuses one of the options of the UL drop down list.</p>
+<p>
+	Callback function when the user focuses one of the options of the UL drop down list.
+</p>
 <ul class='ui'>
 	<li class='title'>The ui object</li>
 	<li><b>data:</b> Data attached to that entry</li>
@@ -608,7 +685,9 @@ From 5.0 and on, autoComplete will be using this style so new feature's can easi
 
 
 <h3><div class='default'>Empty Function</div> <a name='onSelect'>onSelect</a> - <span class='type'>Function(event, ui)</span></h3>
-<p>Callback function when the user selects an option from the UL drop down list.</p>
+<p>
+	Callback function when the user selects an option from the UL drop down list.
+</p>
 <ul class='ui'>
 	<li class='title'>The ui object</li>
 	<li><b>data:</b> Data attached to that entry</li>
@@ -617,7 +696,6 @@ From 5.0 and on, autoComplete will be using this style so new feature's can easi
 	<li><b>cache:</b> Current cache attached to the input in focus</li>
 	<li><b>ul:</b> Cached $ul jQuery object of the drop down list.</li>
 </ul>
-<br><br>
 <p class='notes'>
 	<b>Note*:</b> with the <a href='#backwardsCompatible'>backwardsCompatible</a> flag enabled, the params are:<br>
 	Function(data, li, ul, event, settings, cache).
@@ -626,7 +704,9 @@ From 5.0 and on, autoComplete will be using this style so new feature's can easi
 
 
 <h3><div class='default'>undefined</div> <a name='onShow'>onShow</a> - <span class='type'>Function(event, ui)</span></h3>
-<p>Callback function when the drop down list is opened.</p>
+<p>
+	Callback function when the drop down list is opened.
+</p>
 <ul class='ui'>
 	<li class='title'>The ui object</li>
 	<li><b>settings:</b> Current settings attached to the input in focus</li>
@@ -637,7 +717,10 @@ From 5.0 and on, autoComplete will be using this style so new feature's can easi
 
 
 <h3><div class='default'>Returns True</div> <a name='onSubmit'>onSubmit</a> - <span class='type'>Function(event, ui)</span></h3>
-<p>Callback function called when form submission occurs. If <a href='#preventEnterSubmit'>preventEnterSubmit</a> is enabled, the onSubmit method will only fire when the drop list is not active.</p>
+<p>
+	Callback function called when form submission occurs. If <a href='#preventEnterSubmit'>preventEnterSubmit</a> is enabled,
+	the onSubmit method will only fire when the drop list is not active.
+</p>
 <ul class='ui'>
 	<li class='title'>The ui object</li>
 	<li><b>form:</b> Contains the parent form element of the input in focus.</li>
@@ -649,7 +732,9 @@ From 5.0 and on, autoComplete will be using this style so new feature's can easi
 
 
 <h3><div class='default'>undefined</div> <a name='spinner'>spinner</a> - <span class='type'>Function(active)</span></h3>
-<p>Callback function used to let developers know when to activate and deactivate any spinner's they want to run during requests.</p>
+<p>
+	Callback function used to let developers know when to activate and deactivate any spinner's they want to run during requests.
+</p>
 <ul class='ui'>
 	<li class='title'>The ui object</li>
 	<li><b>active:</b> Current state of activity. True when spinner needs to be activated, false when spinner needs to be deactivated.</li>
@@ -675,78 +760,78 @@ From 5.0 and on, autoComplete will be using this style so new feature's can easi
 
 <h3><a name='button-ajax'>button-ajax</a> - <span class='type'>.autoComplete('button-ajax', postData, cacheName)</span></h3>
 <p>
-The button-ajax method allows for sending requests through an external trigger(<i style='font-weight: normal;'>button</i>).
-It's required to pass a special cacheName is passed if more than one button-ajax method is used on the same input. If only one is 
-used, an inner string of random characters will be used. This can enable a sort of select drop down functionality, where 
-clicking a button can show the whole list, or users can just use the autoComplete to find their selection.
+	The button-ajax method allows for sending requests through an external trigger(<i style='font-weight: normal;'>button</i>).
+	It's required to pass a special cacheName is passed if more than one button-ajax method is used on the same input. If only one is 
+	used, an inner string of random characters will be used. This can enable a sort of select drop down functionality, where 
+	clicking a button can show the whole list, or users can just use the autoComplete to find their selection.
 </p>
 
 
 
 <h3><a name='button-supply'>button-supply</a> - <span class='type'>.autoComplete('button-supply', data, cacheName)</span></h3>
 <p>
-The button-supply method is essentially the same as the <a href='#button-ajax'>button-ajax</a> method, except it works
-with a localized set of results instead of through ajax requests. Additionally, an optional
-second data parameter can be passed to supply a different set of results on just this event,
-instead of the normal set supplied during initialization. Also, if more than one method is in use for the
-same input, it is required to pass different cacheName's so caching of the data-set's don't override each other.
+	The button-supply method is essentially the same as the <a href='#button-ajax'>button-ajax</a> method, except it works
+	with a localized set of results instead of through ajax requests. Additionally, an optional
+	second data parameter can be passed to supply a different set of results on just this event,
+	instead of the normal set supplied during initialization. Also, if more than one method is in use for the
+	same input, it is required to pass different cacheName's so caching of the data-set's don't override each other.
 </p>
 
 
 
 <h3><a name='destroy'>destroy</a> - <span class='type'>.autoComplete('destroy')</span></h3>
 <p>
-Destroys the autoComplete initiation. Removes all events and data that were attached to
-the input, form, and document. Also, if the UL drop list was created through the function, and
-no other input's are using it, that element will be removed as well.
+	Destroys the autoComplete initiation. Removes all events and data that were attached to
+	the input, form, and document. Also, if the UL drop list was created through the function, and
+	no other input's are using it, that element will be removed as well.
 </p>
 
 
 
 <h3><a name='direct-supply'>direct-supply</a> - <span class='type'>.autoComplete('direct-supply', data, cacheName)</span></h3>
 <p>
-The direct-supply method bypasses list formatting and request delays, and loads either the data supplied to it, or the 
-<a href='#dataSupply'>dataSupply</a> data. This would be the fastest way to load a list directly into the drop down UL, but
-is prone to errors if the data passed to formatted incorrectly.
+	The direct-supply method bypasses list formatting and request delays, and loads either the data supplied to it, or the 
+	<a href='#dataSupply'>dataSupply</a> data. This would be the fastest way to load a list directly into the drop down UL, but
+	is prone to errors if the data passed to formatted incorrectly.
 </p>
 
 
 
 <h3><a name='disable'>disable</a> - <span class='type'>.autoComplete('disable')</span></h3>
 <p>
-Disables the autoComplete, but doesn't destroy it.
+	Disables the autoComplete, but doesn't destroy it.
 </p>
 
 
 
 <h3><a name='enable'>enable</a> - <span class='type'>.autoComplete('enable')</span></h3>
 <p>
-Enables the autoComplete.
+	Enables the autoComplete.
 </p>
 
 
 
 <h3><a name='flush'>flush</a> - <span class='type'>.autoComplete('flush', cacheOnly)</span></h3>
 <p>
-The flush event clears out the inner cache of results, as well as the number of requests made.
-And optional, second boolean parameter can be passed if only the cache needs to be flushed, not
-the number of requests made.
+	The flush event clears out the inner cache of results, as well as the number of requests made.
+	And optional, second boolean parameter can be passed if only the cache needs to be flushed, not
+	the number of requests made.
 </p>
 
 
 
 <h3><a name='option'>option</a> - <span class='type'>.autoComplete('option', name, value)</span></h3>
 <p>
-The option method provides a way to get/set single settings.<br><br>
--Passing both name and value parameters will set that option into the current settings.<br>
--Passing just the name value returns that settings value. There are four keywords that return special objects:
-<span style='display:block;margin: 0 0 0 25px;'>
-	-Passing 'ul' will return the $ul object for the drop down list<br>
-	-Passing 'cache' will return the current cache object<br>
-	-Passing 'xhr' will return the last called xhr request<br>
-	-Passing 'input' will return the current $input object.<br>
-</span>
--Passing no name or value parameter's will return the entire settings object.<br><br>
+	The option method provides a way to get/set single settings.<br><br>
+	-Passing both name and value parameters will set that option into the current settings.<br>
+	-Passing just the name value returns that settings value. There are four keywords that return special objects:
+	<span style='display:block;margin: 0 0 0 25px;'>
+		-Passing 'ul' will return the $ul object for the drop down list<br>
+		-Passing 'cache' will return the current cache object<br>
+		-Passing 'xhr' will return the last called xhr request<br>
+		-Passing 'input' will return the current $input object.<br>
+	</span>
+	-Passing no name or value parameter's will return the entire settings object.<br><br>
 </p>
 <p class='notes'>
 	<b>Note*:</b> Not passing the value parameter breaks the chain, as it utilizes jQuery's
@@ -757,20 +842,19 @@ The option method provides a way to get/set single settings.<br><br>
 
 <h3><a name='search'>search</a> - <span class='type'>.autoComplete('search', value)</span></h3>
 <p>
-The search method gives a programmatic way for triggering search with custom input. The 'value'
-parameter passed should contain a string for the custom search to be triggered.
+	The search method gives a programmatic way for triggering search with custom input. The 'value'
+	parameter passed should contain a string for the custom search to be triggered.
 </p>
 
 
 
 <h3><a name='settings'>settings</a> - <span class='type'>.autoComplete('settings', newSettings)</span></h3>
 <p style='margin-bottom: 20px;'>
-The settings method allows for changes to the settings for that inputs autoComplete at any
-point of time. This can be very useful if the metadata plugin is not installed, yet separate
-functionality is needed for each input. Simply initiate the autoComplete on each input,
-and use the settings method to attach special parameters to each input's autoComplete instance.
+	The settings method allows for changes to the settings for that inputs autoComplete at any
+	point of time. This can be very useful if the metadata plugin is not installed, yet separate
+	functionality is needed for each input. Simply initiate the autoComplete on each input,
+	and use the settings method to attach special parameters to each input's autoComplete instance.
 </p>
-
 <p class='notes'>
 	<b>Extra Functionality*:</b> If a function is passed as the newSettings var, the inputs current settings and cache
 	are passed to the function as parameters. Just return the array [newSettings, cache]. Here's the format:
