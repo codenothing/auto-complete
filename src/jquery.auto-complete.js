@@ -882,7 +882,7 @@ var
 				if ( $ul.data( 'ac-selfmade' ) === TRUE ) {
 					$ul.remove();
 				}
-				// Kill all data associated with autoComplete and return a cleaned drop down element
+				// Kill all data associated with autoComplete for a cleaned drop down element
 				else {
 					$ul.removeData( 'autoComplete' ).removeData( 'ac-input-index' ).removeData( 'ac-inputs' );
 				}
@@ -1093,10 +1093,10 @@ var
 			}
 
 			// Scrolling
-			var v = liFocus * liHeight;
-			if ( v < view-ulHeight ) {
-				view = v+ulHeight;
-				$ul.scrollTop( v );
+			var scroll = liFocus * liHeight;
+			if ( scroll < view - ulHeight ) {
+				view = scroll + ulHeight;
+				$ul.scrollTop( scroll );
 			}
 
 			return $li;
@@ -1119,9 +1119,9 @@ var
 			autoFill( liData.value );
 
 			// Scrolling
-			var v = ( liFocus + 1 ) * liHeight;
-			if ( v > view ) {
-				$ul.scrollTop( ( view = v ) - ulHeight );
+			var scroll = ( liFocus + 1 ) * liHeight;
+			if ( scroll > view ) {
+				$ul.scrollTop( ( view = scroll ) - ulHeight );
 			}
 
 			if ( settings.onRollover ) {
@@ -1263,7 +1263,7 @@ var
 			// Initialize Vars together (save bytes)
 			var offset = $input.offset(), // Input position
 				container = [], // Container for list elements
-				aci = 0, k = 0, i = -1, even = FALSE, length = currentList.length; // Loop Items
+				items = 0, i = -1, even = FALSE, length = currentList.length; // Loop Items
 
 			if ( settings.onListFormat ) {
 				settings.onListFormat.call( self, event, { list: currentList, settings: settings, cache: cache, ul: $ul } );
@@ -1271,7 +1271,7 @@ var
 				// Push items onto container
 				for ( ; ++i < length; ) {
 					if ( currentList[i].value ) {
-						if ( settings.maxItems > -1 && ++aci > settings.maxItems ) {
+						if ( settings.maxItems > -1 && ++items > settings.maxItems ) {
 							break;
 						}
 

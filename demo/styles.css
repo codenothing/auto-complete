@@ -9,24 +9,36 @@ body {
 	padding: 2px;
 }
 
+body {
+	font-family: Verdana;
+	font-size: 10pt;
+	padding: 10px;
+	margin: 0;
+}
+
 body > div, pre, .hr {
-	font-size: 9pt;
 	width: 600px;
 }
 
 h1 {
-	margin: -2px -2px 10px -2px;
+	margin: -10px -10px 10px -10px;
 	padding: 10px;
 	background-color: #6A1617;
 	color: white;
 }
 
 pre {
+	font-size: 8pt;
 	border: 2px dashed #ADADB3;
 	background-color: #F7F7F7;
 	padding: 10px;
 	width: 576px;
 	overflow: auto;
+}
+
+input {
+	padding: 2px;
+	font-size: 9pt;
 }
 
 .hr {
@@ -35,6 +47,7 @@ pre {
 }
 
 #AutoCompleteFocus {
+	font-size: 9pt;
 	background-color: #f6f6f6;
 	border: 2px solid #c1c1c1;
 	position: fixed;
