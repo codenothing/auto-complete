@@ -11,6 +11,7 @@
 -Forms only have a single autoComplete event attached to them as well, with the event being transfered to the input in focus
 -Filled in default nonInput array with shift, left arrow, and right arrow keys
 -Moved all input data to an object stored on the 'autoComplete' data namespace.
+-setting cacheLimit to -1 now removes any limitation on cache size.
 
 
 # New Settings
@@ -18,6 +19,8 @@
 -postFormat: Ability to format the post data object/string being sent server side
 -formatSupply: Ability to format the supplied list, which overwrites the slower internal function.
 -bgiframe: Object of settings to be passed into the bgiframe plugin.
+-onListFormat: Event callback that when defined, must populate the drop down element. A list of possible values will be provided. This is
+intended to overwrite the source populater (which just loops through the list and makes an html frag to insert into the drop down element)
 
 
 # New Methods
@@ -27,16 +30,22 @@ none.
 
 # jQuery.autoComplete
 
--Added version to show current autoComplete version
--Added global focus and blur events.
--Now storing jQuery cached objects of autoComplete elements.
+-version: Current autoComplete version
+-blur: Global function to capture event when an autoComplete element loses focus.
+-focus: Global function to capture event when an autoComplete element gains focus.
+-jqStack: Now storing jQuery cached objects of autoComplete elements.
+-keys: Object containing a list of keys used throughout the autoComplete plugin
+
 -The getFocus and getPrevious methods can now take a single boolean argument to return jQuery cached object of the element desired.
--Exposing arrayMethods and handlerMethods for custom method triggering
--Exposed keycodes used throughout the plugin.
+
+/* Internal */
+-arrayMethods: Custom methods that take an array as the first parameter
+-handlerMethods: /* Describe this */
 
 
 # Possible Breakages
 
+-jQuery.autoComplete.focus has been changed to a function handler instead of the current element in focus.
 -Removed dataName setting, now based off global list cache
 -The nonInput setting default is changed from undefined to an array fill with shift, left & right arrow key codes.
 -All data associated with the input has been moved to an object stored on the 'autoComplete' data namespace.

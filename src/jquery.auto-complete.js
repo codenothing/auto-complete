@@ -85,11 +85,11 @@
 			rootjQuery.unbind( 'click.autoComplete' );
 		}
 
-		var $form = $input.closest( 'form' ), formList = $form.data( 'ac-inputs' ), i = -1, l = ( formList || [] ).length;
+		var $form = $input.closest( 'form' ), formList = $form.data( 'ac-inputs' ) || {}, i;
 
 		formList[ inputIndex ] = FALSE;
-		for ( ; ++i < l ; ) {
-			if ( formList[ i ] === TRUE ) {
+		for ( i in formList ) {
+			if ( formList.hasOwnProperty(i) && formList[i] === TRUE ) {
 				return;
 			}
 		}
@@ -276,9 +276,9 @@ var
 			onRollover: undefined,
 			onSelect: undefined,
 			onShow: undefined,
-			onSubmit: function(){ return TRUE; },
-			spinner: undefined,
 			onListFormat: undefined,
+			onSubmit: undefined,
+			spinner: undefined,
 			preventEnterSubmit: TRUE,
 			delay: 0,
 			// Caching Options
@@ -551,7 +551,7 @@ var
 					AutoComplete.order.unshift( inputIndex );
 				}
 
-				if ( AutoComplete.order.length > AutoComplete.defaults.cacheLimit ) {
+				if ( AutoComplete.defaults.cacheLimit !== -1 && AutoComplete.order.length > AutoComplete.defaults.cacheLimit ) {
 					AutoComplete.order.pop();
 				}
 
@@ -601,11 +601,12 @@ var
 
 				// Because IE triggers focus AND closes the drop list before form submission,
 				// tracking enter is set on the keydown event
-				return settings.preventEnterSubmit && ( ulOpen || LastEvent[ 'enter_' + ExpandoFlag ] ) ?
-					FALSE : settings.onSubmit.call( self, event, { form: form, settings: settings, cache: cache, ul: $ul } );
+				return settings.preventEnterSubmit && ( ulOpen || LastEvent[ 'enter_' + ExpandoFlag ] ) ? FALSE : 
+					settings.onSubmit === undefined ? TRUE : 
+					settings.onSubmit.call( self, event, { form: form, settings: settings, cache: cache, ul: $ul } );
 			},
 
-			// Catch mouseovers on the drop down list
+			// Catch mouseovers on the drop down element
 			'autoComplete.ul-mouseenter': function( e, event, el ) {
 				if ( $li ) {
 					$li.removeClass( settings.rollover );
@@ -867,10 +868,10 @@ var
 				// Remove form/drop list/document event catchers if possible
 				teardown( $input, inputIndex );
 
-				// Remove input from the drop down list of inputs
+				// Remove input from the drop down element of inputs
 				list[ inputIndex ] = undefined;
 
-				// Go through the drop down list and see if any other inputs are attached to it
+				// Go through the drop down element and see if any other inputs are attached to it
 				for ( i in list ) {
 					if ( list.hasOwnProperty(i) && list[i] === TRUE ) {
 						return LastEvent;
@@ -881,7 +882,7 @@ var
 				if ( $ul.data( 'ac-selfmade' ) === TRUE ) {
 					$ul.remove();
 				}
-				// Kill all data associated with autoComplete and return a cleaned drop down list
+				// Kill all data associated with autoComplete and return a cleaned drop down element
 				else {
 					$ul.removeData( 'autoComplete' ).removeData( 'ac-input-index' ).removeData( 'ac-inputs' );
 				}
@@ -914,7 +915,7 @@ var
 			}
 
 			// Load from cache if possible
-			if ( settings.useCache && cache.list[ cache.val ] ) {
+			if ( settings.useCache && $.isArray( cache.list[ cache.val ] ) ) {
 				return loadResults( event, cache.list[ cache.val ], settings, cache, backSpace );
 			}
 
@@ -986,7 +987,7 @@ var
 			var list = [], args = [],
 				fn = $.isFunction( settings.dataFn ),
 				regex = fn ? undefined : new RegExp( '^'+cache.val, 'i' ),
-				k = 0, entry, i = -1, l = settings.dataSupply.length;
+				items = 0, entry, i = -1, l = settings.dataSupply.length;
 
 			if ( settings.formatSupply ) {
 				list = settings.formatSupply.call( self, event, {
@@ -1000,7 +1001,7 @@ var
 				for ( ; ++i < l ; ) {
 					// Force object wrapper for entry
 					entry = settings.dataSupply[i];
-					entry = typeof entry === 'object' && entry.value ? entry : { value: entry };
+					entry = entry && typeof entry.value === 'string' ? entry : { value: entry };
 
 					// Setup arguments for dataFn in a backwards compatible way if needed
 					args = settings.backwardsCompatible ? 
@@ -1019,7 +1020,7 @@ var
 					// If user supplied function, use that, otherwise test with default regex
 					if ( ( fn && settings.dataFn.apply( self, args ) ) || ( ! fn && entry.value.match( regex ) ) ) {
 						// Reduce browser load by breaking on limit if it exists
-						if ( settings.maxItems > -1 && ++k > settings.maxItems ) {
+						if ( settings.maxItems > -1 && ++items > settings.maxItems ) {
 							break;
 						}
 						list.push( entry );
@@ -1240,12 +1241,12 @@ var
 			}
 
 			// Store results into the cache if allowed
-			if ( settings.useCache && cache.list[ cache.val ] === undefined ) {
+			if ( settings.useCache && ! $.isArray( cache.list[ cache.val ] ) ) {
 				cache.length++;
 				cache.list[ cache.val ] = list;
 
 				// Clear cache if necessary
-				if ( cache.length > settings.cacheLimit ) {
+				if ( settings.cacheLimit !== -1 && cache.length > settings.cacheLimit ) {
 					cache.list = {};
 					cache.length = 0;
 				}
@@ -1297,7 +1298,7 @@ var
 				$li = $elems.eq(0).addClass( settings.rollover );
 			}
 
-			// Align the drop down list
+			// Align the drop down element
 			$ul.data( 'ac-input-index', inputIndex ).scrollTop(0).css({
 				top: offset.top + $input.outerHeight(),
 				left: offset.left,
@@ -1331,7 +1332,7 @@ var
 			return $ul.show( event );
 		}
 
-		// Custom modifications to the drop down list
+		// Custom modifications to the drop down element
 		newUl();
 
 		// Do case change on initialization so it's not run on every request

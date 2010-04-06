@@ -9,7 +9,7 @@ body {
 	padding: 2px;
 }
 
-body > div, pre {
+body > div, pre, .hr {
 	font-size: 9pt;
 	width: 600px;
 }
@@ -21,13 +21,25 @@ h1 {
 	color: white;
 }
 
+pre {
+	border: 2px dashed #ADADB3;
+	background-color: #F7F7F7;
+	padding: 10px;
+	width: 576px;
+	overflow: auto;
+}
+
+.hr {
+	background-color: #595959;
+	height: 3px;
+}
+
 #AutoCompleteFocus {
 	background-color: #f6f6f6;
 	border: 2px solid #c1c1c1;
 	position: fixed;
 	top: 80px;
 	left: 800px;
-	/*margin: 40px 0 0 700px;*/
 	padding: 15px;
 	width: 300px;
 	height: 100px;
@@ -40,4 +52,8 @@ h1 {
 
 #AutoCompleteFocus pre {
 	display: none;
+	width: auto;
+	overflow: visible;
+	border: none;
+	background-color: none;
 }

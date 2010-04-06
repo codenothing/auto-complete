@@ -69,11 +69,11 @@ jQuery(function($){
 	$('#input-c').autoComplete();
 	// Trigger full 'c' list
 	$('#submit-c').click(function(){
-		$('#input-c').autoComplete('button.ajax', {all:true, letter:'c'}, 'ALL_LETTER_C_REQUESTS');
+		$('#input-c').autoComplete('button.ajax', { all: true, letter: 'c' }, 'ALL_LETTER_C_REQUESTS');
 	});
 	// Trigger full 'd' list
 	$('#submit-d').click(function(){
-		$('#input-c').autoComplete('button.ajax', {all:true, letter:'d'},  'ALL_LETTER_D_REQUESTS');
+		$('#input-c').autoComplete('button.ajax', { all: true, letter: 'd' },  'ALL_LETTER_D_REQUESTS');
 	});
 	// Clear just the cache, not the # of requests
 	$('#submit-flush').click(function(){
@@ -107,26 +107,24 @@ jQuery(function($){
 
 	// Hide/Show affect on code preview
 	var code = false;
-	var $div = $('#AutoCompleteFocus'); // Local copy
-	var maxWidth = $(window).width() - $div.offset().left - 50;
-	if (maxWidth > 500) maxWidth = 500;
-	$div.find('a').click(function(){
-		$(this).html(code ? '+ Open Code' : '- Close Code');
-		$div.css({height: code ? 100 : 250, width: code ? 300 : maxWidth}).find('pre')[ code ? 'hide' : 'show' ]();
+	var wrapper = $('#AutoCompleteFocus'); // Local copy
+	var maxWidth = $(window).width() - wrapper.offset().left - 50;
+	if ( maxWidth > 500 ) {
+		maxWidth = 500;
+	}
+	wrapper.find('a').click(function(){
+		$(this).html( code ? '+ Open Code' : '- Close Code' );
+		wrapper.css({ height: code ? 100 : 250, width: code ? 300 : maxWidth }).find('pre')[ code ? 'hide' : 'show' ]();
 		code = !code;
 		return false;
 	});
 	$.autoComplete.focus = function(){
-		var f = $.autoComplete.getFocus(), p = $.autoComplete.getPrevious();
-		$div.find('.current span').html(
-			$.autoComplete.hasFocus ? 
-			'name=' + $(f).attr('name') + "'" :
-			'Nothing in Focus'
+		var focus = $.autoComplete.getFocus( true ), previous = $.autoComplete.getPrevious( true );
+		wrapper.find('.current span').html(
+			focus.length ? 'name=' + focus.attr('name') + "'" : 'Nothing in Focus'
 		);
-		$div.find('.previous span').html(
-			p ? 
-			'name=' + $(p).attr('name') + "'" :
-			'Nothing previously in focus'
+		wrapper.find('.previous span').html(
+			previous.length ? 'name=' + previous.attr('name') + "'" : 'Nothing previously in focus'
 		);
 	};
 });

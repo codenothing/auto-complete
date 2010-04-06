@@ -56,11 +56,15 @@ is used as the sample result set.
 	<a href='#'>+ Open Code</a>
 <pre>
 var $div = $('#AutoCompleteFocus');
-$('input[type=text]').focus(function(){
-	var f = $.autoComplete.getFocus(), p = $.autoComplete.getPrevious();
-	$div.find('.current span').html('#' + $.autoComplete.focus + ": '" + $(f).attr('name') + "'");
-	$div.find('.previous span').html('#' + $.autoComplete.previous + ": '" + $(p).attr('name') + "'");
-});
+$.autoComplete.focus = function(){
+	var focus = $.autoComplete.getFocus( true ), previous = $.autoComplete.getPrevious( true );
+	$div.find('.current span').html(
+		focus.length ? 'name=' + focus.attr('name') + "'" : 'Nothing in Focus'
+	);
+	$div.find('.previous span').html(
+		previous.length ? 'name=' + previous.attr('name') + "'" : 'Nothing previously in focus'
+	);
+};
 </pre>
 </div>
 
@@ -96,7 +100,7 @@ $('input[name=destroy-1]').click(function(){
 </pre>
 
 
-<hr size='1' width='300px;' align='left' />
+<div class='hr'></div>
 
 
 <div style='margin:40px 0;'>
@@ -117,7 +121,7 @@ $('input[name=search2]').autoComplete({
 </div>
 
 
-<hr size='1' width='300px;' align='left' />
+<div class='hr'></div>
 
 
 <div style='margin:40px 0;'>
@@ -145,7 +149,7 @@ $('input[name=search3]').autoComplete({
 
 
 
-<hr size='1' width='300px;' align='left' />
+<div class='hr'></div>
 
 
 
@@ -171,7 +175,7 @@ $('input[name=search4-submit]').click(function(){
 
 
 
-<hr size='1' width='300px;' align='left' />
+<div class='hr'></div>
 
 
 
@@ -201,7 +205,7 @@ $('#submit-flush').click(function(){
 
 
 
-<hr size='1' width='300px;' align='left' />
+<div class='hr'></div>
 
 
 
@@ -223,7 +227,7 @@ $('#search6').click(function(){
 
 
 
-<hr size='1' width='300px;' align='left' />
+<div class='hr'></div>
 
 
 
