@@ -132,6 +132,10 @@ var
 	// regex's
 	rdot = /\./,
 
+	// Opera and Firefox on Mac need to use the keypress event to track holding of
+	// a key down and not releasing
+	keypress = window.opera || /macintosh/i.test( window.navigator.userAgent ),
+
 	// Event flag that gets passed around
 	ExpandoFlag = 'autoComplete_' + $.expando,
 
@@ -364,6 +368,7 @@ var
 				if ( event.keyCode === KEY.enter ) {
 					var enter = TRUE;
 
+					// See entertracking on main key(press/down) event for explanation
 					if ( $li && $li.hasClass( settings.rollover ) ) {
 						enter = settings.preventEnterSubmit && ulOpen ? FALSE : TRUE;
 						select( event );
@@ -378,8 +383,9 @@ var
 		}
 
 
-		// Opera uses keypress as it has problems with keydown
-		$input.bind( window.opera ? 'keypress.autoComplete' : 'keydown.autoComplete' , function( event ) {
+		// Opera && firefox on Mac use keypress to track holding down of key, 
+		// while everybody else uses keydown for same functionality
+		$input.bind( keypress ? 'keypress.autoComplete' : 'keydown.autoComplete' , function( event ) {
 			// If autoComplete has been disabled, prevent input events
 			if ( ! ACData.active ) {
 				return TRUE;
@@ -395,18 +401,7 @@ var
 			}
 			// Enter Key
 			else if ( key === KEY.enter ) {
-				// IE needs keydown to return false on 'enter' so the element doesn't
-				// lose focus. The problem with returning false is that it prevents bubbling,
-				// and most importantly, form submission. To allow for most flexibility,
-				// preventEnterSubmit is used along with activity of drop down UL list to
-				// determine whether focus is on the drop list or is just on the input.
-				//
-				// Furthermore, preventEnterSubmit will now be defaulted to true, so as
-				// to affect as few implementations as possible, and the ones that need
-				// form submission on 'enter' can just set this flag to false for it to
-				// work as needed.
-				//
-				// And lastly, when tracking whether to submit the form or not, we have
+				// When tracking whether to submit the form or not, we have
 				// to ensure that the user is actually selecting an element from the drop
 				// down list. It no element is selected, then hide the list and track form
 				// submission. If an element is selected, then track for submission first, 
