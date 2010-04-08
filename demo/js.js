@@ -100,7 +100,7 @@ jQuery(function($){
 		autoFill: true,
 		striped: 'auto-complete-striped',
 		// Add a delay as autofill takes some time
-		delay: 200
+		delay: 100
 	});
 
 

@@ -16,7 +16,7 @@ body {
 	margin: 0;
 }
 
-body > div, pre, .hr {
+div.content, pre, .hr {
 	width: 600px;
 }
 
@@ -47,10 +47,10 @@ input {
 }
 
 #AutoCompleteFocus {
+	position: absolute;
 	font-size: 9pt;
 	background-color: #f6f6f6;
 	border: 2px solid #c1c1c1;
-	position: fixed;
 	top: 80px;
 	left: 800px;
 	padding: 15px;
@@ -59,8 +59,14 @@ input {
 	overflow: auto;
 }
 
+/* Hack for ie6, the helper window will scroll with every browser but ie6 */
+body > #AutoCompleteFocus {
+	position: fixed;
+}
+
 #AutoCompleteFocus div {
 	margin-bottom: 20px;
+	width: auto;
 }
 
 #AutoCompleteFocus pre {

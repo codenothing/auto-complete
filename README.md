@@ -7,9 +7,9 @@ Autocomplete enbles custom hinting on input fields. Both client and server side 
 Bowser Support
 --------------
 
-Tested On: FireFox 3.6, Chrome 5.0, Safari 3.0/3.1/3.2/4.0, Opera 10.10
+Tested On: IE 6/7/8, FireFox 3.6, Chrome 5.0, Safari 3.0.4/3.1.2/3.2.1/4.0.5, Opera 9.52/10.10
 
-Looking to Support: IE 6,7,8,9, FireFox 3.x, Opera 9.x
+Still needs testing on: IE 9, FireFox 3.x
 
 Credits
 --------

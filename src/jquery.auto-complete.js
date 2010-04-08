@@ -351,9 +351,35 @@ var
 			active: TRUE,
 			settings: settings,
 			initialSettings: $.extend( TRUE, {}, settings )
-		})
+		});
+
+		// IE catches the enter key only on keypress/keyup, so add a helper
+		// to track that event if needed
+		if ( $.browser.msie ) {
+			$input.bind( 'keypress.autoComplete', function( event ){
+				if ( ! ACData.active ) {
+					return TRUE;
+				}
+
+				if ( event.keyCode === KEY.enter ) {
+					var enter = TRUE;
+
+					if ( $li && $li.hasClass( settings.rollover ) ) {
+						enter = settings.preventEnterSubmit && ulOpen ? FALSE : TRUE;
+						select( event );
+					}
+					else if ( ulOpen ) { 
+						$ul.hide( event );
+					}
+
+					return enter;
+				}
+			});
+		}
+
+
 		// Opera uses keypress as it has problems with keydown
-		.bind( window.opera ? 'keypress.autoComplete' : 'keydown.autoComplete' , function( event ) {
+		$input.bind( window.opera ? 'keypress.autoComplete' : 'keydown.autoComplete' , function( event ) {
 			// If autoComplete has been disabled, prevent input events
 			if ( ! ACData.active ) {
 				return TRUE;
@@ -361,6 +387,7 @@ var
 
 			// Track last event and store code for munging
 			var key = ( LastEvent = event ).keyCode, enter = FALSE;
+
 
 			// Tab Key
 			if ( key === KEY.tab && ulOpen ) {
