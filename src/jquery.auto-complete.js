@@ -134,7 +134,7 @@ var
 
 	// Opera and Firefox on Mac need to use the keypress event to track holding of
 	// a key down and not releasing
-	keypress = window.opera || /macintosh/i.test( window.navigator.userAgent ),
+	keypress = window.opera || ( /macintosh/i.test( window.navigator.userAgent ) && $.browser.mozilla ),
 
 	// Event flag that gets passed around
 	ExpandoFlag = 'autoComplete_' + $.expando,
