@@ -1,2 +1,3 @@
 # Ignore all temporary files 
 *.swp
+minify.sh

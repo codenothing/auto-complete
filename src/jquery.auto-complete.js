@@ -1303,7 +1303,9 @@ var
 				top: offset.top + $input.outerHeight(),
 				left: offset.left,
 				width: settings.width
-			});
+			})
+			// The drop list has to be shown before maxHeight can be configured
+			.show( event );
 
 			// Log li height for less computation
 			liHeight = $elems.eq(0).outerHeight();
@@ -1327,9 +1329,6 @@ var
 			// Include amount of time it took
 			// to load the list
 			LastEvent.timeStamp = ( new Date() ).getTime();
-
-			// Every function needs to return something
-			return $ul.show( event );
 		}
 
 		// Custom modifications to the drop down element
