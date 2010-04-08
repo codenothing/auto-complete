@@ -637,6 +637,7 @@ var
 				$li = $( el ).addClass( settings.rollover );
 				liFocus = $elems.index( el );
 				liData = currentList[ liFocus ];
+				LastEvent = event;
 
 				if ( settings.onRollover ) {
 					settings.onRollover.apply( self, settings.backwardsCompatible ? 
@@ -650,8 +651,6 @@ var
 						}]
 					);
 				}
-
-				return ( LastEvent = event );
 			},
 
 			// Catch click events on the drop down
@@ -665,7 +664,7 @@ var
 					liData.value 
 				);
 
-				$ul.hide( event );
+				$ul.hide( LastEvent = event );
 				autoFill();
 
 				if ( settings.onSelect ) {
@@ -680,8 +679,6 @@ var
 						}]
 					);
 				}
-
-				return ( LastEvent = event );
 			},
 
 			// Allow for change of settings at any point
@@ -690,6 +687,7 @@ var
 					return TRUE;
 				}
 
+				LastEvent = event;
 				var ret, $el;
 
 				// Give access to current settings and cache
@@ -725,9 +723,6 @@ var
 
 				// Just to be sure, repush the settings onto the data object
 				ACData.settings = settings;
-
-				// Return & Store event
-				return ( LastEvent = event );
 			},
 
 			// Clears the Cache & requests (requests can be blocked from clearing)
@@ -741,7 +736,7 @@ var
 				}
 
 				cache = { length: 0, val: undefined, list: {} };
-				return ( LastEvent = event );
+				LastEvent = event;
 			},
 
 			// External button trigger for ajax requests
@@ -846,38 +841,32 @@ var
 					return TRUE;
 				}
 
-				var length = Slice.call( arguments ).length;
 				LastEvent = event;
-
-				if ( length === 3 ) {
-					settings[ name ] = value;
-					return value;
-				}
-				else if ( length === 2 ) {
-					switch ( name ) {
-						case 'ul': return $ul;
-						case 'cache': return cache;
-						case 'xhr': return xhr;
-						case 'input': return $input;
-						default: return settings[ name ] || undefined;
-					}
-				}
-				else {
-					return settings;
+				switch ( Slice.call( arguments ).length ) {
+					case 3: 
+						settings[ name ] = value;
+						return value;
+					case 2:
+						return name === 'ul' ? $ul :
+							name === 'cache' ? cache :
+							name === 'xhr' ? xhr :
+							name === 'input' ? $input :
+							settings[ name ] || undefined;
+					default:
+						return settings;
 				}
 			},
 
 			// Add enabling event (only applicable after disable)
 			'autoComplete.enable': function( event ) {
 				ACData.active = TRUE;
-				return ( LastEvent = event );
+				LastEvent = event;
 			},
 
 			// Add disable event
 			'autoComplete.disable': function( event ) {
 				ACData.active = FALSE;
-				$ul.html('').hide( event );
-				return ( LastEvent = event );
+				$ul.html('').hide( LastEvent = event );
 			},
 
 			// Add a destruction function
@@ -908,8 +897,6 @@ var
 				else {
 					$ul.removeData( 'autoComplete' ).removeData( 'ac-input-index' ).removeData( 'ac-inputs' );
 				}
-
-				return LastEvent;
 			}
 		});
 
@@ -1083,7 +1070,7 @@ var
 				$ul.hide( event );
 			}
 
-			return ( $li = undefined );
+			$li = undefined;
 		}
 
 		// Key direction up
@@ -1120,8 +1107,6 @@ var
 				view = scroll + ulHeight;
 				$ul.scrollTop( scroll );
 			}
-
-			return $li;
 		}
 
 		// Key direction down
@@ -1157,8 +1142,6 @@ var
 					}]
 				);
 			}
-
-			return $li;
 		}
 
 		// Attach new show/hide functionality to only the ul object (so not to infect all of jQuery),
@@ -1202,7 +1185,7 @@ var
 			}
 
 			list[ inputIndex ] = TRUE;
-			return $ul.data( 'ac-inputs', list );
+			$ul.data( 'ac-inputs', list );
 		}
 
 		// Auto-fill the input
@@ -1247,8 +1230,6 @@ var
 				self.selectionStart = start;
 				self.selectionEnd = end;
 			}
-
-			return TRUE;
 		}
 
 		// List Functionality
