@@ -1285,11 +1285,12 @@ var
 			// Initialize Vars together (save bytes)
 			var offset = $input.offset(), // Input position
 				container = [], // Container for list elements
-				items = 0, i = -1, even = FALSE, length = currentList.length; // Loop Items
+				items = 0, i = -1, striped = FALSE, length = currentList.length; // Loop Items
 
 			if ( settings.onListFormat ) {
 				settings.onListFormat.call( self, event, { list: currentList, settings: settings, cache: cache, ul: $ul } );
-			} else {
+			}
+			else {
 				// Push items onto container
 				for ( ; ++i < length; ) {
 					if ( currentList[i].value ) {
@@ -1298,12 +1299,12 @@ var
 						}
 
 						container.push(
-							settings.striped && even ? '<li class="' + settings.striped + '">' : '<li>',
+							settings.striped && striped ? '<li class="' + settings.striped + '">' : '<li>',
 							currentList[i].display || currentList[i].value,
 							'</li>'
 						);
 
-						even = !even;
+						striped = ! striped;
 					}
 				}
 				$ul.html( container.join('') );

@@ -4,6 +4,9 @@
  * Corey Hart @ http://www.codenothing.com
  */ 
 jQuery(function($){
+	// Setup maxHeight for IE6
+	$.autoComplete.defaults.maxHeight = 250;
+
 	// Normal Auto-complete initiation
 	$('input[name=search1]').autoComplete();
 
@@ -106,18 +109,26 @@ jQuery(function($){
 
 
 	// Hide/Show affect on code preview
-	var code = false;
-	var wrapper = $('#AutoCompleteFocus'); // Local copy
-	var maxWidth = $(window).width() - wrapper.offset().left - 50;
+	var wrapper = $('#AutoCompleteFocus'), maxWidth = $(window).width() - wrapper.offset().left - 50;
 	if ( maxWidth > 500 ) {
 		maxWidth = 500;
 	}
-	wrapper.find('a').click(function(){
-		$(this).html( code ? '+ Open Code' : '- Close Code' );
-		wrapper.css({ height: code ? 100 : 250, width: code ? 300 : maxWidth }).find('pre')[ code ? 'hide' : 'show' ]();
-		code = !code;
-		return false;
-	});
+
+	// Toggle code for floater
+	wrapper.find('a').toggle(
+		function(){
+			$(this).html('- Close Code');
+			wrapper.css({ height: 250, width: maxWidth }).find('pre').show();
+			return false;
+		},
+		function(){
+			$(this).html('+ Open Code');
+			wrapper.css({ height: 100, width: 300 }).find('pre').hide();
+			return false;
+		} 
+	);
+
+	// Setup global focus event for tracking
 	$.autoComplete.focus = function(){
 		var focus = $.autoComplete.getFocus( true ), previous = $.autoComplete.getPrevious( true );
 		wrapper.find('.current span').html(
