@@ -49,3 +49,7 @@ none.
 -Removed dataName setting, now based off global list cache
 -The nonInput setting default is changed from undefined to an array fill with shift, left & right arrow key codes.
 -All data associated with the input has been moved to an object stored on the 'autoComplete' data namespace.
+
+
+# Known Bugs
+-In versions of Opera before 10.01, using auto-fill puts the cursor at the start of the input, instead of at the end.

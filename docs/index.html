@@ -7,18 +7,27 @@
 	<script type='text/javascript' src='../jquery/jquery.history.js'></script>
 <script type='text/javascript'>
 $(function(){
-	var $h1 = $('h1').eq(0);
-	$('ul#menu').css({
+	var $h1 = $('h1').eq(0), firstLoad = true;
+	$('#menu').css({
 		height: ( $(window).height()-$h1.outerHeight() )*.9,
 		position: 'fixed',
 		overflow: 'auto',
 		top: $h1.outerHeight() + 5
 	});
 	$.historyInit(function(hash){
+		// Body Descriptions
 		$('h3.focus').removeClass('focus');
 		$('a[name='+hash+']').parent().addClass('focus');
-		$('#menu li.focus').removeClass('focus');
-		$('a[href=#'+hash+']').parent().addClass('focus');
+
+		// Floating Menu
+		var $li = $('a[href=#'+hash+']').parent(), $menu = $('#menu');
+		$menu.find('li.focus').removeClass('focus');
+		$li.addClass('focus');
+
+		if ( firstLoad ) {
+			$menu.scrollTop( $li.offset().top - $menu.offset().top - 1 );
+			firstLoad = false;
+		}
 	});
 });
 </script>
@@ -124,18 +133,13 @@ Corey Hart @ http://www.codenothing.com
 	<h2>Note's about autoComplete</h2>
 	<b>Namespaces</b>
 
-	autoComplete only requires control of 2 namespaces: jQuery.autoComplete &amp; jQuery.fn.autoComplete. The 2 other
-	namespaces(jQuery.expando &amp; jQuery.fn.bgiframe) are used internally and default to their original values if
-	defined. When not defined, jQuery.expando tries to find the expando defined first through jQuery event object, 
-	before creating one itself, and the jQuery.fn.bgiframe creates a useless non-chain breaking function.<br><br>
-
-	While jQuery.fn.bgiframe can be redefined at any given time, it is a bad idea to try and redefine the jQuery.expando
-	namespace after autoComplete has been initialized on elements. Doing so may or may not break the application, depending
-	on the timing. 
+	autoComplete only requires control of 2 namespaces: jQuery.autoComplete &amp; jQuery.fn.autoComplete. The plugin
+	first runs a check to see if the bgiframe plugin is installed, and if it's not, it creates a useless function
+	that returns 'this' for internal purposes. The bgiframe plugin can be installed before or after and will be used.<br><br>
 
 	<b>Event Namespacing</b>
 
-	All normal event's are attached with the .autoComplete namespace, and all method's(made up event's) are attached to
+	All normal event's are attached with the .autoComplete namespace, and all method's(custom event's) are attached to
 	the autoComplete event namespace. In cases where a manual trigger is required, prefix the method with
 	autoComplete, i.e: .trigger('autoComplete.<i>namespace</i>', args...).
 
@@ -196,12 +200,16 @@ Corey Hart @ http://www.codenothing.com
 	exactly like the instance specific focus event, only it tracks all inputs. The <span class='this'>this</span>
 	references the element currently in focus. The function gets two arguments passed in, the first is the event
 	object that was triggered, the second is a ui object.
-	<ul class='ui'>
-		<li class='title'>The ui object</li>
-		<li><b>settings:</b> Current settings attached to the input in focus</li>
-		<li><b>cache:</b> Current cache attached to the input in focus</li>
-		<li><b>ul:</b> Cached $ul jQuery object of the drop down list.</li>
-	</ul>
+</p>
+<ul class='ui'>
+	<li class='title'>The ui object</li>
+	<li><b>settings:</b> Current settings attached to the input in focus</li>
+	<li><b>cache:</b> Current cache attached to the input in focus</li>
+	<li><b>ul:</b> Cached $ul jQuery object of the drop down list.</li>
+</ul>
+<p class='notes'>
+	<b>Note*:</b> This function gets triggered across all inputs. For a per instance focus function,
+	check out the <a href='#onFocus'>onFocus</a> event.
 </p>
 
 
@@ -212,12 +220,16 @@ Corey Hart @ http://www.codenothing.com
 	almost the same as the instance specific blur event, only it tracks all inputs. The <span class='this'>this</span>
 	references the element currently losing focus. The function gets two arguments passed in, the first is the event
 	object that was triggered, the second is a ui object.
-	<ul class='ui'>
-		<li class='title'>The ui object</li>
-		<li><b>settings:</b> Current settings attached to the input in focus</li>
-		<li><b>cache:</b> Current cache attached to the input in focus</li>
-		<li><b>ul:</b> Cached $ul jQuery object of the drop down list.</li>
-	</ul>
+</p>
+<ul class='ui'>
+	<li class='title'>The ui object</li>
+	<li><b>settings:</b> Current settings attached to the input in focus</li>
+	<li><b>cache:</b> Current cache attached to the input in focus</li>
+	<li><b>ul:</b> Cached $ul jQuery object of the drop down list.</li>
+</ul>
+<p class='notes'>
+	<b>Note*:</b> This function gets triggered across all inputs. For a per instance blur function,
+	check out the <a href='#onBlur'>onBlur</a> event.
 </p>
 
 
@@ -456,7 +468,7 @@ Corey Hart @ http://www.codenothing.com
 
 <h3><div class='default'>false</div> <a name='multiple'>multiple</a> - <span class='type'>Boolean</span></h3>
 <p>
-	When true, multiple word inputs and word searching is allowed.
+	When true, multiple word searching is allowed.
 </p>
 
 
@@ -616,7 +628,7 @@ Corey Hart @ http://www.codenothing.com
 
 <h3><div class='default'>undefined</div> <a name='onListFormat'>onListFormat</a> - <span class='type'>Function(event, ui)</span></h3>
 <p>
-	Callback function to format the list elements into the ul dropdown.
+	Callback function to format the list elements into the ul drop down.
 </p>
 <ul class='ui'>
 	<li class='title'>The ui object</li>
@@ -669,7 +681,7 @@ Corey Hart @ http://www.codenothing.com
 
 <h3><div class='default'>Empty Function</div> <a name='onRollover'>onRollover</a> - <span class='type'>Function(event, ui)</span></h3>
 <p>
-	Callback function when the user focuses one of the options of the UL drop down list.
+	Callback function when the user focuses on one of the li elements in the UL drop down list.
 </p>
 <ul class='ui'>
 	<li class='title'>The ui object</li>
@@ -763,7 +775,7 @@ Corey Hart @ http://www.codenothing.com
 <h3><a name='button-ajax'>button-ajax</a> - <span class='type'>.autoComplete('button-ajax', postData, cacheName)</span></h3>
 <p>
 	The button-ajax method allows for sending requests through an external trigger(<i style='font-weight: normal;'>button</i>).
-	It's required to pass a special cacheName is passed if more than one button-ajax method is used on the same input. If only one is 
+	It's required to pass a special cacheName string if more than one button-ajax method is used on the same input. If only one is 
 	used, an inner string of random characters will be used. This can enable a sort of select drop down functionality, where 
 	clicking a button can show the whole list, or users can just use the autoComplete to find their selection.
 </p>
@@ -857,7 +869,7 @@ Corey Hart @ http://www.codenothing.com
 	functionality is needed for each input. Simply initiate the autoComplete on each input,
 	and use the settings method to attach special parameters to each input's autoComplete instance.
 </p>
-<p class='notes'>
+<p style='margin-bottom: 5px;'>
 	<b>Extra Functionality*:</b> If a function is passed as the newSettings var, the inputs current settings and cache
 	are passed to the function as parameters. Just return the array [newSettings, cache]. Here's the format:
 </p>

@@ -599,7 +599,7 @@ var
 			},
 
 			/**
-			 * Autocomplete Methods (Extensions off autoComplete event)
+			 * Autocomplete Custom Methods (Extensions off autoComplete event)
 			 */ 
 			// Catches document click events from the global scope
 			'autoComplete.document-click': function( e, event ) {
@@ -629,14 +629,15 @@ var
 			},
 
 			// Catch mouseovers on the drop down element
-			'autoComplete.ul-mouseenter': function( e, event, el ) {
+			'autoComplete.ul-mouseenter': function( e, event, li ) {
 				if ( $li ) {
 					$li.removeClass( settings.rollover );
 				}
 
-				$li = $( el ).addClass( settings.rollover );
-				liFocus = $elems.index( el );
+				$li = $( li ).addClass( settings.rollover );
+				liFocus = $elems.index( li );
 				liData = currentList[ liFocus ];
+				view = $ul.scrollTop() + ulHeight;
 				LastEvent = event;
 
 				if ( settings.onRollover ) {
@@ -687,8 +688,8 @@ var
 					return TRUE;
 				}
 
-				LastEvent = event;
 				var ret, $el;
+				LastEvent = event;
 
 				// Give access to current settings and cache
 				if ( $.isFunction( newSettings ) ) {
@@ -721,7 +722,7 @@ var
 				// Local copy of the seperator for faster referencing
 				separator = settings.multiple ? settings.multipleSeparator : undefined;
 
-				// Just to be sure, repush the settings onto the data object
+				// Just to be sure, reset the settings object into the data storage
 				ACData.settings = settings;
 			},
 
@@ -750,6 +751,8 @@ var
 					postData = {};
 				}
 
+				// Save off the last event before triggering focus on the off-chance
+				// it is needed by a secondary focus event
 				LastEvent = event;
 
 				// Refocus the input box, but pass flag to prevent inner focus events
@@ -776,6 +779,7 @@ var
 					data = undefined;
 				}
 
+				// Again, save off event before triggering focus
 				LastEvent = event;
 
 				// Refocus the input box and pass flag to prevent inner focus events
@@ -805,6 +809,7 @@ var
 					data = undefined;
 				}
 
+				// Again, save off event before triggering focus
 				LastEvent = event;
 
 				// Refocus the input box and pass flag to prevent inner focus events
@@ -1330,8 +1335,8 @@ var
 			// Number of elements per viewport
 			liPerView = liHeight === 0 ? 0 : Math.floor( view / liHeight );
 
-			// Include amount of time it took
-			// to load the list
+			// Include amount of time it took to load the list
+			// and run modifications
 			LastEvent.timeStamp = ( new Date() ).getTime();
 		}
 

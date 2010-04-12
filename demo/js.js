@@ -35,7 +35,7 @@ jQuery(function($){
 
 
 
-	// Auto-complete using seperate ajax script/post values
+	// Auto-complete using separate ajax script/post values
 	$('input[name=search3]').autoComplete({
 		ajax: 'ajax2.php',
 		postData: {
@@ -54,7 +54,7 @@ jQuery(function($){
 
 
 
-	// Auto-complete using metadata and maxiumum requests
+	// Auto-complete using metadata and maximum requests
 	$('input[name=search4]').autoComplete({
 		onMaxRequest: function(event, ui){
 			$(this).css('background-color', 'red');
