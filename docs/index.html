@@ -74,6 +74,7 @@ Corey Hart @ http://www.codenothing.com
 	<li><a href='#maxItems'>maxItems</a></li>
 	<li><a href='#maxHeight'>maxHeight</a></li>
 	<li><a href='#maxRequests'>maxRequests</a></li>
+	<li><a href='#maxRequestsDeep'>maxRequestsDeep</a></li>
 	<li><a href='#minChars'>minChars</a></li>
 	<li><a href='#multiple'>multiple</a></li>
 	<li><a href='#multipleSeparator'>multipleSeparator</a></li>
@@ -285,7 +286,8 @@ Corey Hart @ http://www.codenothing.com
 	<b>-keys:</b> A list of keycodes used throughout the plugin.<br>
 	<b>-arrayMethods:</b> Object containing all methods that may take an array as their first argument.<br>
 	<!-- TODO: Get a better description -->
-	<b>-handlerMethods:</b> Object containing all methods that may use triggerHandler under the proper condition.<br>
+	<b>-handlerMethods:</b> Object containing all methods that may use triggerHandler under the proper number of arguments 
+	(-1 forces triggerHandler method regardless the number of arguments).<br>
 	<b>-remove:</b> Function that removes an input from the stack, takes the element's unique id as the parameter.<br>
 </p>
 
@@ -455,6 +457,15 @@ Corey Hart @ http://www.codenothing.com
 <h3><div class='default'>0</div> <a name='maxRequests'>maxRequests</a> - <span class='type'>Integer</span></h3>
 <p>
 	Maximum number of ajax requests allowed within a scripts duration. If 0, no limit is applied
+</p>
+
+
+
+<h3><div class='default'>false</div> <a name='maxRequestsDeep'>maxRequestsDeep</a> - <span class='type'>Boolean</span></h3>
+<p>
+	The blocker setup by maxRequests only prevents more ajax requests from being made, while lists stored in the cache
+	and supplied through <a href='#dataSupply'>dataSupply</a> will still work. By setting this value to true, all
+	requests are blocked.
 </p>
 
 

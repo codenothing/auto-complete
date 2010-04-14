@@ -89,7 +89,7 @@
 
 		formList[ inputIndex ] = FALSE;
 		for ( i in formList ) {
-			if ( formList.hasOwnProperty(i) && formList[i] === TRUE ) {
+			if ( formList.hasOwnProperty( i ) && formList[ i ] === TRUE ) {
 				return;
 			}
 		}
@@ -127,7 +127,7 @@ var
 	rootjQuery = $( window.document ),
 
 	// Also make a copy of an empty jQuery set for fast referencing
-	emptyjQuery = $(),
+	emptyjQuery = $( ),
 
 	// regex's
 	rdot = /\./,
@@ -186,7 +186,9 @@ var
 			'direct-supply': TRUE
 		},
 
-		// TODO: Find a way to describe this
+		// Defines the maximum number of arguments that can be passed for using
+		// triggerHandler method instead of trigger. Passing -1 forces triggerHandler
+		// no matter the number of arguments
 		handlerMethods: {
 			'option': 2
 		},
@@ -229,7 +231,7 @@ var
 		},
 
 		// Returns full stack in jQuery form
-		getAll: function() {
+		getAll: function(){
 			for ( var i = -1, l = AutoComplete.counter, stack = []; ++i < l; ) {
 				if ( AutoComplete.stack[i] ) {
 					stack.push( AutoComplete.stack[i] );
@@ -264,6 +266,7 @@ var
 			minChars: 1,
 			maxItems: -1,
 			maxRequests: 0,
+			maxRequestsDeep: FALSE,
 			requestType: 'POST',
 			// Input
 			inputControl: undefined,
@@ -313,7 +316,7 @@ var
 			$li,
 			// View and heights for scrolling
 			view, ulHeight, liHeight, liPerView,
-			// Harcoded value for ul visiblity
+			// Hardcoded value for ul visiblity
 			ulOpen = FALSE,
 			// Timer for delay
 			timeid,
@@ -343,8 +346,8 @@ var
 			),
 
 			// Create the drop list (Use an existing one if possible)
-			$ul = ! settings.newList && rootjQuery.find( 'ul.' + settings.list )[0] ?
-				rootjQuery.find( 'ul.' + settings.list ).eq(0).bgiframe( settings.bgiframe ) :
+			$ul = ! settings.newList && rootjQuery.find( 'ul.' + settings.list )[ 0 ] ?
+				rootjQuery.find( 'ul.' + settings.list ).eq( 0 ).bgiframe( settings.bgiframe ) :
 				$('<ul/>').appendTo('body').addClass( settings.list ).bgiframe( settings.bgiframe ).hide().data( 'ac-selfmade', TRUE );
 
 
@@ -360,7 +363,7 @@ var
 		// IE catches the enter key only on keypress/keyup, so add a helper
 		// to track that event if needed
 		if ( $.browser.msie ) {
-			$input.bind( 'keypress.autoComplete', function( event ){
+			$input.bind( 'keypress.autoComplete', function( event ) {
 				if ( ! ACData.active ) {
 					return TRUE;
 				}
@@ -521,7 +524,7 @@ var
 				}
 
 				// Only push undefined index onto order stack
-				// if not already there (incase multiple blur events occur)
+				// if not already there (in-case multiple blur events occur)
 				if ( AutoComplete.order[0] !== undefined ) {
 					AutoComplete.order.unshift( undefined );
 				}
@@ -708,7 +711,7 @@ var
 
 				// Change the drop down if dev want's a differen't class attached
 				$ul = ! settings.newList && $ul.hasClass( settings.list ) ? $ul : 
-					! settings.newList && ( $el = rootjQuery.find( 'ul.' + settings.list ).eq(0) ).length ? 
+					! settings.newList && ( $el = rootjQuery.find( 'ul.' + settings.list ).eq( 0 ) ).length ? 
 						$el.bgiframe( settings.bgiframe ) :
 						$('<ul/>').appendTo('body').addClass( settings.list )
 							.bgiframe( settings.bgiframe ).hide().data( 'ac-selfmade', TRUE );
@@ -889,7 +892,7 @@ var
 
 				// Go through the drop down element and see if any other inputs are attached to it
 				for ( i in list ) {
-					if ( list.hasOwnProperty(i) && list[i] === TRUE ) {
+					if ( list.hasOwnProperty( i ) && list[ i ] === TRUE ) {
 						return LastEvent;
 					}
 				}
@@ -907,6 +910,12 @@ var
 
 		// Ajax/Cache Request
 		function sendRequest( event, settings, cache, backSpace, timeout ) {
+			// Merely setting max requests still allows usage of cache and supplied data,
+			// this 'Deep' option prevents those scenarios if needed
+			if ( settings.maxRequestsDeep === true && requests >= settings.maxRequests ) {
+				return FALSE;
+			}
+
 			if ( settings.spinner ) {
 				settings.spinner.call( self, event, { active: TRUE, settings: settings, cache: cache, ul: $ul } );
 			}
@@ -1297,18 +1306,18 @@ var
 			}
 
 			// Cache the list items
-			$elems = $ul.children('li');
+			$elems = $ul.children( 'li' );
 
 			// Autofill input with first entry
 			if ( settings.autoFill && ! backSpace ) {
 				liFocus = 0;
-				liData = currentList[0];
+				liData = currentList[ 0 ];
 				autoFill( liData.value );
-				$li = $elems.eq(0).addClass( settings.rollover );
+				$li = $elems.eq( 0 ).addClass( settings.rollover );
 			}
 
 			// Align the drop down element
-			$ul.data( 'ac-input-index', inputIndex ).scrollTop(0).css({
+			$ul.data( 'ac-input-index', inputIndex ).scrollTop( 0 ).css({
 				top: offset.top + $input.outerHeight(),
 				left: offset.left,
 				width: settings.width
@@ -1317,7 +1326,7 @@ var
 			.show( event );
 
 			// Log li height for less computation
-			liHeight = $elems.eq(0).outerHeight();
+			liHeight = $elems.eq( 0 ).outerHeight();
 
 			// If Max Height specified, control it
 			if ( settings.maxHeight ) {

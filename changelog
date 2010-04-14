@@ -7,8 +7,8 @@
 # New Features
 
 -All callbacks have the settings and cache object passed into them
--There is only a single event that gets bound to both the document and the drop down list. These event's get transfered to the input's in focus.
--Forms only have a single autoComplete event attached to them as well, with the event being transfered to the input in focus
+-There is only a single event that gets bound to both the document and the drop down list. These event's get transferred to the input's in focus.
+-Forms only have a single autoComplete event attached to them as well, with the event being transferred to the input in focus
 -Filled in default nonInput array with shift, left arrow, and right arrow keys
 -Moved all input data to an object stored on the 'autoComplete' data namespace.
 -setting cacheLimit to -1 now removes any limitation on cache size.
@@ -18,14 +18,10 @@
 
 -postFormat: Ability to format the post data object/string being sent server side
 -formatSupply: Ability to format the supplied list, which overwrites the slower internal function.
+-maxRequestsDeep: When true, blocks all requests, not just ajax calls, when maxRequests limit has been reached
 -bgiframe: Object of settings to be passed into the bgiframe plugin.
 -onListFormat: Event callback that when defined, must populate the drop down element. A list of possible values will be provided. This is
-intended to overwrite the source populater (which just loops through the list and makes an html frag to insert into the drop down element)
-
-
-# New Methods
-
-none.
+intended to overwrite the source population (which just loops through the list and makes an html frag to insert into the drop down element)
 
 
 # jQuery.autoComplete
@@ -35,12 +31,12 @@ none.
 -focus: Global function to capture event when an autoComplete element gains focus.
 -jqStack: Now storing jQuery cached objects of autoComplete elements.
 -keys: Object containing a list of keys used throughout the autoComplete plugin
-
 -The getFocus and getPrevious methods can now take a single boolean argument to return jQuery cached object of the element desired.
 
 /* Internal */
 -arrayMethods: Custom methods that take an array as the first parameter
--handlerMethods: /* Describe this */
+-handlerMethods: Defines methods that use triggerHandler method, and the maximum number of arguments allowed to use with it. When -1,
+triggerHandler is used regardless of the number of arguments
 
 
 # Possible Breakages
