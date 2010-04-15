@@ -912,7 +912,7 @@ var
 		function sendRequest( event, settings, cache, backSpace, timeout ) {
 			// Merely setting max requests still allows usage of cache and supplied data,
 			// this 'Deep' option prevents those scenarios if needed
-			if ( settings.maxRequestsDeep === true && requests >= settings.maxRequests ) {
+			if ( settings.maxRequestsDeep === TRUE && requests >= settings.maxRequests ) {
 				return FALSE;
 			}
 
