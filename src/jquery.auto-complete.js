@@ -1,4 +1,4 @@
-/*!
+/*
  * Auto Complete [VERSION]
  * [DATE]
  * Corey Hart @ http://www.codenothing.com
@@ -43,13 +43,6 @@
 					AutoCompleteFunction( el, first );
 				}
 			});
-	};
-
-	// bgiframe is needed to fix z-index problem for IE6 users.
-	$.fn.bgiframe = $.fn.bgiframe ? $.fn.bgiframe : $.fn.bgIframe ? $.fn.bgIframe : function() {
-		// For applications that don't have bgiframe plugin installed, create a useless 
-		// function that doesn't break the chain
-		return this;
 	};
 
 	// Allows for single event binding to document and forms associated with the autoComplete inputs
@@ -110,6 +103,13 @@
 		}
 
 		return ret;
+	}
+
+	// bgiframe is needed to fix z-index problem for IE6 users.
+	// For applications that don't have bgiframe plugin installed, create a useless 
+	// function that doesn't break the chain
+	function emptyfn(){
+		return this;
 	}
 
 
@@ -330,6 +330,8 @@ var
 			inputIndex = AutoComplete.counter,
 			// Number of requests made
 			requests = 0,
+			// Make local copy of bgiframe plugin
+			bgiframe = $.fn.bgiframe || $.fn.bgIframe || emptyfn,
 			// Internal Per Input Cache
 			cache = {
 				length: 0,
@@ -347,12 +349,15 @@ var
 
 			// Create the drop list (Use an existing one if possible)
 			$ul = ! settings.newList && rootjQuery.find( 'ul.' + settings.list )[ 0 ] ?
-				rootjQuery.find( 'ul.' + settings.list ).eq( 0 ).bgiframe( settings.bgiframe ) :
-				$('<ul/>').appendTo('body').addClass( settings.list ).bgiframe( settings.bgiframe ).hide().data( 'ac-selfmade', TRUE );
+				bgiframe.call( rootjQuery.find( 'ul.' + settings.list ).eq( 0 ), settings.bgiframe ) :
+				bgiframe.call(
+					$('<ul/>').appendTo('body').addClass( settings.list ).hide().data( 'ac-selfmade', TRUE ),
+					settings.bgiframe
+				);
 
 
-		// Start Binding
-		$input.data( 'autoComplete', ACData = {
+		// Bind initial data to the element
+		$.data( self, 'autoComplete', ACData = {
 			index: inputIndex,
 			hasFocus: FALSE,
 			active: TRUE,
@@ -709,12 +714,17 @@ var
 					$.extend( TRUE, settings, newSettings || {} );
 				}
 
+				// Re-copy the bgiframe plugin in cases where it's loaded on-demand
+				bgiframe = $.fn.bgiframe || $.fn.bgIframe || emptyfn;
+
 				// Change the drop down if dev want's a differen't class attached
 				$ul = ! settings.newList && $ul.hasClass( settings.list ) ? $ul : 
 					! settings.newList && ( $el = rootjQuery.find( 'ul.' + settings.list ).eq( 0 ) ).length ? 
-						$el.bgiframe( settings.bgiframe ) :
-						$('<ul/>').appendTo('body').addClass( settings.list )
-							.bgiframe( settings.bgiframe ).hide().data( 'ac-selfmade', TRUE );
+						bgiframe.call( $el, settings.bgiframe ) :
+						bgiframe.call(
+							$('<ul/>').appendTo('body').addClass( settings.list ).hide().data( 'ac-selfmade', TRUE ),
+							settings.bgiframe
+						);
 
 				// Custom drop list modifications
 				newUl();
