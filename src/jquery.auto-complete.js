@@ -38,8 +38,8 @@
 			first && first.preventDefault !== undefined ? self.trigger( first, args ) :
 
 			// Initiate the autocomplete on each element (Only takes a single argument, the options object)
-			self.each(function(){
-				if ( $( el = this ).data( 'autoComplete' ) !== TRUE ) {
+			$.each( self, function(){
+				if ( $.data( el = this, 'autoComplete' ) !== TRUE ) {
 					AutoCompleteFunction( el, first );
 				}
 			});
@@ -153,6 +153,10 @@ var
 		right: 39,
 		down: 40
 	},
+
+	// Make a copy of the old autoComplete settings for version tracking
+	// (when loading more than one version on a page)
+	_autoComplete = $.autoComplete,
 
 	// Attach global aspects to jQuery itself
 	AutoComplete = $.autoComplete = {
@@ -348,8 +352,8 @@ var
 			),
 
 			// Create the drop list (Use an existing one if possible)
-			$ul = ! settings.newList && rootjQuery.find( 'ul.' + settings.list )[ 0 ] ?
-				bgiframe.call( rootjQuery.find( 'ul.' + settings.list ).eq( 0 ), settings.bgiframe ) :
+			$ul = ! settings.newList && ( $el = rootjQuery.find( 'ul.' + settings.list ).eq(0) ).length ?
+				bgiframe.call( $el, settings.bgiframe ) :
 				bgiframe.call(
 					$('<ul/>').appendTo('body').addClass( settings.list ).hide().data( 'ac-selfmade', TRUE ),
 					settings.bgiframe
