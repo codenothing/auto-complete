@@ -292,7 +292,7 @@ var
 			maxRequestsDeep: FALSE,
 			requestType: 'POST',
 			// Input
-			inputControl: undefined,
+			onChange: undefined,
 			autoFill: FALSE,
 			nonInput: [ KEY.shift, KEY.left, KEY.right ],
 			multiple: FALSE,
@@ -521,8 +521,8 @@ jQuery.autoComplete = function( self, options ) {
 			if ( key != KEY.enter ) {
 
 				// Caching key value
-				cache.val = settings.inputControl === undefined ? val : 
-					settings.inputControl.apply( self, settings.backwardsCompatible ? 
+				cache.val = settings.onChange === undefined ? val : 
+					settings.onChange.apply( self, settings.backwardsCompatible ? 
 						[ val, key, $ul, event, settings, cache ] :
 						[ event, {
 							val: val,
@@ -754,6 +754,11 @@ jQuery.autoComplete = function( self, options ) {
 
 			// Change case here so it doesn't have to be done on every request
 			settings.requestType = settings.requestType.toUpperCase();
+
+			// autoComplete 5.1 and below had inputControl as the onChange handler
+			if ( settings.inputControl !== undefined ) {
+				settings.onChange = settings.inputControl;
+			}
 
 			// Local copy of the seperator for faster referencing
 			separator = settings.multiple ? settings.multipleSeparator : undefined;
@@ -1388,6 +1393,11 @@ jQuery.autoComplete = function( self, options ) {
 
 	// Do case change on initialization so it's not run on every request
 	settings.requestType = settings.requestType.toUpperCase();
+
+	// autoComplete 5.1 and below had inputControl as the onChange handler
+	if ( settings.inputControl !== undefined ) {
+		settings.onChange = settings.inputControl;
+	}
 
 	// Local quick copy of the seperator (so we don't have to run this check every time)
 	separator = settings.multiple ? settings.multipleSeparator : undefined;
