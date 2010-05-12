@@ -55,13 +55,22 @@
 			});
 		}
 
-		var $form = $input.closest( 'form' ), formList = $form.data( 'ac-inputs' ) || {}, $el;
+		var $form = $input.closest( 'form' ), formList, $el;
 
+		// Make sure a form was found before binding to an empty object
+		if ( $form.length < 1 ) {
+			return $form;
+		}
+
+		// Attach the input to the parent form
+		formList = jQuery.data( $form[ 0 ], 'ac-inputs' ) || {};
 		formList[ inputIndex ] = TRUE;
-		$form.data( 'ac-inputs', formList );
+		jQuery.data( $form[ 0 ], 'ac-inputs', formList );
 
-		if ( $form.data( 'autoComplete' ) !== TRUE ) {
-			$form.data( 'autoComplete', TRUE ).bind( 'submit.autoComplete', function( event ) {
+		// Transfer the submit event to the input in focus
+		if ( jQuery.data( $form[ 0 ], 'autoComplete' ) !== TRUE ) {
+			jQuery.data( $form[ 0 ], 'autoComplete', TRUE );
+			$form.bind( 'submit.autoComplete', function( event ) {
 				return ( $el = AutoComplete.getFocus( TRUE ) ).length ?
 					$el.triggerHandler( 'autoComplete.form-submit', [ event, this ] ) :
 					TRUE;
@@ -78,15 +87,25 @@
 			rootjQuery.unbind( 'click.autoComplete' );
 		}
 
-		var $form = $input.closest( 'form' ), formList = $form.data( 'ac-inputs' ) || {}, i;
+		var $form = $input.closest( 'form' ), formList, i;
 
+		// Make sure a parent form was found
+		if ( $form.length < 1 ) {
+			return;
+		}
+
+		// Remove the input from the forms cache
+		formList = $form.data( 'ac-inputs' ) || {};
 		formList[ inputIndex ] = FALSE;
+
+		// Check to see if this was the last input attached to the form
 		for ( i in formList ) {
 			if ( formList.hasOwnProperty( i ) && formList[ i ] === TRUE ) {
 				return;
 			}
 		}
 
+		// No other inputs are attached to this form, unbind the autoComplete submit handler only
 		$form.unbind( 'submit.autoComplete' );
 	}
 
@@ -569,7 +588,7 @@ jQuery.autoComplete = function( self, options ) {
 				return TRUE;
 			}
 
-			if ( inputIndex !== $ul.data( 'ac-input-index' ) ) {
+			if ( inputIndex !== jQuery.data( $ul[ 0 ], 'ac-input-index' ) ) {
 				$ul.html('').hide( event );
 			}
 
@@ -619,7 +638,7 @@ jQuery.autoComplete = function( self, options ) {
 				// Double check the event timestamps to ensure there isn't a delayed reaction from a button
 				( ! LastEvent || event.timeStamp - LastEvent.timeStamp > 200 ) && 
 				// Check the target after all other checks are passed (less processing)
-				jQuery( event.target ).closest( 'ul' ).data( 'ac-input-index' ) !== inputIndex ) {
+				jQuery.data( jQuery( event.target ).closest( 'ul' )[ 0 ], 'ac-input-index' ) !== inputIndex ) {
 					$ul.hide( LastEvent = event );
 					$input.blur();
 			}
@@ -893,7 +912,7 @@ jQuery.autoComplete = function( self, options ) {
 
 		// Add a destruction function
 		'autoComplete.destroy': function( event ) {
-			var list = $ul.html('').hide( LastEvent = event ).data( 'ac-inputs' ) || {}, i;
+			var list = jQuery.data( $ul.html('').hide( LastEvent = event )[ 0 ], 'ac-inputs' ) || {}, i;
 
 			// Remove all autoComplete specific data and events
 			$input.removeData( 'autoComplete' ).unbind( '.autoComplete autoComplete' );
@@ -912,7 +931,7 @@ jQuery.autoComplete = function( self, options ) {
 			}
 
 			// Remove the element from the DOM if self created
-			if ( $ul.data( 'ac-selfmade' ) === TRUE ) {
+			if ( jQuery.data( $ul[ 0 ], 'ac-selfmade' ) === TRUE ) {
 				$ul.remove();
 			}
 			// Kill all data associated with autoComplete for a cleaned drop down element
@@ -1175,7 +1194,7 @@ jQuery.autoComplete = function( self, options ) {
 	// Attach new show/hide functionality to only the ul object (so not to infect all of jQuery),
 	// And also attach event handlers if not already done so
 	function newUl() {
-		var hide = $ul.hide, show = $ul.show, list = $ul.data( 'ac-inputs' ) || {};
+		var hide = $ul.hide, show = $ul.show, list = jQuery.data( $ul[ 0 ], 'ac-inputs' ) || {};
 
 		if ( ! $ul[ ExpandoFlag ] ) {
 			$ul.hide = function( event, speed, callback ) {
@@ -1201,9 +1220,9 @@ jQuery.autoComplete = function( self, options ) {
 		}
 
 		// Attach global handlers for event delegation (So there is no more loss time in unbinding and rebinding)
-		if ( $ul.data( 'autoComplete' ) !== TRUE ) {
-			$ul.data( 'autoComplete', TRUE )
-			.delegate( 'li', 'mouseenter.autoComplete', function( event ) {
+		if ( jQuery.data( $ul[ 0 ], 'autoComplete' ) !== TRUE ) {
+			jQuery.data( $ul[ 0 ], 'autoComplete', TRUE );
+			$ul.delegate( 'li', 'mouseenter.autoComplete', function( event ) {
 				AutoComplete.getFocus( TRUE ).trigger( 'autoComplete.ul-mouseenter', [ event, this ] );
 			})
 			.bind( 'click.autoComplete', function( event ) {
@@ -1213,7 +1232,7 @@ jQuery.autoComplete = function( self, options ) {
 		}
 
 		list[ inputIndex ] = TRUE;
-		$ul.data( 'ac-inputs', list );
+		jQuery.data( $ul[ 0 ], 'ac-inputs', list );
 	}
 
 	// Auto-fill the input
@@ -1319,8 +1338,9 @@ jQuery.autoComplete = function( self, options ) {
 			$ul.html( container.join('') );
 		}
 
-		// Cache the list items
+		// Cache the list items and give focus to the drop list
 		$elems = $ul.children( 'li' );
+		jQuery.data( $ul[ 0 ], 'ac-input-index', inputIndex );
 
 		// Autofill input with first entry
 		if ( settings.autoFill && ! backSpace ) {
@@ -1331,7 +1351,7 @@ jQuery.autoComplete = function( self, options ) {
 		}
 
 		// Align the drop down element
-		$ul.data( 'ac-input-index', inputIndex ).scrollTop( 0 ).css({
+		$ul.scrollTop( 0 ).css({
 			top: offset.top + $input.outerHeight(),
 			left: offset.left,
 			width: settings.width
