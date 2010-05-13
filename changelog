@@ -5,7 +5,9 @@
 ###
 
 # New Features
+Micro optimizations implemented for all data access
 
 
 # Possible Breaks
 -Removed bgiframe namespace creation (Makes a copy internally if it exists, or creates a blank function)
+-Removed backwardsCompatibility flag and its components. Anyone scripts still using 4.1 will now break

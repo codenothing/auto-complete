@@ -44,9 +44,6 @@ Corey Hart @ http://www.codenothing.com
 
 
 <ul id='menu'>
-	<li class='title'>4.1 and lower</li>
-	<li><a href='#backwardsCompatible'>backwardsCompatible</a></li>
-
 	<li class='title' style='margin-top: 20px;'>jQuery.autoComplete</li>
 	<li><a href='#defaults'>defaults</a></li>
 	<li><a href='#length'>length</a></li>
@@ -135,9 +132,10 @@ Corey Hart @ http://www.codenothing.com
 	<h2>Note's about autoComplete</h2>
 	<b>Namespaces</b>
 
-	autoComplete only requires control of 2 namespaces: jQuery.autoComplete &amp; jQuery.fn.autoComplete. The plugin
-	first runs a check to see if the bgiframe plugin is installed, and if it's not, it creates a useless function
-	that returns 'this' for internal purposes. The bgiframe plugin can be installed before or after and will be used.<br><br>
+	autoComplete only requires control of 2 namespaces: jQuery.autoComplete &amp; jQuery.fn.autoComplete.
+	autoComplete makes a local copy of the bgiframe plugin if installed, but no longer creates the bgiframe
+	namespace on the jQuery prototype object.
+	<br><br>
 
 	<b>Event Namespacing</b>
 
@@ -158,10 +156,8 @@ Corey Hart @ http://www.codenothing.com
 	2) The first parameter contains the original event that was triggered.<br>
 	3) The second parameter contains an object of argument's needed for that function.<br><br>
 	
-	This tries to conform to jQuery-ui's standards for callback functions, and allows for new feature's to be added while still
-	being backwards compatible from this point on. For autoComplete versions 4.1 and lower, this new style will completely
-	break those code bases. For those instances, a <a href='#backwardsCompatible'>backwardsCompatible</a> setting has been installed 
-	for an easier transition to the new style. Please update all code bases as this will be the new standard going forward.
+	This tries to conform to jQuery-ui's standards for callback functions, 
+	and allows for new feature's to be added while still being backwards compatible.
 </div>
 
 
@@ -307,16 +303,6 @@ Corey Hart @ http://www.codenothing.com
 	<div>Default</div>
 	Name - Type
 </div>
-<h3><div class='default'>false</div> <a name='backwardsCompatible'>backwardsCompatible</a> - <span class='type'>Boolean</span></h3>
-<p>
-	With version 5.0 and going forward, autoComplete will become more jqueryui standards compliant for event driven functions. With that,
-	the parameter's passed to those functions have changed. To respect developers who are currently on 4.1, a backwardsCompatible setting
-	has been implemented to ensure parameters passed to those functions remain constant. This is to ease the transition into 5.0 and beyond.<br><br>
-	From 5.0 and on, autoComplete will be using this style so new feature's can easily be implemented while still be compatible with earlier versions.
-</p>
-
-
-
 <h3><div class='default'>'ajax.php'</div> <a name='ajax'>ajax</a> - <span class='type'>String</span></h3>
 <p>
 	URL of the server side script.
@@ -375,10 +361,6 @@ Corey Hart @ http://www.codenothing.com
 	<li><b>cache:</b> Current cache attached to the input in focus</li>
 	<li><b>ul:</b> Cached $ul jQuery object of the drop down list.</li>
 </ul>
-<p class='notes'>
-	<b>Note*:</b> with the <a href='#backwardsCompatible'>backwardsCompatible</a> flag enabled, the params are:<br>
-	Function(search, entry, list, i, supply, ul, event, settings, cache).
-</p>
 
 
 <h3><div class='default'>[]</div> <a name='dataSupply'>dataSupply</a> - <span class='type'>Array</span></h3>
@@ -576,7 +558,7 @@ Corey Hart @ http://www.codenothing.com
 	<b style='color: red;'>Note*:</b> The <span style='color:blue;'>this</span> object references the input field currently in focus.
 </div>
 
-<h3><div class='default'>Empty Function</div> <a name='onBlur'>onBlur</a> - <span class='type'>Function(event, ui)</span></h3>
+<h3><div class='default'>undefined</div> <a name='onBlur'>onBlur</a> - <span class='type'>Function(event, ui)</span></h3>
 <p>
 	Callback function when the user loses focus on the input field.
 </p>
@@ -587,10 +569,6 @@ Corey Hart @ http://www.codenothing.com
 	<li><b>cache:</b> Current cache attached to the input in focus</li>
 	<li><b>ul:</b> Cached $ul jQuery object of the drop down list.</li>
 </ul>
-<p class='notes'>
-	<b>Note*:</b> with the <a href='#backwardsCompatible'>backwardsCompatible</a> flag enabled, the params are:<br>
-	Function(val, ul, event, settings, cache).
-</p>
 
 <h3><div class='default'>undefined</div> <a name='onChange'>onChange</a> - <span class='type'>Function(event, ui)</span></h3>
 <p>
@@ -607,12 +585,10 @@ Corey Hart @ http://www.codenothing.com
 </ul>
 <p class='notes'>
 	<b>Note*:</b> This function must return a string, which is either the 'val' key of the ui object or a modification of it.<br>
-	<b>Note2*:</b> with the <a href='#backwardsCompatible'>backwardsCompatible</a> flag enabled, the params are:<br>
-	Function(val, key, ul, event, settings, cache).
 </p>
 
 
-<h3><div class='default'>Empty Function</div> <a name='onFocus'>onFocus</a> - <span class='type'>Function(event, ui)</span></h3>
+<h3><div class='default'>undefined</div> <a name='onFocus'>onFocus</a> - <span class='type'>Function(event, ui)</span></h3>
 <p>
 	Callback function when the user focuses on the input field.
 </p>
@@ -622,10 +598,6 @@ Corey Hart @ http://www.codenothing.com
 	<li><b>cache:</b> Current cache attached to the input in focus</li>
 	<li><b>ul:</b> Cached $ul jQuery object of the drop down list.</li>
 </ul>
-<p class='notes'>
-	<b>Note*:</b> with the <a href='#backwardsCompatible'>backwardsCompatible</a> flag enabled, the params are:<br>
-	Function(ul, event, settings, cache).
-</p>
 
 
 
@@ -676,7 +648,7 @@ Corey Hart @ http://www.codenothing.com
 
 
 
-<h3><div class='default'>Empty Function</div> <a name='onMaxRequest'>onMaxRequest</a> - <span class='type'>Function(event, ui)</span></h3>
+<h3><div class='default'>undefined</div> <a name='onMaxRequest'>onMaxRequest</a> - <span class='type'>Function(event, ui)</span></h3>
 <p>
 	Callback function when maximum number of ajax requests is reached. Will only fire if <a href='#maxRequests'>maxRequests</a> is not 0.
 </p>
@@ -688,14 +660,10 @@ Corey Hart @ http://www.codenothing.com
 	<li><b>cache:</b> Current cache attached to the input in focus</li>
 	<li><b>ul:</b> Cached $ul jQuery object of the drop down list.</li>
 </ul>
-<p class='notes'>
-	<b>Note*:</b> with the <a href='#backwardsCompatible'>backwardsCompatible</a> flag enabled, the params are:<br>
-	Function(search, ul, event, val, settings, cache).
-</p>
 
 
 
-<h3><div class='default'>Empty Function</div> <a name='onRollover'>onRollover</a> - <span class='type'>Function(event, ui)</span></h3>
+<h3><div class='default'>undefined</div> <a name='onRollover'>onRollover</a> - <span class='type'>Function(event, ui)</span></h3>
 <p>
 	Callback function when the user focuses on one of the li elements in the UL drop down list.
 </p>
@@ -707,14 +675,10 @@ Corey Hart @ http://www.codenothing.com
 	<li><b>cache:</b> Current cache attached to the input in focus</li>
 	<li><b>ul:</b> Cached $ul jQuery object of the drop down list.</li>
 </ul>
-<p class='notes'>
-	<b>Note*:</b> with the <a href='#backwardsCompatible'>backwardsCompatible</a> flag enabled, the params are:<br>
-	Function(data, li, ul, event, settings, cache).
-</p>
 
 
 
-<h3><div class='default'>Empty Function</div> <a name='onSelect'>onSelect</a> - <span class='type'>Function(event, ui)</span></h3>
+<h3><div class='default'>undefined</div> <a name='onSelect'>onSelect</a> - <span class='type'>Function(event, ui)</span></h3>
 <p>
 	Callback function when the user selects an option from the UL drop down list.
 </p>
@@ -726,10 +690,6 @@ Corey Hart @ http://www.codenothing.com
 	<li><b>cache:</b> Current cache attached to the input in focus</li>
 	<li><b>ul:</b> Cached $ul jQuery object of the drop down list.</li>
 </ul>
-<p class='notes'>
-	<b>Note*:</b> with the <a href='#backwardsCompatible'>backwardsCompatible</a> flag enabled, the params are:<br>
-	Function(data, li, ul, event, settings, cache).
-</p>
 
 
 
@@ -746,7 +706,7 @@ Corey Hart @ http://www.codenothing.com
 
 
 
-<h3><div class='default'>Returns True</div> <a name='onSubmit'>onSubmit</a> - <span class='type'>Function(event, ui)</span></h3>
+<h3><div class='default'>undefined</div> <a name='onSubmit'>onSubmit</a> - <span class='type'>Function(event, ui)</span></h3>
 <p>
 	Callback function called when form submission occurs. If <a href='#preventEnterSubmit'>preventEnterSubmit</a> is enabled,
 	the onSubmit method will only fire when the drop list is not active.

@@ -264,8 +264,6 @@ var
 		},
 
 		defaults: {
-			// To smooth upgrade process to 5.x, set backwardsCompatible to true
-			backwardsCompatible: FALSE,
 			// Server Script Path
 			ajax: 'ajax.php',
 			ajaxCache: jQuery.ajaxSettings.cache,
@@ -522,16 +520,13 @@ jQuery.autoComplete = function( self, options ) {
 
 				// Caching key value
 				cache.val = settings.onChange === undefined ? val : 
-					settings.onChange.apply( self, settings.backwardsCompatible ? 
-						[ val, key, $ul, event, settings, cache ] :
-						[ event, {
-							val: val,
-							key: key,
-							settings: settings,
-							cache: cache,
-							ul: $ul
-						}]
-					);
+					settings.onChange.call( self, event, {
+						val: val,
+						key: key,
+						settings: settings,
+						cache: cache,
+						ul: $ul
+					});
 
 				// Only send request if character length passes
 				if ( cache.val.length >= settings.minChars ) {
@@ -569,14 +564,12 @@ jQuery.autoComplete = function( self, options ) {
 			}
 
 			if ( settings.onBlur ) {
-				settings.onBlur.apply( self, settings.backwardsCompatible ?
-					[ inputval, $ul, event, settings, cache ] : [ event, {
-						val: inputval,
-						settings: settings,
-						cache: cache,
-						ul: $ul
-					}]
-				);
+				settings.onBlur.call( self, event, {
+					val: inputval,
+					settings: settings,
+					cache: cache,
+					ul: $ul
+				});
 			}
 		},
 
@@ -619,13 +612,7 @@ jQuery.autoComplete = function( self, options ) {
 			}
 
 			if ( settings.onFocus ) {
-				settings.onFocus.apply( self, 
-					settings.backwardsCompatible ? [ $ul, event, settings, cache ] : [ event, {
-						settings: settings,
-						cache: cache,
-						ul: $ul
-					}]
-				);
+				settings.onFocus.call( self, event, { settings: settings, cache: cache, ul: $ul } );
 			}
 		},
 
@@ -672,16 +659,13 @@ jQuery.autoComplete = function( self, options ) {
 			LastEvent = event;
 
 			if ( settings.onRollover ) {
-				settings.onRollover.apply( self, settings.backwardsCompatible ? 
-					[ liData, $li, $ul, event, settings, cache ] : 
-					[ event, {
-						data: liData,
-						li: $li,
-						settings: settings,
-						cache: cache,
-						ul: $ul
-					}]
-				);
+				settings.onRollover.call( self, event, {
+					data: liData,
+					li: $li,
+					settings: settings,
+					cache: cache,
+					ul: $ul
+				});
 			}
 		},
 
@@ -700,16 +684,13 @@ jQuery.autoComplete = function( self, options ) {
 			autoFill();
 
 			if ( settings.onSelect ) {
-				settings.onSelect.apply( self, settings.backwardsCompatible ? 
-					[ liData, $li, $ul, event, settings, cache ] :
-					[ event, {
-						data: liData,
-						li: $li,
-						settings: settings,
-						cache: cache,
-						ul: $ul
-					}]
-				);
+				settings.onSelect.call( self, event, {
+					data: liData,
+					li: $li,
+					settings: settings,
+					cache: cache,
+					ul: $ul
+				});
 			}
 		},
 
@@ -724,9 +705,7 @@ jQuery.autoComplete = function( self, options ) {
 
 			// Give access to current settings and cache
 			if ( jQuery.isFunction( newSettings ) ) {
-				ret = newSettings.apply( self, settings.backwardsCompatible ? 
-					[ settings, cache, $ul, event ] : [ event, { settings: settings, cache: cache, ul: $ul } ]
-				);
+				ret = newSettings.call( self, event, { settings: settings, cache: cache, ul: $ul } );
 
 				// Allow for extending of settings/cache based off function return values
 				if ( jQuery.isArray( ret ) && ret[0] !== undefined ) {
@@ -994,16 +973,13 @@ jQuery.autoComplete = function( self, options ) {
 			}
 
 			if ( settings.onMaxRequest && requests === settings.maxRequests ) {
-				return settings.onMaxRequest.apply( self, settings.backwardsCompatible ? 
-					[ cache.val, $ul, event, inputval, settings, cache ] : 
-					[ event, {
-						search: cache.val,
-						val: inputval,
-						settings: settings,
-						cache: cache,
-						ul: $ul
-					}]
-				);
+				return settings.onMaxRequest.call( self, event, {
+					search: cache.val,
+					val: inputval,
+					settings: settings,
+					cache: cache,
+					ul: $ul
+				});
 			}
 			
 			return FALSE;
@@ -1045,7 +1021,7 @@ jQuery.autoComplete = function( self, options ) {
 
 	// Parse User Supplied Data
 	function userSuppliedData( event, settings, cache, backSpace ) {
-		var list = [], args = [],
+		var list = [], ui = {},
 			fn = jQuery.isFunction( settings.dataFn ),
 			regex = fn ? undefined : new RegExp( '^'+cache.val, 'i' ),
 			items = 0, entry, i = -1, l = settings.dataSupply.length;
@@ -1064,22 +1040,20 @@ jQuery.autoComplete = function( self, options ) {
 				entry = settings.dataSupply[i];
 				entry = entry && typeof entry.value === 'string' ? entry : { value: entry };
 
-				// Setup arguments for dataFn in a backwards compatible way if needed
-				args = settings.backwardsCompatible ? 
-					[ cache.val, entry.value, list, i, settings.dataSupply, $ul, event, settings, cache ] :
-					[ event, {
-						search: cache.val,
-						entry: entry.value,
-						list: list,
-						i: i,
-						supply: settings.dataSupply,
-						settings: settings,
-						cache: cache,
-						ul: $ul
-					}];
+				// Setup ui object for dataFn
+				ui = {
+					search: cache.val,
+					entry: entry.value,
+					list: list,
+					i: i,
+					supply: settings.dataSupply,
+					settings: settings,
+					cache: cache,
+					ul: $ul
+				};
 
 				// If user supplied function, use that, otherwise test with default regex
-				if ( ( fn && settings.dataFn.apply( self, args ) ) || ( ! fn && entry.value.match( regex ) ) ) {
+				if ( ( fn && settings.dataFn.call( self, event, ui ) ) || ( ! fn && entry.value.match( regex ) ) ) {
 					// Reduce browser load by breaking on limit if it exists
 					if ( settings.maxItems > -1 && ++items > settings.maxItems ) {
 						break;
@@ -1098,16 +1072,13 @@ jQuery.autoComplete = function( self, options ) {
 		// Ensure the select function only gets fired when list of open
 		if ( ulOpen ) {
 			if ( settings.onSelect ) {
-				settings.onSelect.apply( self, settings.backwardsCompatible ? 
-					[ liData, $li, $ul, event, settings, cache ] :
-					[ event, {
-						data: liData,
-						li: $li,
-						settings: settings,
-						cache: cache,
-						ul: $ul
-					}]
-				);
+				settings.onSelect.call( self, event, {
+					data: liData,
+					li: $li,
+					settings: settings,
+					cache: cache,
+					ul: $ul
+				});
 			}
 
 			autoFill();
@@ -1141,16 +1112,13 @@ jQuery.autoComplete = function( self, options ) {
 
 		autoFill( liData.value );
 		if ( settings.onRollover ) {
-			settings.onRollover.apply( self, settings.backwardsCompatible ? 
-				[ liData, $li, $ul, event, settings, cache ] :
-				[ event, {
-					data: liData,
-					li: $li,
-					settings: settings,
-					cache: cache,
-					ul: $ul
-				}]
-			);
+			settings.onRollover.call( self, event, {
+				data: liData,
+				li: $li,
+				settings: settings,
+				cache: cache,
+				ul: $ul
+			});
 		}
 
 		// Scrolling
@@ -1184,15 +1152,13 @@ jQuery.autoComplete = function( self, options ) {
 		}
 
 		if ( settings.onRollover ) {
-			settings.onRollover.apply( self, settings.backwardsCompatible ? 
-				[ liData, $li, $ul, event, settings, cache ] : [ event, {
-					data: liData,
-					li: $li,
-					settings: settings,
-					cache: cache,
-					ul: $ul
-				}]
-			);
+			settings.onRollover.call( self, event, {
+				data: liData,
+				li: $li,
+				settings: settings,
+				cache: cache,
+				ul: $ul
+			});
 		}
 	}
 
