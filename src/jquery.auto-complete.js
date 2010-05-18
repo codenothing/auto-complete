@@ -6,18 +6,13 @@
 (function( jQuery, window, undefined ) {
 
 	// Expose autoComplete to the jQuery chain
-	jQuery.fn.autoComplete = function() {
+	jQuery.fn.autoComplete = function(){
 		// Force array of arguments
 		var args = Slice.call( arguments ),
 			self = this, 
 			first = args.shift(),
 			isMethod = typeof first === 'string',
 			handler, el;
-
-		// Deep namespacing is not supported in jQuery, a mistake I made in v4.1
-		if ( isMethod ) {
-			first = first.replace( rdot, '-' );
-		}
 		
 		// Allow for passing array of arguments, or multiple arguments
 		// Eg: .autoComplete('trigger', [arg1, arg2, arg3...]) or .autoComplete('trigger', arg1, arg2, arg3...)
@@ -148,12 +143,10 @@ var
 	// Also make a copy of an empty jQuery set for fast referencing
 	emptyjQuery = jQuery( ),
 
-	// regex's
-	rdot = /\./,
-
 	// Opera and Firefox on Mac need to use the keypress event to track holding of
 	// a key down and not releasing
-	keypress = window.opera || ( /macintosh/i.test( window.navigator.userAgent ) && jQuery.browser.mozilla ),
+	keyevent = window.opera || ( /macintosh/i.test( window.navigator.userAgent ) && jQuery.browser.mozilla ) ? 
+		'keypress.autoComplete' : 'keydown.autoComplete',
 
 	// Event flag that gets passed around
 	ExpandoFlag = 'autoComplete_' + jQuery.expando,
@@ -181,6 +174,9 @@ var
 	AutoComplete = {
 		// Autocomplete Version
 		version: '[VERSION]',
+
+		// Autocomplete specific expando
+		expando: ExpandoFlag,
 
 		// Index Counter
 		counter: 0,
@@ -221,13 +217,14 @@ var
 		focus: undefined,
 		blur: undefined,
 
-		// Allow access to jquery cached object versions of the elements
+		// Element currently in focus
 		getFocus: function( jqStack ) {
 			return ! AutoComplete.order[0] ? jqStack ? emptyjQuery : undefined :
 				jqStack ? AutoComplete.jqStack[ AutoComplete.order[0] ] :
 				AutoComplete.stack[ AutoComplete.order[0] ];
 		},
 
+		// Element previously in focus
 		getPrevious: function( jqStack ) {
 			// Removing elements cause some indexs on the order stack
 			// to become undefined, so loop until one is found
@@ -242,6 +239,7 @@ var
 			return jqStack ? emptyjQuery : undefined;
 		},
 
+		// Removing an element from the stack
 		remove: function( n ) {
 			for ( var i = -1, l = AutoComplete.order.length; ++i < l; ) {
 				if ( AutoComplete.order[i] === n ) {
@@ -263,6 +261,7 @@ var
 			return jQuery( stack );
 		},
 
+		// Global Defaults
 		defaults: {
 			// Server Script Path
 			ajax: 'ajax.php',
@@ -388,7 +387,7 @@ jQuery.autoComplete = function( self, options ) {
 
 	// IE catches the enter key only on keypress/keyup, so add a helper
 	// to track that event if needed
-	if ( jQuery.browser.msie ) {
+	if ( window.attachEvent ) {
 		$input.bind( 'keypress.autoComplete', function( event ) {
 			if ( ! ACData.active ) {
 				return TRUE;
@@ -414,7 +413,7 @@ jQuery.autoComplete = function( self, options ) {
 
 	// Opera && firefox on Mac use keypress to track holding down of key, 
 	// while everybody else uses keydown for same functionality
-	$input.bind( keypress ? 'keypress.autoComplete' : 'keydown.autoComplete' , function( event ) {
+	$input.bind( keyevent , function( event ) {
 		// If autoComplete has been disabled, prevent input events
 		if ( ! ACData.active ) {
 			return TRUE;
