@@ -11,7 +11,7 @@
 		var args = Slice.call( arguments ),
 			self = this, 
 			first = args.shift(),
-			isMethod = typeof first === 'string',
+			isMethod = typeof first == 'string',
 			handler, el;
 		
 		// Allow for passing array of arguments, or multiple arguments
@@ -137,8 +137,11 @@ var
 	// Copy of the slice prototype
 	Slice = Array.prototype.slice,
 
+	// Copy document element for munging
+	document = window.document,
+
 	// Make a copy of the document element for caching
-	rootjQuery = jQuery( window.document ),
+	rootjQuery = jQuery( document ),
 
 	// Also make a copy of an empty jQuery set for fast referencing
 	emptyjQuery = jQuery( ),
@@ -321,7 +324,7 @@ jQuery.autoComplete = function( self, options ) {
 	AutoComplete.counter++;
 
 	// Input specific vars
-	var $input = jQuery( self ).attr( 'autocomplete', 'off' ), $el,
+	var $input = jQuery( self ).attr( 'autocomplete', 'off' ), $ul, $el,
 		// Data object stored on 'autoComplete' data namespace of input
 		ACData = {},
 		// Track every event triggered
@@ -363,18 +366,9 @@ jQuery.autoComplete = function( self, options ) {
 		settings = jQuery.extend(
 			{ width: $input.outerWidth() },
 			AutoComplete.defaults, 
-			options||{},
+			options || {},
 			jQuery.metadata ? $input.metadata() : {}
-		),
-
-		// Create the drop list (Use an existing one if possible)
-		$ul = ! settings.newList && ( $el = rootjQuery.find( 'ul.' + settings.list ).eq(0) ).length ?
-			bgiframe.call( $el, settings.bgiframe ) :
-			bgiframe.call(
-				jQuery('<ul/>').appendTo('body').addClass( settings.list ).hide().data( 'ac-selfmade', TRUE ),
-				settings.bgiframe
-			);
-
+		);
 
 	// Bind initial data to the element
 	jQuery.data( self, 'autoComplete', ACData = {
@@ -387,7 +381,7 @@ jQuery.autoComplete = function( self, options ) {
 
 	// IE catches the enter key only on keypress/keyup, so add a helper
 	// to track that event if needed
-	if ( window.attachEvent ) {
+	if ( document.attachEvent ) {
 		$input.bind( 'keypress.autoComplete', function( event ) {
 			if ( ! ACData.active ) {
 				return TRUE;
@@ -626,7 +620,7 @@ jQuery.autoComplete = function( self, options ) {
 				// Check the target after all other checks are passed (less processing)
 				jQuery.data( jQuery( event.target ).closest( 'ul' )[ 0 ], 'ac-input-index' ) !== inputIndex ) {
 					$ul.hide( LastEvent = event );
-					$input.blur();
+					$input.trigger( 'blur' );
 			}
 		},
 
@@ -718,23 +712,14 @@ jQuery.autoComplete = function( self, options ) {
 			// Re-copy the bgiframe plugin in cases where it's loaded on-demand
 			bgiframe = jQuery.fn.bgiframe || jQuery.fn.bgIframe || emptyfn;
 
-			// Change the drop down if dev want's a differen't class attached
-			$ul = ! settings.newList && $ul.hasClass( settings.list ) ? $ul : 
-				! settings.newList && ( $el = rootjQuery.find( 'ul.' + settings.list ).eq( 0 ) ).length ? 
-					bgiframe.call( $el, settings.bgiframe ) :
-					bgiframe.call(
-						jQuery('<ul/>').appendTo('body').addClass( settings.list ).hide().data( 'ac-selfmade', TRUE ),
-						settings.bgiframe
-					);
-
 			// Custom drop list modifications
-			newUl();
+			$ul = newUl();
 
 			// Change case here so it doesn't have to be done on every request
 			settings.requestType = settings.requestType.toUpperCase();
 
 			// autoComplete 5.1 and below had inputControl as the onChange handler
-			if ( settings.inputControl !== undefined ) {
+			if ( settings.inputControl !== undefined && settings.onChange === undefined ) {
 				settings.onChange = settings.inputControl;
 			}
 
@@ -765,7 +750,7 @@ jQuery.autoComplete = function( self, options ) {
 				return TRUE;
 			}
 
-			if ( typeof postData === 'string' ) {
+			if ( typeof postData == 'string' ) {
 				cacheName = postData;
 				postData = {};
 			}
@@ -793,7 +778,7 @@ jQuery.autoComplete = function( self, options ) {
 				return TRUE;
 			}
 
-			if ( typeof data === 'string' ) {
+			if ( typeof data == 'string' ) {
 				cacheName = data;
 				data = undefined;
 			}
@@ -823,7 +808,7 @@ jQuery.autoComplete = function( self, options ) {
 				return TRUE;
 			}
 
-			if ( typeof data === 'string' ) {
+			if ( typeof data == 'string' ) {
 				cacheName = data;
 				data = undefined;
 			}
@@ -1037,7 +1022,7 @@ jQuery.autoComplete = function( self, options ) {
 			for ( ; ++i < l ; ) {
 				// Force object wrapper for entry
 				entry = settings.dataSupply[i];
-				entry = entry && typeof entry.value === 'string' ? entry : { value: entry };
+				entry = entry && typeof entry.value == 'string' ? entry : { value: entry };
 
 				// Setup ui object for dataFn
 				ui = {
@@ -1164,8 +1149,27 @@ jQuery.autoComplete = function( self, options ) {
 	// Attach new show/hide functionality to only the ul object (so not to infect all of jQuery),
 	// And also attach event handlers if not already done so
 	function newUl() {
+		// Allow for passing elements as the list propery for more control
+		if ( ! settings.newList && ! $ul ) {
+			$ul = settings.list.jquery ? settings.list:
+				settings.list.nodeName ? jQuery( settings.list ) :
+				typeof settings.list == 'string' && ( $el = rootjQuery.find( 'ul.' + settings.list ).eq( 0 ) ).length ?
+					bgiframe.call( $el, settings.bgiframe ) :
+				undefined;
+		}
+
+		// Create the list element since it does not exist based on the checks above
+		if ( ! $ul ) {
+			$ul = bgiframe.call(
+				jQuery('<ul/>').appendTo('body').addClass( settings.list ).hide().data( 'ac-selfmade', TRUE ),
+				settings.bgiframe
+			);
+		}
+
+		// Storage for monkey patching
 		var hide = $ul.hide, show = $ul.show, list = jQuery.data( $ul[ 0 ], 'ac-inputs' ) || {};
 
+		// Monkey patch the list object to control the hiding and showing
 		if ( ! $ul[ ExpandoFlag ] ) {
 			$ul.hide = function( event, speed, callback ) {
 				if ( settings.onHide && ulOpen ) {
@@ -1203,6 +1207,7 @@ jQuery.autoComplete = function( self, options ) {
 
 		list[ inputIndex ] = TRUE;
 		jQuery.data( $ul[ 0 ], 'ac-inputs', list );
+		return $ul;
 	}
 
 	// Auto-fill the input
@@ -1354,13 +1359,13 @@ jQuery.autoComplete = function( self, options ) {
 	}
 
 	// Custom modifications to the drop down element
-	newUl();
+	$ul = newUl();
 
 	// Do case change on initialization so it's not run on every request
 	settings.requestType = settings.requestType.toUpperCase();
 
 	// autoComplete 5.1 and below had inputControl as the onChange handler
-	if ( settings.inputControl !== undefined ) {
+	if ( settings.inputControl !== undefined && settings.onChange === undefined ) {
 		settings.onChange = settings.inputControl;
 	}
 
@@ -1378,4 +1383,4 @@ jQuery.autoComplete = function( self, options ) {
 // Extend the autoComplete configuration onto the base autoComplete function
 AutoComplete = jQuery.extend( jQuery.autoComplete, AutoComplete );
 
-})( jQuery, window || this );
+})( jQuery, this );
