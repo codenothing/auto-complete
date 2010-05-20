@@ -90,7 +90,7 @@
 		}
 
 		// Remove the input from the forms cache
-		formList = $form.data( 'ac-inputs' ) || {};
+		formList = jQuery.data( $form[ 0 ], 'ac-inputs' ) || {};
 		formList[ inputIndex ] = FALSE;
 
 		// Check to see if this was the last input attached to the form
@@ -324,7 +324,9 @@ jQuery.autoComplete = function( self, options ) {
 	AutoComplete.counter++;
 
 	// Input specific vars
-	var $input = jQuery( self ).attr( 'autocomplete', 'off' ), $ul, $el,
+	var $input = jQuery( self ).attr( 'autocomplete', 'off' ), $ul,
+		// Reusable variables that should never be depended on
+		$el, el,
 		// Data object stored on 'autoComplete' data namespace of input
 		ACData = {},
 		// Track every event triggered
@@ -381,7 +383,7 @@ jQuery.autoComplete = function( self, options ) {
 
 	// IE catches the enter key only on keypress/keyup, so add a helper
 	// to track that event if needed
-	if ( document.attachEvent ) {
+	if ( self.attachEvent ) {
 		$input.bind( 'keypress.autoComplete', function( event ) {
 			if ( ! ACData.active ) {
 				return TRUE;
@@ -444,6 +446,7 @@ jQuery.autoComplete = function( self, options ) {
 				up( event );
 			} else {
 				liFocus = -1;
+				$li = undefined;
 				$input.val( inputval );
 				$ul.hide( event );
 			}
@@ -549,6 +552,7 @@ jQuery.autoComplete = function( self, options ) {
 			AutoComplete.hasFocus = FALSE;
 			ACData.hasFocus = FALSE;
 			liFocus = -1;
+			$li = undefined;
 			$ul.hide( LastEvent = event );
 
 			// Trigger both the global and element specific blur events
@@ -618,7 +622,7 @@ jQuery.autoComplete = function( self, options ) {
 				// Double check the event timestamps to ensure there isn't a delayed reaction from a button
 				( ! LastEvent || event.timeStamp - LastEvent.timeStamp > 200 ) && 
 				// Check the target after all other checks are passed (less processing)
-				jQuery.data( jQuery( event.target ).closest( 'ul' )[ 0 ], 'ac-input-index' ) !== inputIndex ) {
+				jQuery( event.target ).closest( 'ul' ).data('ac-input-index' ) !== inputIndex ) {
 					$ul.hide( LastEvent = event );
 					$input.trigger( 'blur' );
 			}
@@ -1284,6 +1288,7 @@ jQuery.autoComplete = function( self, options ) {
 
 		// Refocus list element
 		liFocus = -1;
+		$li = undefined;
 
 		// Initialize Vars together (save bytes)
 		var offset = $input.offset(), // Input position
