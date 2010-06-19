@@ -26,8 +26,11 @@
 		handler = isMethod && ( AutoComplete.handlerMethods[ first ] === -1 || args.length < ( AutoComplete.handlerMethods[ first ] || 0 ) ) ? 
 			'triggerHandler' : 'trigger';
 
-		return isMethod ?
-			self[ handler ]( 'autoComplete.' + first, args ) :
+		// Only act on elements provided
+		return self.length < 1 ? self :
+
+			// Method Call
+			isMethod ? self[ handler ]( 'autoComplete.' + first, args ) :
 
 			// Allow passing a jquery event special object {from jQuery.Event()}
 			first && first.preventDefault !== undefined ? self.trigger( first, args ) :
@@ -148,8 +151,9 @@ var
 
 	// Opera and Firefox on Mac need to use the keypress event to track holding of
 	// a key down and not releasing
-	keyevent = window.opera || ( /macintosh/i.test( window.navigator.userAgent ) && jQuery.browser.mozilla ) ? 
-		'keypress.autoComplete' : 'keydown.autoComplete',
+	keyevent = Object.prototype.toString.call( window.opera ) === '[object Opera]' || 
+		( /macintosh/i.test( window.navigator.userAgent ) && jQuery.browser.mozilla ) ? 
+			'keypress.autoComplete' : 'keydown.autoComplete',
 
 	// Event flag that gets passed around
 	ExpandoFlag = 'autoComplete_' + jQuery.expando,
@@ -313,6 +317,7 @@ var
 			delay: 0,
 			// Caching Options
 			useCache: TRUE,
+			forceFormat: false,
 			cacheLimit: 50
 		}
 	};
@@ -583,14 +588,14 @@ jQuery.autoComplete = function( self, options ) {
 			}
 
 			// Overwrite undefined index pushed on by the blur event
-			if ( AutoComplete.order[0] === undefined ) {
-				if ( AutoComplete.order[1] === inputIndex ) {
+			if ( AutoComplete.order[ 0 ] === undefined ) {
+				if ( AutoComplete.order[ 1 ] === inputIndex ) {
 					AutoComplete.order.shift();
 				} else {
-					AutoComplete.order[0] = inputIndex;
+					AutoComplete.order[ 0 ] = inputIndex;
 				}
 			}
-			else if ( AutoComplete.order[0] != inputIndex && AutoComplete.order[1] != inputIndex ) {
+			else if ( AutoComplete.order[ 0 ] != inputIndex && AutoComplete.order[ 1 ] != inputIndex ) {
 				AutoComplete.order.unshift( inputIndex );
 			}
 
@@ -705,9 +710,9 @@ jQuery.autoComplete = function( self, options ) {
 				ret = newSettings.call( self, event, { settings: settings, cache: cache, ul: $ul } );
 
 				// Allow for extending of settings/cache based off function return values
-				if ( jQuery.isArray( ret ) && ret[0] !== undefined ) {
-					jQuery.extend( TRUE, settings, ret[0] || settings );
-					jQuery.extend( TRUE, cache, ret[1] || cache );
+				if ( ret && jQuery.isArray( ret ) && ret[ 0 ] !== undefined ) {
+					jQuery.extend( TRUE, settings, ret[ 0 ] || settings );
+					jQuery.extend( TRUE, cache, ret[ 1 ] || cache );
 				}
 			} else {
 				jQuery.extend( TRUE, settings, newSettings || {} );
@@ -1270,9 +1275,12 @@ jQuery.autoComplete = function( self, options ) {
 		}
 
 		// Store results into the cache if allowed
-		if ( settings.useCache && ! jQuery.isArray( cache.list[ cache.val ] ) ) {
+		if ( settings.useCache && ! cache.list[ cache.val ] && ! jQuery.isArray( cache.list[ cache.val ].src ) ) {
 			cache.length++;
-			cache.list[ cache.val ] = list;
+			cache.list[ cache.val ] = {
+				src: currentList,
+				built: ''
+			};
 
 			// Clear cache if necessary
 			if ( settings.cacheLimit !== -1 && cache.length > settings.cacheLimit ) {
@@ -1298,24 +1306,27 @@ jQuery.autoComplete = function( self, options ) {
 		if ( settings.onListFormat ) {
 			settings.onListFormat.call( self, event, { list: currentList, settings: settings, cache: cache, ul: $ul } );
 		}
+		else if ( cache.list[ cache.val ].built !== '' && ! settings.forceFormat ) {
+			$ul.html( cache.list[ cache.val ].built );
+		}
 		else {
 			// Push items onto container
 			for ( ; ++i < length; ) {
-				if ( currentList[i].value ) {
+				if ( currentList[ i ].value ) {
 					if ( settings.maxItems > -1 && ++items > settings.maxItems ) {
 						break;
 					}
 
 					container.push(
 						settings.striped && striped ? '<li class="' + settings.striped + '">' : '<li>',
-						currentList[i].display || currentList[i].value,
+						currentList[ i ].display || currentList[ i ].value,
 						'</li>'
 					);
 
 					striped = ! striped;
 				}
 			}
-			$ul.html( container.join('') );
+			$ul.html( ( cache.list[ cache.val ].built = container.join('') ) );
 		}
 
 		// Cache the list items and give focus to the drop list

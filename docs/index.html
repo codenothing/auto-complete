@@ -65,6 +65,7 @@ Corey Hart @ http://www.codenothing.com
 	<li><a href='#dataFn'>dataFn</a></li>
 	<li><a href='#dataSupply'>dataSupply</a></li>
 	<li><a href='#delay'>delay</a></li>
+	<li><a href='#forceFormat'>forceFormat</a></li>
 	<li><a href='#formatSupply'>formatSupply</a></li>
 	<li><a href='#inputControl'>inputControl</a></li>
 	<li><a href='#list'>list</a></li>
@@ -129,7 +130,7 @@ Corey Hart @ http://www.codenothing.com
 
 
 <div id='notes'>
-	<h2>Note's about autoComplete</h2>
+	<h2>Notes about autoComplete</h2>
 	<b>Namespaces</b>
 
 	autoComplete only requires control of 2 namespaces: jQuery.autoComplete &amp; jQuery.fn.autoComplete.
@@ -139,25 +140,25 @@ Corey Hart @ http://www.codenothing.com
 
 	<b>Event Namespacing</b>
 
-	All normal event's are attached with the .autoComplete namespace, and all method's(custom event's) are attached to
+	All normal events are attached with the .autoComplete namespace, and all methods(custom events) are attached to
 	the autoComplete event namespace. In cases where a manual trigger is required, prefix the method with
 	autoComplete, i.e: .trigger('autoComplete.<i>namespace</i>', args...).
 
-	<b>Passing array of argument's with method's</b>
+	<b>Passing array of arguments with methods</b>
 
-	autoComplete is flexible enough to pass an array of argument's, or list out argument's as needed. So 
+	autoComplete is flexible enough to pass an array of arguments, or list out arguments as needed. So 
 	.autoComplete('method', arg1, arg2, arg3) is the same as .autoComplete('method', [arg1, arg2, arg3]), and
 	if needed, .autoComplete('method', arguments).
 
 	<b>Callback Functions</b>
 
 	Any callback functions defined through the settings have 3 properties attached to them:<br>
-	1) The '<span style='color:blue;'>this</span>' object reference's the element in focus(losing focus for blur event)<br>
+	1) The '<span style='color:blue;'>this</span>' object references the element in focus(losing focus for blur event)<br>
 	2) The first parameter contains the original event that was triggered.<br>
-	3) The second parameter contains an object of argument's needed for that function.<br><br>
+	3) The second parameter contains an object of arguments needed for that function.<br><br>
 	
 	This tries to conform to jQuery-ui's standards for callback functions, 
-	and allows for new feature's to be added while still being backwards compatible.
+	and allows for new features to be added while still being backwards compatible.
 </div>
 
 
@@ -187,7 +188,7 @@ Corey Hart @ http://www.codenothing.com
 
 <h3><div class='default'>Integer</div> <a name='length'>length</a></h3>
 <p>
-	Number of element's on the page that currently have autoComplete attached to them.
+	Number of elements on the page that currently have autoComplete attached to them.
 </p>
 
 
@@ -274,19 +275,19 @@ Corey Hart @ http://www.codenothing.com
 <h3><a name='other'>Other Inner Operation Methods</a></h3>
 <p>
 	The jQuery.autoComplete comes with a few more key variables that are operated on internally. Adjusting
-	these value's is generally a bad idea, but if required, here are the docs:<br><br>
+	these values is generally a bad idea, but if required, here are the docs:<br><br>
 
 	<b>-expando:</b> autoComplete specific expando, extension of the jQuery.expando property. Used for monkey patching and internal event notification<br>
 	<b>-counter:</b> Index counter. Gives a unique id to each element internally.<br>
-	<b>-stack:</b> Object containing all element's with autoComplete attached to them, referenced by their unique id.<br>
-	<b>-jqStack:</b> Object containing all cached jQuery element's with autoComplete attached to them, referenced by their unique id.<br>
+	<b>-stack:</b> Object containing all elements with autoComplete attached to them, referenced by their unique id.<br>
+	<b>-jqStack:</b> Object containing all cached jQuery elements with autoComplete attached to them, referenced by their unique id.<br>
 	<b>-order:</b> Array containing list order of each element focus event.<br>
 	<b>-keys:</b> A list of keycodes used throughout the plugin.<br>
 	<b>-arrayMethods:</b> Object containing all methods that may take an array as their first argument.<br>
 	<!-- TODO: Get a better description -->
 	<b>-handlerMethods:</b> Object containing all methods that may use triggerHandler under the proper number of arguments 
 	(-1 forces triggerHandler method regardless the number of arguments).<br>
-	<b>-remove:</b> Function that removes an input from the stack, takes the element's unique id as the parameter.<br>
+	<b>-remove:</b> Function that removes an input from the stack, takes the elements unique id as the parameter.<br>
 </p>
 
 
@@ -316,7 +317,7 @@ Corey Hart @ http://www.codenothing.com
 
 <h3><div class='default'>jQuery.ajaxSettings.cache</div> <a name='ajaxCache'>ajaxCache</a> - <span class='type'>Boolean</span></h3>
 <p>
-	Whether to allow browsers to cache ajax requests. Default's to jQuery's native settings.
+	Whether to allow browsers to cache ajax requests. Defaults to jQuery's native settings.
 </p>
 
 
@@ -338,7 +339,7 @@ Corey Hart @ http://www.codenothing.com
 
 <h3><div class='default'>50</div> <a name='cacheLimit'>cacheLimit</a> - <span class='type'>Integer</span></h3>
 <p>
-	Limit's the number of entries stored in cache. Setting this value to -1 will remove any limitation.
+	Limits the number of entries stored in cache. Setting this value to -1 will remove any limitation.
 </p>
 <p class='notes'>
 	<b>Note*:</b> The global jQuery.autoComplete.defaults.cacheLimit value is used in determining the stack limit
@@ -374,6 +375,14 @@ Corey Hart @ http://www.codenothing.com
 <h3><div class='default'>100</div> <a name='delay'>delay</a> - <span class='type'>Integer</span></h3>
 <p>
 	Time delay of when to send the ajax requests in milliseconds.
+</p>
+
+
+
+<h3><div class='default'>false</div> <a name='forceFormat'>forceFormat</a> - <span class='type'>Boolean</span></h3>
+<p>
+	When a list is cached, the compiled list is cached in string format and reused when that same request is made again. Setting forceFormat
+	to true forces a recompile of the list.
 </p>
 
 
@@ -421,7 +430,7 @@ Corey Hart @ http://www.codenothing.com
 
 <h3><div class='default'>undefined</div> <a name='maxHeight'>maxHeight</a> - <span class='type'>Number</span></h3>
 <p>
-	Applies the max-height logic programmatically for browser's that don't support that css property.
+	Applies the max-height logic programmatically for browsers that don't support that css property.
 </p>
 
 
@@ -458,7 +467,7 @@ Corey Hart @ http://www.codenothing.com
 
 <h3><div class='default'>' '</div> <a name='multipleSeparator'>multipleSeparator</a> - <span class='type'>String</span></h3>
 <p>
-	Separator used between multiple words. Default's to an empty space, and is only active when the
+	Separator used between multiple words. Defaults to an empty space, and is only active when the
 	<a href='#multiple'>multiple</a> option is true.
 </p>
 
@@ -551,7 +560,7 @@ Corey Hart @ http://www.codenothing.com
 
 <h3><div class='default'>Input Width</div> <a name='width'>width</a> - <span class='type'>Float</span></h3>
 <p>
-	Width of the UL drop down list. Default's to the width of the Input field
+	Width of the UL drop down list. Defaults to the width of the Input field
 </p>
 
 
@@ -726,7 +735,7 @@ Corey Hart @ http://www.codenothing.com
 
 <h3><div class='default'>undefined</div> <a name='spinner'>spinner</a> - <span class='type'>Function(event, ui)</span></h3>
 <p>
-	Callback function used to let developers know when to activate and deactivate any spinner's they want to run during requests.
+	Callback function used to let developers know when to activate and deactivate any spinners they want to run during requests.
 </p>
 <ul class='ui'>
 	<li class='title'>The ui object</li>
@@ -741,7 +750,7 @@ Corey Hart @ http://www.codenothing.com
 
 <h2 style='margin-bottom: 0px;'>Methods (Event Triggers)</h2>
 <div style='width:600px;margin-bottom:10px;'>
-	Auto-complete comes with a set of predefined method's that operate some common tasks.
+	Auto-complete comes with a set of predefined methods that operate some common tasks.
 	To trigger these events, use the normal autoComplete function initialization, with the
 	string name of the event as the first parameter, along with any other parameters that
 	are needed. Something like the following:
@@ -776,7 +785,7 @@ Corey Hart @ http://www.codenothing.com
 <p>
 	Destroys the autoComplete initiation. Removes all events and data that were attached to
 	the input, form, and document. Also, if the UL drop list was created through the function, and
-	no other input's are using it, that element will be removed as well.
+	no other inputs are using it, that element will be removed as well.
 </p>
 
 
@@ -824,7 +833,7 @@ Corey Hart @ http://www.codenothing.com
 		-Passing 'xhr' will return the last called xhr request<br>
 		-Passing 'input' will return the current $input object.<br>
 	</span>
-	-Passing no name or value parameter's will return the entire settings object.<br><br>
+	-Passing no name or value parameters will return the entire settings object.<br><br>
 </p>
 <p class='notes'>
 	<b>Note*:</b> Not passing the value parameter breaks the chain, as it utilizes jQuery's
@@ -846,7 +855,7 @@ Corey Hart @ http://www.codenothing.com
 	The settings method allows for changes to the settings for that inputs autoComplete at any
 	point of time. This can be very useful if the metadata plugin is not installed, yet separate
 	functionality is needed for each input. Simply initiate the autoComplete on each input,
-	and use the settings method to attach special parameters to each input's autoComplete instance.
+	and use the settings method to attach special parameters to each inputs autoComplete instance.
 </p>
 <p style='margin-bottom: 5px;'>
 	<b>Extra Functionality*:</b> If a function is passed as the newSettings var, the inputs current settings and cache
