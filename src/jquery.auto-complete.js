@@ -12,19 +12,24 @@
 			self = this, 
 			first = args.shift(),
 			isMethod = typeof first == 'string',
-			handler, el;
+			isEvent = ( first && first.preventDefault !== undefined ),
+			handler;
 		
-		// Allow for passing array of arguments, or multiple arguments
-		// Eg: .autoComplete('trigger', [arg1, arg2, arg3...]) or .autoComplete('trigger', arg1, arg2, arg3...)
-		// Mainly to allow for .autoComplete('trigger', arguments) to work
-		// Note*: Some triggers pass an array as the first param, so check against that first
-		args = ( AutoComplete.arrayMethods[ first ] === TRUE && jQuery.isArray( args[0] ) && jQuery.isArray( args[0][0] ) ) || 
-			( args.length === 1 && jQuery.isArray( args[0] ) ) ? 
-				args[0] : args;
+		// No need to run complex argument checks on initializations
+		if ( isMethod || isEvent ) {
+			// Allow for passing array of arguments, or multiple arguments
+			// Eg: .autoComplete('trigger', [arg1, arg2, arg3...]) or .autoComplete('trigger', arg1, arg2, arg3...)
+			// Mainly to allow for .autoComplete('trigger', arguments) to work
+			// Note*: Some triggers pass an array as the first param, so check against that first
+			args = ( AutoComplete.arrayMethods[ first ] === TRUE && jQuery.isArray( args[0] ) && jQuery.isArray( args[0][0] ) ) || 
+				( args.length === 1 && jQuery.isArray( args[0] ) ) ? 
+					args[0] : args;
 
-		// Check method against handlers that need to use triggerHandler 
-		handler = isMethod && ( AutoComplete.handlerMethods[ first ] === -1 || args.length < ( AutoComplete.handlerMethods[ first ] || 0 ) ) ? 
-			'triggerHandler' : 'trigger';
+			// Check method against handlers that need to use triggerHandler 
+			handler = isMethod &&
+				( AutoComplete.handlerMethods[ first ] === -1 || args.length < ( AutoComplete.handlerMethods[ first ] || 0 ) ) ? 
+					'triggerHandler' : 'trigger';
+		}
 
 		// Only act on elements provided
 		return self.length < 1 ? self :
@@ -33,12 +38,12 @@
 			isMethod ? self[ handler ]( 'autoComplete.' + first, args ) :
 
 			// Allow passing a jquery event special object {from jQuery.Event()}
-			first && first.preventDefault !== undefined ? self.trigger( first, args ) :
+			isEvent ? self.trigger( first, args ) :
 
 			// Initiate the autocomplete on each element (Only takes a single argument, the options object)
-			jQuery.each( self, function(){
-				if ( jQuery.data( el = this, 'autoComplete' ) !== TRUE ) {
-					jQuery.autoComplete( el, first );
+			jQuery.each( self, function( i, elem ) {
+				if ( jQuery.data( elem, 'autoComplete' ) !== TRUE ) {
+					jQuery.autoComplete( elem, first );
 				}
 			});
 	};
@@ -98,7 +103,7 @@
 
 		// Check to see if this was the last input attached to the form
 		for ( i in formList ) {
-			if ( formList.hasOwnProperty( i ) && formList[ i ] === TRUE ) {
+			if ( formList[ i ] === TRUE ) {
 				return;
 			}
 		}
@@ -902,7 +907,7 @@ jQuery.autoComplete = function( self, options ) {
 
 			// Go through the drop down element and see if any other inputs are attached to it
 			for ( i in list ) {
-				if ( list.hasOwnProperty( i ) && list[ i ] === TRUE ) {
+				if ( list[ i ] === TRUE ) {
 					return LastEvent;
 				}
 			}
