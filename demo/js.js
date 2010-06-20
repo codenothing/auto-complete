@@ -8,7 +8,7 @@ jQuery(function($){
 	$.autoComplete.defaults.maxHeight = 250;
 
 	// Normal Auto-complete initiation
-	$('input[name=search1]').autoComplete();
+	$('input[name=search1]').autoComplete({populate:false});
 
 	// Add enabling feature (disable to begin with)
 	$('input[name=enable-1]').attr('disabled', 'true').click(function(){
@@ -72,11 +72,11 @@ jQuery(function($){
 	$('#input-c').autoComplete();
 	// Trigger full 'c' list
 	$('#submit-c').click(function(){
-		$('#input-c').autoComplete('button.ajax', { all: true, letter: 'c' }, 'ALL_LETTER_C_REQUESTS');
+		$('#input-c').autoComplete('button-ajax', { all: true, letter: 'c' }, 'ALL_LETTER_C_REQUESTS');
 	});
 	// Trigger full 'd' list
 	$('#submit-d').click(function(){
-		$('#input-c').autoComplete('button.ajax', { all: true, letter: 'd' },  'ALL_LETTER_D_REQUESTS');
+		$('#input-c').autoComplete('button-ajax', { all: true, letter: 'd' },  'ALL_LETTER_D_REQUESTS');
 	});
 	// Clear just the cache, not the # of requests
 	$('#submit-flush').click(function(){

@@ -226,9 +226,9 @@ var
 
 		// Element currently in focus
 		getFocus: function( jqStack ) {
-			return ! AutoComplete.order[0] ? jqStack ? emptyjQuery : undefined :
-				jqStack ? AutoComplete.jqStack[ AutoComplete.order[0] ] :
-				AutoComplete.stack[ AutoComplete.order[0] ];
+			return ! AutoComplete.order[ 0 ] ? jqStack ? emptyjQuery : undefined :
+				jqStack ? AutoComplete.jqStack[ AutoComplete.order[ 0 ] ] :
+				AutoComplete.stack[ AutoComplete.order[ 0 ] ];
 		},
 
 		// Element previously in focus
@@ -236,10 +236,10 @@ var
 			// Removing elements cause some indexs on the order stack
 			// to become undefined, so loop until one is found
 			for ( var i = 0, l = AutoComplete.order.length; ++i < l; ) {
-				if ( AutoComplete.order[i] ) {
+				if ( AutoComplete.order[ i ] ) {
 					return jqStack ?
-						AutoComplete.jqStack[ AutoComplete.order[i] ] :
-						AutoComplete.stack[ AutoComplete.order[i] ];
+						AutoComplete.jqStack[ AutoComplete.order[ i ] ] :
+						AutoComplete.stack[ AutoComplete.order[ i ] ];
 				}
 			}
 
@@ -249,20 +249,20 @@ var
 		// Removing an element from the stack
 		remove: function( n ) {
 			for ( var i = -1, l = AutoComplete.order.length; ++i < l; ) {
-				if ( AutoComplete.order[i] === n ) {
-					AutoComplete.order[i] = undefined;
+				if ( AutoComplete.order[ i ] === n ) {
+					AutoComplete.order[ i ] = undefined;
 				}
 			}
 
 			AutoComplete.length--;
-			delete AutoComplete.stack[n];
+			delete AutoComplete.stack[ n ];
 		},
 
 		// Returns full stack in jQuery form
 		getAll: function(){
 			for ( var i = -1, l = AutoComplete.counter, stack = []; ++i < l; ) {
-				if ( AutoComplete.stack[i] ) {
-					stack.push( AutoComplete.stack[i] );
+				if ( AutoComplete.stack[ i ] ) {
+					stack.push( AutoComplete.stack[ i ] );
 				}
 			}
 			return jQuery( stack );
@@ -317,7 +317,7 @@ var
 			delay: 0,
 			// Caching Options
 			useCache: TRUE,
-			forceFormat: false,
+			forceFormat: FALSE,
 			cacheLimit: 50
 		}
 	};
@@ -948,8 +948,8 @@ jQuery.autoComplete = function( self, options ) {
 		}
 
 		// Load from cache if possible
-		if ( settings.useCache && jQuery.isArray( cache.list[ cache.val ] ) ) {
-			return loadResults( event, cache.list[ cache.val ], settings, cache, backSpace );
+		if ( settings.useCache && cache.list[ cache.val ] && cache.list[ cache.val ].built !== '' ) {
+			return loadResults( event, cache.list[ cache.val ].src, settings, cache, backSpace );
 		}
 
 		// Use user supplied data when defined
@@ -1275,7 +1275,7 @@ jQuery.autoComplete = function( self, options ) {
 		}
 
 		// Store results into the cache if allowed
-		if ( settings.useCache && ! cache.list[ cache.val ] && ! jQuery.isArray( cache.list[ cache.val ].src ) ) {
+		if ( settings.useCache && ( ! cache.list[ cache.val ] || ! jQuery.isArray( cache.list[ cache.val ].src ) ) ) {
 			cache.length++;
 			cache.list[ cache.val ] = {
 				src: currentList,
