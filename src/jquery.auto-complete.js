@@ -21,9 +21,9 @@
 			// Eg: .autoComplete('trigger', [arg1, arg2, arg3...]) or .autoComplete('trigger', arg1, arg2, arg3...)
 			// Mainly to allow for .autoComplete('trigger', arguments) to work
 			// Note*: Some triggers pass an array as the first param, so check against that first
-			args = ( AutoComplete.arrayMethods[ first ] === TRUE && jQuery.isArray( args[0] ) && jQuery.isArray( args[0][0] ) ) || 
-				( args.length === 1 && jQuery.isArray( args[0] ) ) ? 
-					args[0] : args;
+			args = ( AutoComplete.arrayMethods[ first ] === TRUE && jQuery.isArray( args[ 0 ] ) && jQuery.isArray( args[ 0 ][ 0 ] ) ) || 
+				( args.length === 1 && jQuery.isArray( args[ 0 ] ) ) ? 
+					args[ 0 ] : args;
 
 			// Check method against handlers that need to use triggerHandler 
 			handler = isMethod &&
@@ -58,22 +58,14 @@
 			});
 		}
 
-		var $form = $input.closest( 'form' ), formList, $el;
-
-		// Make sure a form was found before binding to an empty object
-		if ( $form.length < 1 ) {
-			return $form;
-		}
-
 		// Attach the input to the parent form
-		formList = jQuery.data( $form[ 0 ], 'ac-inputs' ) || {};
+		var $form = $input.closest( 'form' ), formList = $form.data( 'ac-inputs' ) || {}, $el;
 		formList[ inputIndex ] = TRUE;
-		jQuery.data( $form[ 0 ], 'ac-inputs', formList );
+		$form.data( 'ac-inputs', formList );
 
 		// Transfer the submit event to the input in focus
-		if ( jQuery.data( $form[ 0 ], 'autoComplete' ) !== TRUE ) {
-			jQuery.data( $form[ 0 ], 'autoComplete', TRUE );
-			$form.bind( 'submit.autoComplete', function( event ) {
+		if ( $form.data( 'autoComplete' ) !== TRUE ) {
+			$form.data( 'autoComplete', TRUE ).bind( 'submit.autoComplete', function( event ) {
 				return ( $el = AutoComplete.getFocus( TRUE ) ).length ?
 					$el.triggerHandler( 'autoComplete.form-submit', [ event, this ] ) :
 					TRUE;
@@ -90,15 +82,8 @@
 			rootjQuery.unbind( 'click.autoComplete' );
 		}
 
-		var $form = $input.closest( 'form' ), formList, i;
-
-		// Make sure a parent form was found
-		if ( $form.length < 1 ) {
-			return;
-		}
-
 		// Remove the input from the forms cache
-		formList = jQuery.data( $form[ 0 ], 'ac-inputs' ) || {};
+		var $form = $input.closest( 'form' ), formList = $form.data( 'ac-inputs' ) || {}, i;
 		formList[ inputIndex ] = FALSE;
 
 		// Check to see if this was the last input attached to the form
@@ -114,7 +99,7 @@
 
 	// Default function for adding all supply items to the list
 	function allSupply( event, ui ) {
-		if ( ! jQuery.isArray( ui.supply ) ) {
+		if ( ! ui.supply || ! jQuery.isArray( ui.supply ) ) {
 			return [];
 		}
 
@@ -554,7 +539,7 @@ jQuery.autoComplete = function( self, options ) {
 
 			// Only push undefined index onto order stack
 			// if not already there (in-case multiple blur events occur)
-			if ( AutoComplete.order[0] !== undefined ) {
+			if ( AutoComplete.order[ 0 ] !== undefined ) {
 				AutoComplete.order.unshift( undefined );
 			}
 
@@ -632,7 +617,7 @@ jQuery.autoComplete = function( self, options ) {
 				// Double check the event timestamps to ensure there isn't a delayed reaction from a button
 				( ! LastEvent || event.timeStamp - LastEvent.timeStamp > 200 ) && 
 				// Check the target after all other checks are passed (less processing)
-				jQuery( event.target ).closest( 'ul' ).data('ac-input-index' ) !== inputIndex ) {
+				jQuery( event.target ).closest( 'ul' ).data( 'ac-input-index' ) !== inputIndex ) {
 					$ul.hide( LastEvent = event );
 					$input.trigger( 'blur' );
 			}
@@ -1006,7 +991,7 @@ jQuery.autoComplete = function( self, options ) {
 				loadResults( event, list, settings, cache, backSpace );
 			},
 
-			error: function() {
+			error: function(){
 				$ul.html('').hide( event );
 				if ( settings.spinner ) {
 					settings.spinner.call( self, event, { active: FALSE, settings: settings, cache: cache, ul: $ul } );
@@ -1019,10 +1004,7 @@ jQuery.autoComplete = function( self, options ) {
 
 	// Parse User Supplied Data
 	function userSuppliedData( event, settings, cache, backSpace ) {
-		var list = [], ui = {},
-			fn = jQuery.isFunction( settings.dataFn ),
-			regex = fn ? undefined : new RegExp( '^'+cache.val, 'i' ),
-			items = 0, entry, i = -1, l = settings.dataSupply.length;
+		var list = [];
 
 		if ( settings.formatSupply ) {
 			list = settings.formatSupply.call( self, event, {
@@ -1033,9 +1015,13 @@ jQuery.autoComplete = function( self, options ) {
 				ul: $ul
 			});
 		} else {
+			var items = 0, i = -1, l = settings.dataSupply.length, ui, entry,
+				fn = jQuery.isFunction( settings.dataFn ),
+				regex = fn ? undefined : new RegExp( '^' + cache.val, 'i' );
+
 			for ( ; ++i < l ; ) {
 				// Force object wrapper for entry
-				entry = settings.dataSupply[i];
+				entry = settings.dataSupply[ i ];
 				entry = entry && typeof entry.value == 'string' ? entry : { value: entry };
 
 				// Setup ui object for dataFn
@@ -1162,7 +1148,7 @@ jQuery.autoComplete = function( self, options ) {
 
 	// Attach new show/hide functionality to only the ul object (so not to infect all of jQuery),
 	// And also attach event handlers if not already done so
-	function newUl() {
+	function newUl(){
 		// Allow for passing elements as the list propery for more control
 		if ( ! settings.newList && ! $ul ) {
 			$ul = settings.list.jquery ? settings.list:
@@ -1175,7 +1161,7 @@ jQuery.autoComplete = function( self, options ) {
 		// Create the list element since it does not exist based on the checks above
 		if ( ! $ul ) {
 			$ul = bgiframe.call(
-				jQuery('<ul/>').appendTo('body').addClass( settings.list ).hide().data( 'ac-selfmade', TRUE ),
+				jQuery( '<ul/>' ).appendTo( document.body ).addClass( settings.list ).hide().data( 'ac-selfmade', TRUE ),
 				settings.bgiframe
 			);
 		}
