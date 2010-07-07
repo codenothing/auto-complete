@@ -11,6 +11,7 @@
 		var args = Slice.call( arguments ),
 			self = this, 
 			first = args.shift(),
+			isInstance = first === TRUE,
 			isMethod = typeof first == 'string',
 			isEvent = ( first && first.preventDefault !== undefined ),
 			handler;
@@ -32,13 +33,16 @@
 		}
 
 		// Only act on elements provided
-		return self.length < 1 ? self :
+		return self.length < 1 ? isInstance ? undefined : self :
 
 			// Method Call
 			isMethod ? self[ handler ]( 'autoComplete.' + first, args ) :
 
 			// Allow passing a jquery event special object {from jQuery.Event()}
 			isEvent ? self.trigger( first, args ) :
+
+			// If dev requests the instance object for direct access to autoComplete instance
+			isInstance ? jQuery.autoComplete( self[ 0 ], args.shift() ) :
 
 			// Initiate the autocomplete on each element (Only takes a single argument, the options object)
 			jQuery.each( self, function( i, elem ) {
@@ -1365,6 +1369,36 @@ jQuery.autoComplete = function( self, options ) {
 		LastEvent.timeStamp = ( new Date() ).getTime();
 	}
 
+	// Builds an autoComplete instance object
+	function Instance(){
+		var instance = this, props = {
+			'button-ajax': 'buttonAjax',
+			'button-supply': 'buttonSupply',
+			'destroy': 'destroy',
+			'direct-supply': 'directSupply',
+			'disable': 'disable',
+			'enable': 'enable',
+			'flush': 'flush',
+			'option': 'option',
+			'search': 'search',
+			'settings': 'settings'
+		};
+
+		// Build the instance object for direct access to autocomplete
+		jQuery.each( props, function( trigger, method ) {
+			instance[ method ] = function(){
+				var args = Slice.call( arguments );
+				args.unshift( trigger );
+				$input.autoComplete.apply( $input, args );
+				return instance;
+			};
+		});
+
+		// Also add settings/cache objects
+		instance.settings = settings;
+		instance.cache = cache;
+	}
+
 	// Custom modifications to the drop down element
 	$ul = newUl();
 
@@ -1385,6 +1419,9 @@ jQuery.autoComplete = function( self, options ) {
 
 	// Form and Document event attachment
 	setup( $input, inputIndex );
+
+	// Return the autoComplete instance
+	return ( ACData.instance = new Instance() );
 };
 
 // Extend the autoComplete configuration onto the base autoComplete function
