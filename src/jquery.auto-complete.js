@@ -1387,9 +1387,7 @@ jQuery.autoComplete = function( self, options ) {
 		// Build the instance object for direct access to autocomplete
 		jQuery.each( props, function( trigger, method ) {
 			instance[ method ] = function(){
-				var args = Slice.call( arguments );
-				args.unshift( trigger );
-				$input.autoComplete.apply( $input, args );
+				$input.trigger( trigger, arguments );
 				return instance;
 			};
 		});

@@ -3,12 +3,12 @@
  * [DATE]
  * Corey Hart @ http://www.codenothing.com
  */ 
-jQuery(function($){
-	// Setup maxHeight for IE6
-	$.autoComplete.defaults.maxHeight = 250;
+(function( $, window ) {
 
+
+function AutoCompletes(){
 	// Normal Auto-complete initiation
-	$('input[name=search1]').autoComplete({populate:false});
+	$('input[name=search1]').autoComplete();
 
 	// Add enabling feature (disable to begin with)
 	$('input[name=enable-1]').attr('disabled', 'true').click(function(){
@@ -82,9 +82,10 @@ jQuery(function($){
 	$('#submit-flush').click(function(){
 		$('#input-c').autoComplete('flush', true);
 	});
+}
 
-
-
+// Simple supply searhing
+function SimpleSupply(){
 	// Autocomplete on User Supplied data
 	$('input[name=search6]').autoComplete({
 		dataSupply: ['jane', 'john', 'doe', 'amy', 'alice', 'louis', 'liz', {value: 'mark'}, {value: 'merideth', display: 'Merideth Johnson'}]
@@ -93,11 +94,47 @@ jQuery(function($){
 	$('#search6').click(function(){
 		$('input[name=search6]').autoComplete('button-supply');
 	});
+}
 
 
+// Fuzzy Searching technique described by Dustin Diaz @ http://www.dustindiaz.com/autocomplete-fuzzy-matching/
+// Enhanced for highlighting of found characters
+function FuzzySupply(){
+	$.get( 'words.txt', function( csv ) {
+		var cache = {};
+		$('input[name=search7]').removeAttr('disabled').autoComplete({
+			dataSupply: $.trim( csv ).split(','),
+			formatSupply: function( event, ui ) {
+				// Make sure we have something to search with and search through
+				if ( ! ui.search || ui.search === '' || ! ui.supply ) {
+					return [];
+				}
+				
+				// Develop the regex
+				var regex = cache[ ui.search ] || new RegExp( ui.search.split('').join("\\w*") ),
+					i = -1, l = ui.supply.length, list = [];
 
+				// Recache the regex incase it isnt yet
+				cache[ ui.search ] = regex;
+
+				// Create a new list to present
+				for ( ; ++i < l; ) {
+					if ( regex.exec( ui.supply[ i ] ) ) {
+						list.push( { value: ui.supply[ i ] } );
+					}
+				}
+
+				return list;
+			}
+		});
+	});
+}
+
+
+// Multiple autocomplete searching
+function MultipleAutoComplete(){
 	// Multiple words, autofill, and striped lists
-	$('input[name=search7]').autoComplete({
+	$('input[name=search8]').autoComplete({
 		multiple: true,
 		multipleSeparator: ' ',
 		autoFill: true,
@@ -105,9 +142,10 @@ jQuery(function($){
 		// Add a delay as autofill takes some time
 		delay: 100
 	});
+}
 
 
-
+function Tracking(){
 	// Hide/Show affect on code preview
 	var wrapper = $('#AutoCompleteFocus'), maxWidth = $(window).width() - wrapper.offset().left - 50;
 	if ( maxWidth > 500 ) {
@@ -138,4 +176,22 @@ jQuery(function($){
 			previous.length ? 'name=' + previous.attr('name') + "'" : 'Nothing previously in focus'
 		);
 	};
+}
+
+
+// Dom Ready
+$(function(){
+	// Setup maxHeight for IE6
+	$.autoComplete.defaults.maxHeight = 250;
+
+	// Initializes auto completes based on grouping
+	AutoCompletes();
+	SimpleSupply();
+	FuzzySupply();
+	MultipleAutoComplete();
+	Tracking();
 });
+
+
+
+})( jQuery, this );
