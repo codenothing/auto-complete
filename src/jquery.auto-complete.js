@@ -1425,4 +1425,5 @@ jQuery.autoComplete = function( self, options ) {
 // Extend the autoComplete configuration onto the base autoComplete function
 AutoComplete = jQuery.extend( jQuery.autoComplete, AutoComplete );
 
+
 })( jQuery, this );

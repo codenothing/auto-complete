@@ -101,7 +101,7 @@ function SimpleSupply(){
 // Enhanced for highlighting of found characters
 function FuzzySupply(){
 	$.get( 'words.txt', function( csv ) {
-		var cache = {};
+		var cache = {}, rword = /\W/g;
 		$('input[name=search7]').removeAttr('disabled').autoComplete({
 			dataSupply: $.trim( csv ).split(','),
 			formatSupply: function( event, ui ) {
@@ -111,7 +111,7 @@ function FuzzySupply(){
 				}
 				
 				// Develop the regex
-				var regex = cache[ ui.search ] || new RegExp( ui.search.split('').join("\\w*") ),
+				var regex = cache[ ui.search ] || new RegExp( ui.search.replace( rword, '' ).split( '' ).join( "\\w*" ), 'i' ),
 					i = -1, l = ui.supply.length, list = [];
 
 				// Recache the regex incase it isnt yet
