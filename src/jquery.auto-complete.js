@@ -167,10 +167,6 @@ var
 		down: 40
 	},
 
-	// Make a copy of the old autoComplete settings for version tracking
-	// (when loading more than one version on a page)
-	_autoComplete = jQuery.autoComplete,
-
 	// Create a local copy of the configuration
 	AutoComplete = {
 		// Autocomplete Version
@@ -178,6 +174,11 @@ var
 
 		// Autocomplete specific expando
 		expando: ExpandoFlag,
+
+		// Make a copy of the old autoComplete settings for version tracking
+		// for when loading more than one version on a page
+		// Actually, not really sure what it could be used for yet, but best to have it
+		_autoComplete: jQuery.autoComplete,
 
 		// Index Counter
 		counter: 0,
@@ -376,6 +377,7 @@ jQuery.autoComplete = function( self, options ) {
 		index: inputIndex,
 		hasFocus: FALSE,
 		active: TRUE,
+		cache: cache,
 		settings: settings,
 		initialSettings: jQuery.extend( TRUE, {}, settings )
 	});
@@ -577,7 +579,7 @@ jQuery.autoComplete = function( self, options ) {
 				return TRUE;
 			}
 
-			if ( inputIndex !== jQuery.data( $ul[ 0 ], 'ac-input-index' ) ) {
+			if ( inputIndex !== $ul.data( 'ac-input-index' ) ) {
 				$ul.html('').hide( event );
 			}
 
@@ -883,7 +885,7 @@ jQuery.autoComplete = function( self, options ) {
 
 		// Add a destruction function
 		'autoComplete.destroy': function( event ) {
-			var list = jQuery.data( $ul.html('').hide( LastEvent = event )[ 0 ], 'ac-inputs' ) || {}, i;
+			var list = $ul.html('').hide( LastEvent = event ).data('ac-inputs') || {}, i;
 
 			// Remove all autoComplete specific data and events
 			$input.removeData( 'autoComplete' ).unbind( '.autoComplete autoComplete' );
@@ -902,7 +904,7 @@ jQuery.autoComplete = function( self, options ) {
 			}
 
 			// Remove the element from the DOM if self created
-			if ( jQuery.data( $ul[ 0 ], 'ac-selfmade' ) === TRUE ) {
+			if ( $ul.data( 'ac-selfmade' ) === TRUE ) {
 				$ul.remove();
 			}
 			// Kill all data associated with autoComplete for a cleaned drop down element
@@ -1171,7 +1173,7 @@ jQuery.autoComplete = function( self, options ) {
 		}
 
 		// Storage for monkey patching
-		var hide = $ul.hide, show = $ul.show, list = jQuery.data( $ul[ 0 ], 'ac-inputs' ) || {};
+		var hide = $ul.hide, show = $ul.show, list = $ul.data( 'ac-inputs' ) || {};
 
 		// Monkey patch the list object to control the hiding and showing
 		if ( ! $ul[ ExpandoFlag ] ) {
@@ -1198,9 +1200,8 @@ jQuery.autoComplete = function( self, options ) {
 		}
 
 		// Attach global handlers for event delegation (So there is no more loss time in unbinding and rebinding)
-		if ( jQuery.data( $ul[ 0 ], 'autoComplete' ) !== TRUE ) {
-			jQuery.data( $ul[ 0 ], 'autoComplete', TRUE );
-			$ul.delegate( 'li', 'mouseenter.autoComplete', function( event ) {
+		if ( $ul.data( 'autoComplete' ) !== TRUE ) {
+			$ul.data( 'autoComplete', TRUE ).delegate( 'li', 'mouseenter.autoComplete', function( event ) {
 				AutoComplete.getFocus( TRUE ).trigger( 'autoComplete.ul-mouseenter', [ event, this ] );
 			})
 			.bind( 'click.autoComplete', function( event ) {
@@ -1210,7 +1211,7 @@ jQuery.autoComplete = function( self, options ) {
 		}
 
 		list[ inputIndex ] = TRUE;
-		jQuery.data( $ul[ 0 ], 'ac-inputs', list );
+		$ul.data( 'ac-inputs', list );
 		return $ul;
 	}
 
@@ -1314,7 +1315,7 @@ jQuery.autoComplete = function( self, options ) {
 
 					container.push(
 						settings.striped && striped ? '<li class="' + settings.striped + '">' : '<li>',
-						currentList[ i ].display || currentList[ i ].value,
+							currentList[ i ].display || currentList[ i ].value,
 						'</li>'
 					);
 
@@ -1325,8 +1326,7 @@ jQuery.autoComplete = function( self, options ) {
 		}
 
 		// Cache the list items and give focus to the drop list
-		$elems = $ul.children( 'li' );
-		jQuery.data( $ul[ 0 ], 'ac-input-index', inputIndex );
+		$elems = $ul.data( 'ac-input-index', inputIndex ).children( 'li' );
 
 		// Autofill input with first entry
 		if ( settings.autoFill && ! backSpace ) {
