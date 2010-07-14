@@ -53,9 +53,9 @@ Corey Hart @ http://www.codenothing.com
 	</div>
 	<a href='#'>+ Open Code</a>
 <pre>
-var $div = $('#AutoCompleteFocus');
-$.autoComplete.focus = function(){
-	var focus = $.autoComplete.getFocus( true ), previous = $.autoComplete.getPrevious( true );
+var $div = jQuery('#AutoCompleteFocus');
+jQuery.autoComplete.focus = function(){
+	var focus = jQuery.autoComplete.getFocus( true ), previous = jQuery.autoComplete.getPrevious( true );
 	$div.find('.current span').html(
 		focus.length ? 'name=' + focus.attr('name') + "'" : 'Nothing in Focus'
 	);
@@ -72,7 +72,7 @@ $.autoComplete.focus = function(){
 <div style='margin:40px 0 0 0;' class='content'>
 <b>Normal Initiation</b>
 <pre>
-$('input[name=search1]').autoComplete();
+jQuery('input[name=search1]').autoComplete();
 </pre>
 <input type='text' name='search1' style='width:300px;' />
 <input type='submit' name='enable-1' value='Enable' />
@@ -84,16 +84,16 @@ $('input[name=search1]').autoComplete();
  * Button code for above example
  */
 // Add enabling feature (disable to begin with)
-$('input[name=enable-1]').attr('disabled', 'true').click(function(){
-	$('input[name=search1]').autoComplete();
-	$('input[name=destroy-1]').attr('disabled', false);
-	$(this).attr('disabled', 'true');
+jQuery('input[name=enable-1]').attr('disabled', 'true').click(function(){
+	jQuery('input[name=search1]').autoComplete();
+	jQuery('input[name=destroy-1]').attr('disabled', false);
+	jQuery(this).attr('disabled', 'true');
 });
 // Add disabling feature
-$('input[name=destroy-1]').click(function(){
-	$('input[name=search1]').autoComplete('destroy');
-	$('input[name=enable-1]').attr('disabled', false);
-	$(this).attr('disabled', 'true');
+jQuery('input[name=destroy-1]').click(function(){
+	jQuery('input[name=search1]').autoComplete('destroy');
+	jQuery('input[name=enable-1]').attr('disabled', false);
+	jQuery(this).attr('disabled', 'true');
 });
 </pre>
 
@@ -105,7 +105,7 @@ $('input[name=destroy-1]').click(function(){
 <b>Prevent form submission when running callbacks on selection</b>
 <pre>
 // Auto-complete preventing form submission, and firing onSelect function
-$('input[name=search2]').autoComplete({
+jQuery('input[name=search2]').autoComplete({
 	// preventEnterSubmit is already flagged true by default
 	onSelect: function(event, ui){
 		alert('You have selected ' + ui.data.value);
@@ -125,7 +125,7 @@ $('input[name=search2]').autoComplete({
 <div style='margin:40px 0;' class='content'>
 <b>Send requests to different page with extra POST parameters,<br>returning with no display value.</b>
 <pre>
-$('input[name=search3]').autoComplete({
+jQuery('input[name=search3]').autoComplete({
 	ajax: 'ajax2.php',
 	postData: {
 		hook1: 'Do something on hook1',
@@ -155,15 +155,15 @@ $('input[name=search3]').autoComplete({
 <b>Use the metadata plugin to set limitations on a per input basis.</b>
 <pre>
 // Auto-complete using metadata and maximum requests
-$('input[name=search4]').autoComplete({
+jQuery('input[name=search4]').autoComplete({
 	onMaxRequest: function(event, ui){
-		$(this).css('background-color', 'red');
+		jQuery(this).css('background-color', 'red');
 		alert('Sorry, but you have used up the maximum number of reqests allowed, and ' + ui.search + ' was not processed');
 	}
 });
 // Clear requests and remove red background
-$('input[name=search4-submit]').click(function(){
-	$('input[name=search4]').autoComplete('flush').css('background-color', 'white').val('').focus();
+jQuery('input[name=search4-submit]').click(function(){
+	jQuery('input[name=search4]').autoComplete('flush').css('background-color', 'white').val('').focus();
 });
 &lt;input type='text' name='search4' style='width:300px;' class='someclass {minChars: 2, maxRequests: 10}' /&gt;
 </pre>
@@ -181,18 +181,18 @@ $('input[name=search4-submit]').click(function(){
 <b>Trigger autoComplete by clicking an  external button.</b>
 <pre>
 // Auto-complete with trigger
-$('#input-c').autoComplete();
+jQuery('#input-c').autoComplete();
 // Trigger full 'c' list
-$('#submit-c').click(function(){
-	$('#input-c').autoComplete('button.ajax', {all:true, letter:'c'}, 'ALL_LETTER_C_REQUESTS');
+jQuery('#submit-c').click(function(){
+	jQuery('#input-c').autoComplete('button.ajax', {all:true, letter:'c'}, 'ALL_LETTER_C_REQUESTS');
 });
 // Trigger full 'd' list
-$('#submit-d').click(function(){
-	$('#input-c').autoComplete('button.ajax', {all:true, letter:'d'},  'ALL_LETTER_D_REQUESTS');
+jQuery('#submit-d').click(function(){
+	jQuery('#input-c').autoComplete('button.ajax', {all:true, letter:'d'},  'ALL_LETTER_D_REQUESTS');
 });
 // Clear just the cache, not the # of requests
-$('#submit-flush').click(function(){
-	$('#input-c').autoComplete('flush', true);
+jQuery('#submit-flush').click(function(){
+	jQuery('#input-c').autoComplete('flush', true);
 });
 </pre>
 <input type='text' style='width:300px;' name='search5' />
@@ -211,12 +211,12 @@ $('#submit-flush').click(function(){
 <b>Supply a data set for autoComplete to use.</b>
 <pre>
 // Autocomplete on User Supplied data
-$('input[name=search6]').autoComplete({
+jQuery('input[name=search6]').autoComplete({
 	dataSupply: ['jane', 'john', 'doe', 'amy', 'alice', 'louis', 'liz', {value: 'mark'}, {value: 'merideth', display: 'Merideth Johnson'}]
 });
 // Trigger whole list
-$('#search6').click(function(){
-	$('input[name=search6]').autoComplete('button.supply');
+jQuery('#search6').click(function(){
+	jQuery('input[name=search6]').autoComplete('button.supply');
 });
 </pre>
 <input type='text' style='width:300px;' name='search6' />
@@ -230,8 +230,39 @@ $('#search6').click(function(){
 
 
 <div style='margin:40px 0;' class='content'>
-<b>Using Fuzzy Selection.</b>
+<b>Using formatSupply to implement custom list building with Fuzzy Selection.</b>
 <pre>
+jQuery.get( 'words.txt', function( csv ) {
+	var cache = {}, rword = /\W/g;
+	jQuery('input[name=search7]').removeAttr('disabled').autoComplete({
+		// List of common mispelled words
+		dataSupply: jQuery.trim( csv ).split(','),
+
+		// Custom list formatting
+		formatSupply: function( event, ui ) {
+			// Make sure we have something to search with and search through
+			if ( ! ui.search || ui.search === '' || ! ui.supply ) {
+				return [];
+			}
+			
+			// Develop the regex
+			var regex = cache[ ui.search ] || new RegExp( ui.search.replace( rword, '' ).split( '' ).join( "\\w*" ), 'i' ),
+				i = -1, l = ui.supply.length, list = [];
+
+			// Recache the regex incase it isnt yet
+			cache[ ui.search ] = regex;
+
+			// Create a new list to present
+			for ( ; ++i &lt; l; ) {
+				if ( regex.exec( ui.supply[ i ] ) ) {
+					list.push( { value: ui.supply[ i ] } );
+				}
+			}
+
+			return list;
+		}
+	});
+});
 </pre>
 <input type='text' style='width:300px;' name='search7' disabled='disabled' />
 </div>
@@ -246,7 +277,7 @@ $('#search6').click(function(){
 <b>Allow for multiple words, autofill, and striped lists.</b>
 <pre>
 // Multiple words, autofill and striped lists
-$('input[name=search7]').autoComplete({
+jQuery('input[name=search7]').autoComplete({
 	multiple: true,
 	multipleSeparator: ' ',
 	autofill: true,

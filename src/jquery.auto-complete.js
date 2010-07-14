@@ -167,6 +167,11 @@ var
 		down: 40
 	},
 
+	// Use native timestamp getter if possible
+	now = Date.now || function(){
+		return ( new Date() ).getTime();
+	},
+
 	// Create a local copy of the configuration
 	AutoComplete = {
 		// Autocomplete Version
@@ -280,6 +285,9 @@ var
 			maxHeight: undefined,
 			bgiframe: undefined,
 			newList: FALSE,
+			template: undefined,
+			templateStripe: 'striped',
+			pattern: /(^|.|\r|\n)(#\{(.*?)\})/,
 			// Post Data
 			postVar: 'value',
 			postData: {},
@@ -1259,6 +1267,44 @@ jQuery.autoComplete = function( self, options ) {
 		}
 	}
 
+	// Template logic stolen from http://www.codenothing.com/archives/jquery/jquery-template/
+	function buildTemplate(){
+		var k = -1, l = currentList.length, container = [], striped = FALSE, lastIndex, row, temp, match, m;
+
+		for ( ; ++k < l; ) {
+			row = currentList[ k ];
+			temp = settings.template;
+			lastIndex = 0;
+
+			// Set the striping value
+			if ( settings.striped ) {
+				row[ settings.templateStripe ] = striped ? settings.striped : '';
+			}
+
+			// All patterns matched need to be replaced with their respective values, or
+			// with an empty string. When looping, be sure to only execute the pattern
+			// on the part of the string that has yet to be transformed
+			while ( ( match = settings.pattern.exec( temp.substr( lastIndex ) ) ) ) {
+				// Pass over escaped formats and remove their lingering '\'
+				if ( match[ 1 ] === "\\" ) {
+					lastIndex = temp.indexOf( match[ 0 ] ) + match[ 0 ].length;
+					temp = temp.replace( match[ 0 ], match[ 0 ].substr( 1 ) );
+				}
+				else {
+					m = match[ 3 ];
+					lastIndex = temp.indexOf( match[ 0 ] ) + ( row[ m ] ? row[ m ].length : 0 );
+					temp = temp.replace( match[ 2 ], row[ m ] || '' );
+				}
+			}
+
+			striped = ! striped;
+			container.push( temp );
+		}
+
+		// Store the built list into the cache, and load it into the drop down
+		$ul.html( ( cache.list[ cache.val ].built = container.join('') ) );
+	}
+
 	// List Functionality
 	function loadResults( event, list, settings, cache, backSpace ) {
 		// Allow another level of result handling
@@ -1304,6 +1350,9 @@ jQuery.autoComplete = function( self, options ) {
 		}
 		else if ( cache.list[ cache.val ].built !== '' && ! settings.forceFormat ) {
 			$ul.html( cache.list[ cache.val ].built );
+		}
+		else if ( settings.template ) {
+			buildTemplate();
 		}
 		else {
 			// Push items onto container
@@ -1366,7 +1415,7 @@ jQuery.autoComplete = function( self, options ) {
 
 		// Include amount of time it took to load the list
 		// and run modifications
-		LastEvent.timeStamp = ( new Date() ).getTime();
+		LastEvent.timeStamp = now();
 	}
 
 	// Builds an autoComplete instance object
@@ -1374,20 +1423,18 @@ jQuery.autoComplete = function( self, options ) {
 		var instance = this, props = {
 			'button-ajax': 'buttonAjax',
 			'button-supply': 'buttonSupply',
-			'destroy': 'destroy',
 			'direct-supply': 'directSupply',
+			'destroy': 'destroy',
 			'disable': 'disable',
 			'enable': 'enable',
 			'flush': 'flush',
-			'option': 'option',
-			'search': 'search',
-			'settings': 'settings'
+			'search': 'search'
 		};
 
 		// Build the instance object for direct access to autocomplete
 		jQuery.each( props, function( trigger, method ) {
 			instance[ method ] = function(){
-				$input.trigger( trigger, arguments );
+				$input.trigger( 'autoComplete.' + trigger, arguments );
 				return instance;
 			};
 		});
