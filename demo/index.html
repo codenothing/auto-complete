@@ -4,6 +4,8 @@
 	<title>Auto Complete [VERSION]</title>
 	<script type='text/javascript' src='../jquery/jquery-1.4.2.js'></script>
 	<script type='text/javascript' src='../jquery/jquery.metadata.js'></script>
+	<script type='text/javascript' src='../jquery/jquery.chili.js'></script>
+	<script type='text/javascript' src='../jquery/jquery.chili.recipes.js'></script>
 	<script type='text/javascript' src='../src/jquery.auto-complete.js'></script>
 	<script type='text/javascript' src='js.js'></script>
 	<link rel='stylesheet' type='text/css' href='../src/jquery.auto-complete.css' />
@@ -27,12 +29,6 @@ Corey Hart @ http://www.codenothing.com
 	for a full list of features.
 </div>
 
-<div style='margin-top: 30px;' class='content'>
-	For those upgrading from 4.1, check out the <a href='../changelog'>changelog</a>, the 
-	<a href='../docs/#backwardsCompatible'>backwardsCompatible</a> setting, and the 
-	<a href='4.1-compatible.html'>4.1-compatible</a> page showing that upgrading works.
-</div>
-
 <div style='margin-top:40px;' class='content'>
 	A list of commonly misspelled words in English found at 
 	<a href='http://www.esldesk.com/esl-quizzes/misspelled-words/misspelled-words.htm'>
@@ -52,7 +48,7 @@ Corey Hart @ http://www.codenothing.com
 		<b>Previously in Focus:</b> <span></span>
 	</div>
 	<a href='#'>+ Open Code</a>
-<pre>
+<pre class='js'>
 var $div = jQuery('#AutoCompleteFocus');
 jQuery.autoComplete.focus = function(){
 	var focus = jQuery.autoComplete.getFocus( true ), previous = jQuery.autoComplete.getPrevious( true );
@@ -71,7 +67,7 @@ jQuery.autoComplete.focus = function(){
 
 <div style='margin:40px 0 0 0;' class='content'>
 <b>Normal Initiation</b>
-<pre>
+<pre class='js'>
 jQuery('input[name=search1]').autoComplete();
 </pre>
 <input type='text' name='search1' style='width:300px;' />
@@ -79,7 +75,7 @@ jQuery('input[name=search1]').autoComplete();
 <input type='submit' name='destroy-1' value='Destroy' />
 </div>
 
-<pre style='margin: 20px 0 40px 0;'>
+<pre style='margin: 20px 0 40px 0;' class='js'>
 /**
  * Button code for above example
  */
@@ -103,7 +99,7 @@ jQuery('input[name=destroy-1]').click(function(){
 
 <div style='margin:40px 0;' class='content'>
 <b>Prevent form submission when running callbacks on selection</b>
-<pre>
+<pre class='js'>
 // Auto-complete preventing form submission, and firing onSelect function
 jQuery('input[name=search2]').autoComplete({
 	// preventEnterSubmit is already flagged true by default
@@ -124,7 +120,7 @@ jQuery('input[name=search2]').autoComplete({
 
 <div style='margin:40px 0;' class='content'>
 <b>Send requests to different page with extra POST parameters,<br>returning with no display value.</b>
-<pre>
+<pre class='js'>
 jQuery('input[name=search3]').autoComplete({
 	ajax: 'ajax2.php',
 	postData: {
@@ -153,7 +149,7 @@ jQuery('input[name=search3]').autoComplete({
 
 <div style='margin:40px 0;' class='content'>
 <b>Use the metadata plugin to set limitations on a per input basis.</b>
-<pre>
+<pre class='js'>
 // Auto-complete using metadata and maximum requests
 jQuery('input[name=search4]').autoComplete({
 	onMaxRequest: function(event, ui){
@@ -179,7 +175,7 @@ jQuery('input[name=search4-submit]').click(function(){
 
 <div style='margin:40px 0;' class='content'>
 <b>Trigger autoComplete by clicking an  external button.</b>
-<pre>
+<pre class='js'>
 // Auto-complete with trigger
 jQuery('#input-c').autoComplete();
 // Trigger full 'c' list
@@ -209,7 +205,7 @@ jQuery('#submit-flush').click(function(){
 
 <div style='margin:40px 0;' class='content'>
 <b>Supply a data set for autoComplete to use.</b>
-<pre>
+<pre class='js'>
 // Autocomplete on User Supplied data
 jQuery('input[name=search6]').autoComplete({
 	dataSupply: ['jane', 'john', 'doe', 'amy', 'alice', 'louis', 'liz', {value: 'mark'}, {value: 'merideth', display: 'Merideth Johnson'}]
@@ -231,37 +227,35 @@ jQuery('#search6').click(function(){
 
 <div style='margin:40px 0;' class='content'>
 <b>Using formatSupply to implement custom list building with Fuzzy Selection.</b>
-<pre>
-jQuery.get( 'words.txt', function( csv ) {
-	var cache = {}, rword = /\W/g;
-	jQuery('input[name=search7]').removeAttr('disabled').autoComplete({
-		// List of common mispelled words
-		dataSupply: jQuery.trim( csv ).split(','),
+<pre class='js'>
+var cache = {}, rword = /\W/g;
+jQuery('input[name=search7]').removeAttr('disabled').autoComplete({
+	// List of common mispelled words
+	dataSupply: supply,
 
-		// Custom list formatting
-		formatSupply: function( event, ui ) {
-			// Make sure we have something to search with and search through
-			if ( ! ui.search || ui.search === '' || ! ui.supply ) {
-				return [];
-			}
-			
-			// Develop the regex
-			var regex = cache[ ui.search ] || new RegExp( ui.search.replace( rword, '' ).split( '' ).join( "\\w*" ), 'i' ),
-				i = -1, l = ui.supply.length, list = [];
-
-			// Recache the regex incase it isnt yet
-			cache[ ui.search ] = regex;
-
-			// Create a new list to present
-			for ( ; ++i &lt; l; ) {
-				if ( regex.exec( ui.supply[ i ] ) ) {
-					list.push( { value: ui.supply[ i ] } );
-				}
-			}
-
-			return list;
+	// Custom list formatting
+	formatSupply: function( event, ui ) {
+		// Make sure we have something to search with and search through
+		if ( ! ui.search || ui.search === '' || ! ui.supply ) {
+			return [];
 		}
-	});
+		
+		// Develop the regex
+		var regex = cache[ ui.search ] || new RegExp( ui.search.replace( rword, '' ).split( '' ).join( "\\w*" ), 'i' ),
+			i = -1, l = ui.supply.length, list = [];
+
+		// Recache the regex incase it isnt yet
+		cache[ ui.search ] = regex;
+
+		// Create a new list to present
+		for ( ; ++i < l; ) {
+			if ( regex.exec( ui.supply[ i ] ) ) {
+				list.push( { value: ui.supply[ i ] } );
+			}
+		}
+
+		return list;
+	}
 });
 </pre>
 <input type='text' style='width:300px;' name='search7' disabled='disabled' />
@@ -275,7 +269,7 @@ jQuery.get( 'words.txt', function( csv ) {
 
 <div style='margin:40px 0;' class='content'>
 <b>Allow for multiple words, autofill, and striped lists.</b>
-<pre>
+<pre class='js'>
 // Multiple words, autofill and striped lists
 jQuery('input[name=search7]').autoComplete({
 	multiple: true,
@@ -287,6 +281,25 @@ jQuery('input[name=search7]').autoComplete({
 });
 </pre>
 <input type='text' style='width:300px;' name='search8' />
+</div>
+
+
+
+<div class='hr'></div>
+
+
+
+<div style='margin:40px 0;' class='content'>
+<b>Using templates and stripes.</b>
+<pre class='js'>
+// Using templates and stripes
+jQuery('input[name=search9]').autoComplete({
+	dataSupply: supply,
+	striped: 'auto-complete-striped',
+	template: "&lt;li class='#{striped}'&gt;#{value}&lt;/li&gt;"
+});
+</pre>
+<input type='text' style='width:300px;' name='search9' />
 </div>
 
 

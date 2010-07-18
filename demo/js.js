@@ -106,11 +106,11 @@ var AutoCompletes = {
 	// Auto-complete using formatSupply to build a custom list
 	// Fuzzy Searching technique described by Dustin Diaz @ http://www.dustindiaz.com/autocomplete-fuzzy-matching/
 	search7: function(){
-		jQuery.get( 'words.txt', function( csv ) {
+		CSV(function( supply ) {
 			var cache = {}, rword = /\W/g;
 			jQuery('input[name=search7]').removeAttr('disabled').autoComplete({
 				// List of common mispelled words
-				dataSupply: jQuery.trim( csv ).split(','),
+				dataSupply: supply,
 
 				// Custom list formatting
 				formatSupply: function( event, ui ) {
@@ -151,24 +151,33 @@ var AutoCompletes = {
 		});
 	},
 
+	
+	// Using templates and stripes
+	search9: function(){
+		CSV(function( supply ) {
+			jQuery('input[name=search9]').autoComplete({
+				dataSupply: supply,
+				striped: 'auto-complete-striped',
+				template: "<li class='#{striped}'>#{value}</li>"
+			});
+		});
+	},
+
 	// Showing how to track autoCompletes from a global level
 	tracking: function(){
-		// Hide/Show affect on code preview
-		var wrapper = jQuery('#AutoCompleteFocus'), maxWidth = jQuery(window).width() - wrapper.offset().left - 50;
-		if ( maxWidth > 500 ) {
-			maxWidth = 500;
-		}
+		// Need to cache the element first for sizing
+		var wrapper = jQuery('#AutoCompleteFocus');
 
 		// Toggle code for floater
-		wrapper.find('a').toggle(
+		wrapper.width( jQuery(window).width() - wrapper.offset().left - 50 ).find('a').toggle(
 			function(){
 				jQuery(this).html('- Close Code');
-				wrapper.css({ height: 250, width: maxWidth }).find('pre').show();
+				wrapper.height( 250 ).find('pre').show();
 				return false;
 			},
 			function(){
 				jQuery(this).html('+ Open Code');
-				wrapper.css({ height: 100, width: 300 }).find('pre').hide();
+				wrapper.height( 100 ).find('pre').hide();
 				return false;
 			} 
 		);
@@ -189,6 +198,13 @@ var AutoCompletes = {
 };
 
 
+// Delaying for csv supply
+function CSV( fn ) {
+	CSV.stack.push( fn );
+}
+CSV.stack = [];
+
+
 // Dom Ready
 jQuery(function(){
 	// Setup maxHeight for IE6
@@ -199,6 +215,14 @@ jQuery(function(){
 			AutoCompletes[ i ]();
 		}
 	}
+		
+	jQuery.get( 'words.txt', function( csv ) {
+		var words = csv.split(','), i = -1, l = CSV.stack.length;
+
+		for ( ; ++i < l; ) {
+			CSV.stack[ i ]( words );
+		}
+	});
 });
 
 

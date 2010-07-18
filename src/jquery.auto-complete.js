@@ -131,8 +131,9 @@ var
 	TRUE = true,
 	FALSE = false,
 
-	// Copy of the slice prototype
+	// Copy of utility functions
 	Slice = Array.prototype.slice,
+	toString = Object.prototype.toString,
 
 	// Copy document element for munging
 	document = window.document,
@@ -145,12 +146,11 @@ var
 
 	// Opera and Firefox on Mac need to use the keypress event to track holding of
 	// a key down and not releasing
-	keyevent = Object.prototype.toString.call( window.opera ) === '[object Opera]' || 
-		( /macintosh/i.test( window.navigator.userAgent ) && jQuery.browser.mozilla ) ? 
+	keyevent = toString.call( window.opera ) === '[object Opera]' || ( /macintosh/i.test( window.navigator.userAgent ) && jQuery.browser.mozilla ) ? 
 			'keypress.autoComplete' : 'keydown.autoComplete',
 
-	// Event flag that gets passed around
-	ExpandoFlag = 'autoComplete_' + jQuery.expando,
+	// Flag that marks objects that have been accessed by autoComplete
+	expando = 'autoComplete_' + jQuery.expando,
 
 	// Make a local copy of the key codes used throughout the plugin
 	KEY = {
@@ -178,7 +178,7 @@ var
 		version: '[VERSION]',
 
 		// Autocomplete specific expando
-		expando: ExpandoFlag,
+		expando: expando,
 
 		// Make a copy of the old autoComplete settings for version tracking
 		// for when loading more than one version on a page
@@ -301,7 +301,9 @@ var
 			// Input
 			onChange: undefined,
 			autoFill: FALSE,
-			nonInput: [ KEY.shift, KEY.left, KEY.right ],
+			blacklist: [ KEY.shift, KEY.left, KEY.right ],
+			whitelist: undefined,
+			onlyInput: undefined,
 			multiple: FALSE,
 			multipleSeparator: ' ',
 			// Events
@@ -491,10 +493,11 @@ jQuery.autoComplete = function( self, options ) {
 				down( event );
 			}
 		}
-		// Check for non input values defined by user
-		else if ( settings.nonInput && jQuery.inArray( key, settings.nonInput ) > -1 ) {
-			$ul.html('').hide( event );
-			enter = TRUE;
+		// Check for whitelist/blacklist values defined by user
+		else if ( ( settings.whitelist && jQuery.inArray( key, settings.whitelist ) === -1 ) || 
+			( settings.blacklist && jQuery.inArray( key, settings.blacklist ) > -1 ) ) {
+				$ul.html('').hide( event );
+				enter = TRUE;
 		}
 		// Everything else is considered possible input, so
 		// return before keyup prevention flag is set
@@ -504,14 +507,14 @@ jQuery.autoComplete = function( self, options ) {
 
 		// Prevent autoComplete keyup event's from triggering by
 		// attaching a flag to the last event
-		LastEvent[ 'keydown_' + ExpandoFlag ] = TRUE;
+		LastEvent[ 'keydown_' + expando ] = TRUE;
 		return enter;
 	})
 	.bind({
 		'keyup.autoComplete': function( event ) {
 			// If autoComplete has been disabled or keyup prevention 
 			// flag has be set, prevent input events
-			if ( ! ACData.active || LastEvent[ 'keydown_' + ExpandoFlag ] ) {
+			if ( ! ACData.active || LastEvent[ 'keydown_' + expando ] ) {
 				return TRUE;
 			}
 
@@ -583,7 +586,7 @@ jQuery.autoComplete = function( self, options ) {
 			// Prevent inner focus events if caused by autoComplete inner functionality
 			// Also, because IE triggers focus AND closes the drop list before form submission,
 			// keep the select flag by not reseting the last event
-			if ( ! ACData.active || ( ACData.hasFocus && flag === ExpandoFlag ) || LastEvent[ 'enter_' + ExpandoFlag ] ) {
+			if ( ! ACData.active || ( ACData.hasFocus && flag === expando ) || LastEvent[ 'enter_' + expando ] ) {
 				return TRUE;
 			}
 
@@ -647,7 +650,7 @@ jQuery.autoComplete = function( self, options ) {
 
 			// Because IE triggers focus AND closes the drop list before form submission,
 			// tracking enter is set on the keydown event
-			return settings.preventEnterSubmit && ( ulOpen || LastEvent[ 'enter_' + ExpandoFlag ] ) ? FALSE : 
+			return settings.preventEnterSubmit && ( ulOpen || LastEvent[ 'enter_' + expando ] ) ? FALSE : 
 				settings.onSubmit === undefined ? TRUE : 
 				settings.onSubmit.call( self, event, { form: form, settings: settings, cache: cache, ul: $ul } );
 		},
@@ -678,7 +681,7 @@ jQuery.autoComplete = function( self, options ) {
 		// Catch click events on the drop down
 		'autoComplete.ul-click': function( e, event ) {
 			// Refocus the input box and pass flag to prevent inner focus events
-			$input.trigger( 'focus', [ ExpandoFlag ] );
+			$input.trigger( 'focus', [ expando ] );
 
 			// Check against separator for input value
 			$input.val( inputval === separator ? 
@@ -728,16 +731,8 @@ jQuery.autoComplete = function( self, options ) {
 			// Custom drop list modifications
 			$ul = newUl();
 
-			// Change case here so it doesn't have to be done on every request
-			settings.requestType = settings.requestType.toUpperCase();
-
-			// autoComplete 5.1 and below had inputControl as the onChange handler
-			if ( settings.inputControl !== undefined && settings.onChange === undefined ) {
-				settings.onChange = settings.inputControl;
-			}
-
-			// Local copy of the seperator for faster referencing
-			separator = settings.multiple ? settings.multipleSeparator : undefined;
+			// Handle legacy apps
+			legacy();
 
 			// Just to be sure, reset the settings object into the data storage
 			ACData.settings = settings;
@@ -773,10 +768,10 @@ jQuery.autoComplete = function( self, options ) {
 			LastEvent = event;
 
 			// Refocus the input box, but pass flag to prevent inner focus events
-			$input.trigger( 'focus', [ ExpandoFlag ] );
+			$input.trigger( 'focus', [ expando ] );
 
 			// If no cache name is given, supply a non-common word
-			cache.val = cacheName || 'button-ajax_' + ExpandoFlag;
+			cache.val = cacheName || 'button-ajax_' + expando;
 
 			return sendRequest(
 				event, 
@@ -800,10 +795,10 @@ jQuery.autoComplete = function( self, options ) {
 			LastEvent = event;
 
 			// Refocus the input box and pass flag to prevent inner focus events
-			$input.trigger( 'focus', [ ExpandoFlag ] );
+			$input.trigger( 'focus', [ expando ] );
 
 			// If no cache name is given, supply a non-common word
-			cache.val = cacheName || 'button-supply_' + ExpandoFlag;
+			cache.val = cacheName || 'button-supply_' + expando;
 
 			// If no data is supplied, use data in settings
 			data = jQuery.isArray( data ) ? data : settings.dataSupply;
@@ -830,10 +825,10 @@ jQuery.autoComplete = function( self, options ) {
 			LastEvent = event;
 
 			// Refocus the input box and pass flag to prevent inner focus events
-			$input.trigger( 'focus', [ ExpandoFlag ] );
+			$input.trigger( 'focus', [ expando ] );
 
 			// If no cache name is given, supply a non-common word
-			cache.val = cacheName || 'direct-supply_' + ExpandoFlag;
+			cache.val = cacheName || 'direct-supply_' + expando;
 
 			// If no data is supplied, use data in settings
 			data = jQuery.isArray( data ) && data.length ? data : settings.dataSupply;
@@ -1085,7 +1080,7 @@ jQuery.autoComplete = function( self, options ) {
 			// Because IE triggers focus AND closes the drop list before form submission
 			// attach a flag on 'enter' selection
 			if ( LastEvent.type === 'keydown' ) {
-				LastEvent[ 'enter_' + ExpandoFlag ] = TRUE;
+				LastEvent[ 'enter_' + expando ] = TRUE;
 			}
 
 			$ul.hide( event );
@@ -1184,7 +1179,7 @@ jQuery.autoComplete = function( self, options ) {
 		var hide = $ul.hide, show = $ul.show, list = $ul.data( 'ac-inputs' ) || {};
 
 		// Monkey patch the list object to control the hiding and showing
-		if ( ! $ul[ ExpandoFlag ] ) {
+		if ( ! $ul[ expando ] ) {
 			$ul.hide = function( event, speed, callback ) {
 				if ( settings.onHide && ulOpen ) {
 					settings.onHide.call( self, event, { ul: $ul, settings: settings, cache: cache } );
@@ -1204,7 +1199,7 @@ jQuery.autoComplete = function( self, options ) {
 			};
 
 			// A flag must be attached to the $ul cached object
-			$ul[ ExpandoFlag ] = TRUE;
+			$ul[ expando ] = TRUE;
 		}
 
 		// Attach global handlers for event delegation (So there is no more loss time in unbinding and rebinding)
@@ -1418,6 +1413,25 @@ jQuery.autoComplete = function( self, options ) {
 		LastEvent.timeStamp = now();
 	}
 
+	// Handle legacy apps
+	function legacy(){
+		// Do case change on initialization so it's not run on every request
+		settings.requestType = settings.requestType.toUpperCase();
+
+		// Local quick copy of the seperator (so we don't have to run this check every time)
+		separator = settings.multiple ? settings.multipleSeparator : undefined;
+
+		// autoComplete 5.1 and below had inputControl as the onChange handler
+		if ( settings.inputControl !== undefined && settings.onChange === undefined ) {
+			settings.onChange = settings.inputControl;
+		}
+
+		// autoComplete 5.1 and below had nonInput as the blacklist
+		if ( settings.nonInput !== undefined && settings.blacklist === undefined ) {
+			settings.blacklist = settings.nonInput;
+		}
+	}
+
 	// Builds an autoComplete instance object
 	function Instance(){
 		var instance = this, props = {
@@ -1447,16 +1461,8 @@ jQuery.autoComplete = function( self, options ) {
 	// Custom modifications to the drop down element
 	$ul = newUl();
 
-	// Do case change on initialization so it's not run on every request
-	settings.requestType = settings.requestType.toUpperCase();
-
-	// autoComplete 5.1 and below had inputControl as the onChange handler
-	if ( settings.inputControl !== undefined && settings.onChange === undefined ) {
-		settings.onChange = settings.inputControl;
-	}
-
-	// Local quick copy of the seperator (so we don't have to run this check every time)
-	separator = settings.multiple ? settings.multipleSeparator : undefined;
+	// Run legacy conversion
+	legacy();
 
 	// Expose copies of both the input element and the cached jQuery version
 	AutoComplete.stack[ inputIndex ] = self;
