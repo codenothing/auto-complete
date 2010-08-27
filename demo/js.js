@@ -106,10 +106,18 @@ var AutoCompletes = {
 	// Auto-complete using formatSupply to build a custom list
 	// Fuzzy Searching technique described by Dustin Diaz @ http://www.dustindiaz.com/autocomplete-fuzzy-matching/
 	search7: function(){
+		var ReplaceSupport = false;
+		try {
+			var test = 'tist'.replace( /i/, function(){
+				return 'e';
+			});
+			ReplaceSupport = test === 'test';
+		} catch ( e ) {}
+
 		CSV(function( supply ) {
 			var cache = {}, rword = /\W/g;
 			jQuery('input[name=search7]').removeAttr('disabled').autoComplete({
-				// List of common mispelled words
+				maxItems: 10,
 				dataSupply: supply,
 
 				// Custom list formatting
@@ -119,19 +127,55 @@ var AutoCompletes = {
 						return [];
 					}
 					
-					// Develop the regex
-					var regex = cache[ ui.search ] || new RegExp( ui.search.replace( rword, '' ).split( '' ).join( "\\w*" ), 'i' ),
+					// Need to get array of characters
+					var chars = ui.search.replace( rword, '' ).split( '' ),
+						// Develop the regex
+						regex = cache[ ui.search ] || {
+							searching: new RegExp( chars.join( "\\w*" ), 'i' ),
+							bolding: new RegExp( '(' + chars.join( ")\\w*(" ) + ')', 'i' )
+						},
+						// For lower loop
 						i = -1, l = ui.supply.length, list = [];
+
+					// Highlight the matched letters
+					function replace( section ) {
+						var list = ( section || '' ).split( '' ), word = '',
+							i = -1, l = list.length, pos = 0;
+
+						for ( ; ++i < l; ) {
+							if ( chars[ pos ] && list[ i ].toLowerCase() === chars[ pos ].toLowerCase() ) {
+								word += "<b style='color: red;'>" + list[ i ] + "</b>";
+								pos++;
+							}
+							else {
+								word += list[ i ];
+							}
+						}
+
+						return word;
+					}
 
 					// Recache the regex incase it isnt yet
 					cache[ ui.search ] = regex;
 
 					// Create a new list to present
 					for ( ; ++i < l; ) {
-						if ( regex.exec( ui.supply[ i ] ) ) {
-							list.push( { value: ui.supply[ i ] } );
+						if ( regex.searching.exec( ui.supply[ i ] ) ) {
+							// Push onto the cached list
+							list.push({
+								value: ui.supply[ i ],
+								display: "<span style='color:gray;'>" + 
+										ui.supply[ i ].replace( regex.bolding, replace ) +
+									"</span>"
+							});
+
+							// Reduce the load on the browser and only load as many as needed
+							if ( ui.settings.maxItems > -1 && list.length > ui.settings.maxItems ) {
+								break;
+							}
 						}
 					}
+
 
 					return list;
 				}
@@ -172,12 +216,12 @@ var AutoCompletes = {
 		wrapper.width( jQuery(window).width() - wrapper.offset().left - 50 ).find('a').toggle(
 			function(){
 				jQuery(this).html('- Close Code');
-				wrapper.height( 250 ).find('pre').show();
+				wrapper.find('pre').show();
 				return false;
 			},
 			function(){
 				jQuery(this).html('+ Open Code');
-				wrapper.height( 100 ).find('pre').hide();
+				wrapper.find('pre').hide();
 				return false;
 			} 
 		);

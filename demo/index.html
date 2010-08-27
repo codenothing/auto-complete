@@ -65,15 +65,16 @@ jQuery.autoComplete.focus = function(){
 
 
 
-<div style='margin:40px 0 0 0;' class='content'>
-<b>Normal Initiation</b>
+<h3 class='first'>Normal Initiation</h3>
+
 <pre class='js'>
 jQuery('input[name=search1]').autoComplete();
 </pre>
+
+<!-- Input form -->
 <input type='text' name='search1' style='width:300px;' />
 <input type='submit' name='enable-1' value='Enable' />
 <input type='submit' name='destroy-1' value='Destroy' />
-</div>
 
 <pre style='margin: 20px 0 40px 0;' class='js'>
 /**
@@ -94,11 +95,12 @@ jQuery('input[name=destroy-1]').click(function(){
 </pre>
 
 
-<div class='hr'></div>
 
 
-<div style='margin:40px 0;' class='content'>
-<b>Prevent form submission when running callbacks on selection</b>
+
+
+<h3>Prevent form submission when running callbacks on selection</h3>
+
 <pre class='js'>
 // Auto-complete preventing form submission, and firing onSelect function
 jQuery('input[name=search2]').autoComplete({
@@ -108,18 +110,17 @@ jQuery('input[name=search2]').autoComplete({
 	}
 });
 </pre>
+
 <form action='index.html' method='GET'>
 <input type='text' name='search2' style='width:300px;' />
 <input type='submit' value='Do Something' />
 </form>
-</div>
 
 
-<div class='hr'></div>
 
 
-<div style='margin:40px 0;' class='content'>
-<b>Send requests to different page with extra POST parameters,<br>returning with no display value.</b>
+<h3>Send requests to different page with extra POST parameters,<br>returning with no display value.</h3>
+
 <pre class='js'>
 jQuery('input[name=search3]').autoComplete({
 	ajax: 'ajax2.php',
@@ -138,17 +139,16 @@ jQuery('input[name=search3]').autoComplete({
 	}
 });
 </pre>
+
 <input type='text' name='search3' style='width:300px;' />
-</div>
 
 
 
-<div class='hr'></div>
 
 
 
-<div style='margin:40px 0;' class='content'>
-<b>Use the metadata plugin to set limitations on a per input basis.</b>
+<h3>Use the metadata plugin to set limitations on a per input basis.</h3>
+
 <pre class='js'>
 // Auto-complete using metadata and maximum requests
 jQuery('input[name=search4]').autoComplete({
@@ -163,9 +163,9 @@ jQuery('input[name=search4-submit]').click(function(){
 });
 &lt;input type='text' name='search4' style='width:300px;' class='someclass {minChars: 2, maxRequests: 10}' /&gt;
 </pre>
+
 <input type='text' name='search4' style='width:300px;' class='someclass {minChars: 2, maxRequests: 10}' />
 <input type='submit' name='search4-submit' value="Clear Requests ('flush')" />
-</div>
 
 
 
@@ -173,8 +173,8 @@ jQuery('input[name=search4-submit]').click(function(){
 
 
 
-<div style='margin:40px 0;' class='content'>
-<b>Trigger autoComplete by clicking an  external button.</b>
+<h3>Trigger autoComplete by clicking an  external button.</h3>
+
 <pre class='js'>
 // Auto-complete with trigger
 jQuery('#input-c').autoComplete();
@@ -191,20 +191,19 @@ jQuery('#submit-flush').click(function(){
 	jQuery('#input-c').autoComplete('flush', true);
 });
 </pre>
+
 <input type='text' style='width:300px;' name='search5' />
 <input type='submit' id='submit-c' value="All 'c'" />
 <input type='submit' id='submit-d' value="All 'd'" />
 <input type='submit' id='submit-flush' value="Flush Cache" />
-</div>
 
 
 
-<div class='hr'></div>
 
 
 
-<div style='margin:40px 0;' class='content'>
-<b>Supply a data set for autoComplete to use.</b>
+<h3>Supply a data set for autoComplete to use.</h3>
+
 <pre class='js'>
 // Autocomplete on User Supplied data
 jQuery('input[name=search6]').autoComplete({
@@ -215,18 +214,17 @@ jQuery('#search6').click(function(){
 	jQuery('input[name=search6]').autoComplete('button.supply');
 });
 </pre>
+
 <input type='text' style='width:300px;' name='search6' />
 <input type='submit' id='search6' value="All Values" />
-</div>
 
 
 
-<div class='hr'></div>
 
 
 
-<div style='margin:40px 0;' class='content'>
-<b>Using formatSupply to implement custom list building with Fuzzy Selection.</b>
+<h3>Using formatSupply to implement custom list building with Fuzzy Selection.</h3>
+
 <pre class='js'>
 var cache = {}, rword = /\W/g;
 jQuery('input[name=search7]').removeAttr('disabled').autoComplete({
@@ -248,7 +246,7 @@ jQuery('input[name=search7]').removeAttr('disabled').autoComplete({
 		cache[ ui.search ] = regex;
 
 		// Create a new list to present
-		for ( ; ++i < l; ) {
+		for ( ; ++i &lt; l; ) {
 			if ( regex.exec( ui.supply[ i ] ) ) {
 				list.push( { value: ui.supply[ i ] } );
 			}
@@ -258,17 +256,17 @@ jQuery('input[name=search7]').removeAttr('disabled').autoComplete({
 	}
 });
 </pre>
+
 <input type='text' style='width:300px;' name='search7' disabled='disabled' />
-</div>
 
 
 
-<div class='hr'></div>
 
 
 
-<div style='margin:40px 0;' class='content'>
-<b>Allow for multiple words, autofill, and striped lists.</b>
+
+<h3>Allow for multiple words, autofill, and striped lists.</h3>
+
 <pre class='js'>
 // Multiple words, autofill and striped lists
 jQuery('input[name=search7]').autoComplete({
@@ -280,17 +278,16 @@ jQuery('input[name=search7]').autoComplete({
 	delay: 200
 });
 </pre>
+
 <input type='text' style='width:300px;' name='search8' />
-</div>
 
 
 
-<div class='hr'></div>
 
 
 
-<div style='margin:40px 0;' class='content'>
-<b>Using templates and stripes.</b>
+<h3>Using templates and stripes.</h3>
+
 <pre class='js'>
 // Using templates and stripes
 jQuery('input[name=search9]').autoComplete({
@@ -299,19 +296,19 @@ jQuery('input[name=search9]').autoComplete({
 	template: "&lt;li class='#{striped}'&gt;#{value}&lt;/li&gt;"
 });
 </pre>
+
 <input type='text' style='width:300px;' name='search9' />
-</div>
 
 
 
 
-<div style='margin-top:275px;' class='content'>
+<div style='margin-top:275px;'>
 Be sure to check out the <a href='../docs/'>docs</a> for a full list of options.
 <br clear='all' />
 </div>
 
 
-<div style='margin-top:50px;' class='content'>
+<div style='margin-top:50px;'>
 	<a href='http://www.codenothing.com/archives/jquery/auto-complete/'>Back to Original Article</a>
 </div>
 

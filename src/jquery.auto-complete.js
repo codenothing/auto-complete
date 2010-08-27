@@ -303,7 +303,6 @@ var
 			autoFill: FALSE,
 			blacklist: [ KEY.shift, KEY.left, KEY.right ],
 			whitelist: undefined,
-			onlyInput: undefined,
 			multiple: FALSE,
 			multipleSeparator: ' ',
 			// Events
@@ -1024,7 +1023,7 @@ jQuery.autoComplete = function( self, options ) {
 				ul: $ul
 			});
 		} else {
-			var items = 0, i = -1, l = settings.dataSupply.length, ui, entry,
+			var i = -1, l = settings.dataSupply.length, ui, entry,
 				fn = jQuery.isFunction( settings.dataFn ),
 				regex = fn ? undefined : new RegExp( '^' + cache.val, 'i' );
 
@@ -1047,11 +1046,12 @@ jQuery.autoComplete = function( self, options ) {
 
 				// If user supplied function, use that, otherwise test with default regex
 				if ( ( fn && settings.dataFn.call( self, event, ui ) ) || ( ! fn && entry.value.match( regex ) ) ) {
+					list.push( entry );
+
 					// Reduce browser load by breaking on limit if it exists
-					if ( settings.maxItems > -1 && ++items > settings.maxItems ) {
+					if ( settings.maxItems > -1 && list.length > settings.maxItems ) {
 						break;
 					}
-					list.push( entry );
 				}
 			}
 		}
@@ -1338,7 +1338,7 @@ jQuery.autoComplete = function( self, options ) {
 		// Initialize Vars together (save bytes)
 		var offset = $input.offset(), // Input position
 			container = [], // Container for list elements
-			items = 0, i = -1, striped = FALSE, length = currentList.length; // Loop Items
+			i = -1, striped = FALSE, length = currentList.length; // Loop Items
 
 		if ( settings.onListFormat ) {
 			settings.onListFormat.call( self, event, { list: currentList, settings: settings, cache: cache, ul: $ul } );
@@ -1353,10 +1353,6 @@ jQuery.autoComplete = function( self, options ) {
 			// Push items onto container
 			for ( ; ++i < length; ) {
 				if ( currentList[ i ].value ) {
-					if ( settings.maxItems > -1 && ++items > settings.maxItems ) {
-						break;
-					}
-
 					container.push(
 						settings.striped && striped ? '<li class="' + settings.striped + '">' : '<li>',
 							currentList[ i ].display || currentList[ i ].value,
@@ -1364,6 +1360,9 @@ jQuery.autoComplete = function( self, options ) {
 					);
 
 					striped = ! striped;
+					if ( settings.maxItems > -1 && container.length > settings.maxItems ) {
+						break;
+					}
 				}
 			}
 			$ul.html( ( cache.list[ cache.val ].built = container.join('') ) );

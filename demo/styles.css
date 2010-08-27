@@ -16,7 +16,7 @@ body {
 	margin: 0;
 }
 
-div.content, pre, .hr {
+div.content, h3 {
 	width: 600px;
 }
 
@@ -25,6 +25,17 @@ h1 {
 	padding: 10px;
 	background-color: #6A1617;
 	color: white;
+}
+
+h3 {
+	border-top: 3px solid #595959;
+	margin-top: 120px;
+	padding-top: 100px;
+}
+
+h3.first {
+	border-top: none;
+	margin-top: 0;
 }
 
 pre {
@@ -41,11 +52,6 @@ input {
 	font-size: 9pt;
 }
 
-.hr {
-	background-color: #595959;
-	height: 3px;
-}
-
 #AutoCompleteFocus {
 	position: absolute;
 	font-size: 9pt;
@@ -55,7 +61,6 @@ input {
 	left: 800px;
 	padding: 15px;
 	width: 300px;
-	height: 100px;
 	overflow: auto;
 }
 

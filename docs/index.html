@@ -5,24 +5,28 @@
 	<link rel='stylesheet' type='text/css' href='styles.css' />
 	<script type='text/javascript' src='../jquery/jquery-1.4.2.js'></script>
 	<script type='text/javascript' src='../jquery/jquery.history.js'></script>
+	<script type='text/javascript' src='../jquery/jquery.chili.js'></script>
+	<script type='text/javascript' src='../jquery/jquery.chili.recipes.js'></script>
 <script type='text/javascript'>
-$(function(){
-	var $h1 = $('h1').eq(0), firstLoad = true;
-	$('#menu').css({
-		height: ( $(window).height()-$h1.outerHeight() )*.9,
+jQuery(function( jQuery ) {
+	var $h1 = jQuery('h1').eq(0), firstLoad = true;
+
+	jQuery('#menu').css({
+		height: ( jQuery(window).height() - $h1.outerHeight() ) * .9,
 		position: 'fixed',
 		overflow: 'auto',
 		top: $h1.outerHeight() + 5
 	});
-	$.historyInit(function(hash){
+
+	jQuery.historyInit(function( hash ) {
 		// Body Descriptions
-		$('h3.focus').removeClass('focus');
-		$('a[name='+hash+']').parent().addClass('focus');
+		jQuery( 'h3.focus' ).removeClass( 'focus' );
+		jQuery( 'a[name=' + hash + ']' ).parent().addClass( 'focus' );
 
 		// Floating Menu
-		var $li = $('a[href=#'+hash+']').parent(), $menu = $('#menu');
-		$menu.find('li.focus').removeClass('focus');
-		$li.addClass('focus');
+		var $li = jQuery( 'a[href=#' + hash + ']' ).parent(), $menu = jQuery( '#menu' );
+		$menu.find( 'li.focus' ).removeClass( 'focus' );
+		$li.addClass( 'focus' );
 
 		if ( firstLoad ) {
 			$menu.scrollTop( $li.offset().top - $menu.offset().top - 1 );
@@ -61,6 +65,7 @@ Corey Hart @ http://www.codenothing.com
 	<li><a href='#ajaxCache'>ajaxCache</a></li>
 	<li><a href='#autoFill'>autoFill</a></li>
 	<li><a href='#bgiframe'>bgiframe</a></li>
+	<li><a href='#blacklist'>blacklist</a></li>
 	<li><a href='#cacheLimit'>cacheLimit</a></li>
 	<li><a href='#dataFn'>dataFn</a></li>
 	<li><a href='#dataSupply'>dataSupply</a></li>
@@ -78,6 +83,7 @@ Corey Hart @ http://www.codenothing.com
 	<li><a href='#multipleSeparator'>multipleSeparator</a></li>
 	<li><a href='#newList'>newList</a></li>
 	<li><a href='#nonInput'>nonInput</a></li>
+	<li><a href='#pattern'>pattern</a></li>
 	<li><a href='#postData'>postData</a></li>
 	<li><a href='#postFormat'>postFormat</a></li>
 	<li><a href='#postVar'>postVar</a></li>
@@ -85,6 +91,8 @@ Corey Hart @ http://www.codenothing.com
 	<li><a href='#requestType'>requestType</a></li>
 	<li><a href='#rollover'>rollover</a></li>
 	<li><a href='#striped'>striped</a></li>
+	<li><a href='#template'>template</a></li>
+	<li><a href='#templateStripe'>templateStripe</a></li>
 	<li><a href='#useCache'>useCache</a></li>
 	<li><a href='#width'>width</a></li>
 
@@ -114,6 +122,18 @@ Corey Hart @ http://www.codenothing.com
 	<li><a href='#search'>search</a></li>
 	<li><a href='#settings'>settings</a></li>
 
+	<li class='title' style='margin-top:20px;'>Instance Methods</li>
+	<li><a href='#i-button-ajax'>button-ajax</a></li>
+	<li><a href='#i-button-supply'>button-supply</a></li>
+	<li><a href='#i-destroy'>destroy</a></li>
+	<li><a href='#i-direct-supply'>direct-supply</a></li>
+	<li><a href='#i-disable'>disable</a></li>
+	<li><a href='#i-enable'>enable</a></li>
+	<li><a href='#i-flush'>flush</a></li>
+	<li><a href='#i-option'>option</a></li>
+	<li><a href='#i-search'>search</a></li>
+	<li><a href='#i-settings'>settings</a></li>
+
 	<li class='index' style='margin-top:20px;list-style:none;font-size:8pt;'><a href='../demo/'><i>&lt;--Back to index</i></a></li>
 	<li class='index' style='list-style:none;font-size:8pt;'>
 		<a href='http://www.codenothing.com/archives/jquery/auto-complete/'><i>&lt;--Back to Original Article</i></a>
@@ -136,7 +156,6 @@ Corey Hart @ http://www.codenothing.com
 	autoComplete only requires control of 2 namespaces: jQuery.autoComplete &amp; jQuery.fn.autoComplete.
 	autoComplete makes a local copy of the bgiframe plugin if installed, but no longer creates the bgiframe
 	namespace on the jQuery prototype object.
-	<br><br>
 
 	<b>Event Namespacing</b>
 
@@ -303,7 +322,7 @@ Corey Hart @ http://www.codenothing.com
 <h2>Settings</h2>
 <div class='header'>
 	<div>Default</div>
-	Name - Type
+	Name[ Version Introduced ] - Type
 </div>
 <h3><div class='default'>'ajax.php'</div> <a name='ajax'>ajax</a> - <span class='type'>String</span></h3>
 <p>
@@ -333,6 +352,15 @@ Corey Hart @ http://www.codenothing.com
 <h3><div class='default'>undefined</div> <a name='bgiframe'>bgiframe</a> - <span class='type'>Object</span></h3>
 <p>
 	Only valid when bgiframe plugin is installed, this object gets passed as the settings argument into the bgiframe plugin.
+</p>
+
+
+
+<h3><div class='default'>[ 16(shift), 37(left), 39(right) ]</div> <a name='blacklist'>blacklist</a> - <span class='type'>Array</span></h3>
+<p>
+	Array of character key codes not allowed. Remember to use 
+	<a href='http://www.cambiaresearch.com/c4/702b8cd1-e5b0-42e6-83ac-25f0306e3e25/Javascript-Char-Codes-Key-Codes.aspx'>keyCode's</a>,
+	not characters. By default, the shift, left arrow and right arrow keys are ignored.
 </p>
 
 
@@ -406,8 +434,8 @@ Corey Hart @ http://www.codenothing.com
 
 
 <h3><div class='default'>undefined</div> <a name='inputControl'>inputControl</a> - <span class='type'>Function(event, ui)</span></h3>
-<p>
-	Deprecated. See <a href='#onChange'>onChange</a>
+<p class='deprecated'>
+	Deprecated. See <a href='#onChange'>onChange</a>.
 </p>
 
 
@@ -480,12 +508,18 @@ Corey Hart @ http://www.codenothing.com
 
 
 
-<h3><div class='default'>[ 16(shift), 37(left), 39(right) ]</div> <a name='nonInput'>nonInput</a> - <span class='type'>Array</span></h3>
+<h3><a name='nonInput'>nonInput</a> - <span class='type'>Deprecated</span></h3>
 <p>
-	Array of character key codes not allowed. Remember to use 
-	<a href='http://www.cambiaresearch.com/c4/702b8cd1-e5b0-42e6-83ac-25f0306e3e25/Javascript-Char-Codes-Key-Codes.aspx'>keyCode's</a>,
-	not characters. By default, the shift, left arrow and right arrow keys are ignored.
+	nonInput has been deprecated, see <a href='#blacklist'>blacklist</a>
 </p>
+
+
+
+<h3><div class='default'>/(^|.|\r|\n)(#\{(.*?)\})/</div> <a name='pattern'>pattern</a> - <span class='type'>Regex</span></h3>
+<p>
+	Default pattern used when converting <a href='#template'>templates</a>. Matches all '#{vars}'.
+</p>
+
 
 
 <h3><div class='default'>{}</div> <a name='postData'>postData</a> - <span class='type'>Object</span></h3>
@@ -547,6 +581,23 @@ Corey Hart @ http://www.codenothing.com
 <h3><div class='default'>undefined</div> <a name='striped'>striped</a> - <span class='type'>String</span></h3>
 <p>
 	CSS Class toggled on alternating li elements to give a zebra striped look.
+</p>
+
+
+
+<h3><div class='default'>undefined</div> <a name='template'>template</a> - <span class='type'>String</span></h3>
+<p>
+	Template to build an entry off of. Abstracted from <a href='http://www.codenothing.com/archives/jquery/jquery-template/'>template plugin</a>,
+	each row of the list is evaluated onto this template if provided, instead of using the default display/value usage. Templates need
+	to be wrapped in 'li' elements.
+</p>
+
+
+
+<h3><div class='default'>striped</div> <a name='templateStripe'>templateStripe</a> - <span class='type'>String</span></h3>
+<p>
+	Keyword for striping usage. So all '#{striped}' get replaced with the <a href='#striped'>striped</a> class, or empty
+	string depending on the zebra stripe position.
 </p>
 
 
@@ -754,13 +805,13 @@ Corey Hart @ http://www.codenothing.com
 	To trigger these events, use the normal autoComplete function initialization, with the
 	string name of the event as the first parameter, along with any other parameters that
 	are needed. Something like the following:
-<pre>
-	$('selector of input').autoComplete('<i>method name</i>', ...other params...);
+<pre class='js'>
+	jQuery('selector of input').autoComplete('<i>method name</i>', ...other params...);
 </pre>
 </div>
 
 
-<h3><a name='button-ajax'>button-ajax</a> - <span class='type'>.autoComplete('button-ajax', postData, cacheName)</span></h3>
+<h3><a name='button-ajax'>.autoComplete('button-ajax' [, postData, cacheName ] )</a></h3>
 <p>
 	The button-ajax method allows for sending requests through an external trigger(<i style='font-weight: normal;'>button</i>).
 	It's required to pass a special cacheName string if more than one button-ajax method is used on the same input. If only one is 
@@ -770,7 +821,7 @@ Corey Hart @ http://www.codenothing.com
 
 
 
-<h3><a name='button-supply'>button-supply</a> - <span class='type'>.autoComplete('button-supply', data, cacheName)</span></h3>
+<h3><a name='button-supply'>.autoComplete('button-supply' [, data, cacheName ] )</a></h3>
 <p>
 	The button-supply method is essentially the same as the <a href='#button-ajax'>button-ajax</a> method, except it works
 	with a localized set of results instead of through ajax requests. Additionally, an optional
@@ -781,7 +832,7 @@ Corey Hart @ http://www.codenothing.com
 
 
 
-<h3><a name='destroy'>destroy</a> - <span class='type'>.autoComplete('destroy')</span></h3>
+<h3><a name='destroy'>.autoComplete('destroy')</a></h3>
 <p>
 	Destroys the autoComplete initiation. Removes all events and data that were attached to
 	the input, form, and document. Also, if the UL drop list was created through the function, and
@@ -790,7 +841,7 @@ Corey Hart @ http://www.codenothing.com
 
 
 
-<h3><a name='direct-supply'>direct-supply</a> - <span class='type'>.autoComplete('direct-supply', data, cacheName)</span></h3>
+<h3><a name='direct-supply'>.autoComplete('direct-supply' [, data, cacheName ] )</a></h3>
 <p>
 	The direct-supply method bypasses list formatting and request delays, and loads either the data supplied to it, or the 
 	<a href='#dataSupply'>dataSupply</a> data. This would be the fastest way to load a list directly into the drop down UL, but
@@ -799,21 +850,21 @@ Corey Hart @ http://www.codenothing.com
 
 
 
-<h3><a name='disable'>disable</a> - <span class='type'>.autoComplete('disable')</span></h3>
+<h3><a name='disable'>.autoComplete('disable')</a></h3>
 <p>
 	Disables the autoComplete, but doesn't destroy it.
 </p>
 
 
 
-<h3><a name='enable'>enable</a> - <span class='type'>.autoComplete('enable')</span></h3>
+<h3><a name='enable'>.autoComplete('enable')</a></h3>
 <p>
 	Enables the autoComplete.
 </p>
 
 
 
-<h3><a name='flush'>flush</a> - <span class='type'>.autoComplete('flush', cacheOnly)</span></h3>
+<h3><a name='flush'>.autoComplete('flush' [, cacheOnly ] )</a></h3>
 <p>
 	The flush event clears out the inner cache of results, as well as the number of requests made.
 	And optional, second boolean parameter can be passed if only the cache needs to be flushed, not
@@ -822,7 +873,7 @@ Corey Hart @ http://www.codenothing.com
 
 
 
-<h3><a name='option'>option</a> - <span class='type'>.autoComplete('option', name, value)</span></h3>
+<h3><a name='option'>.autoComplete('option' [, name, value ] )</a></h3>
 <p>
 	The option method provides a way to get/set single settings.<br><br>
 	-Passing both name and value parameters will set that option into the current settings.<br>
@@ -842,7 +893,7 @@ Corey Hart @ http://www.codenothing.com
 
 
 
-<h3><a name='search'>search</a> - <span class='type'>.autoComplete('search', value)</span></h3>
+<h3><a name='search'>.autoComplete('search' [, value ] )</a></h3>
 <p>
 	The search method gives a programmatic way for triggering search with custom input. The 'value'
 	parameter passed should contain a string for the custom search to be triggered.
@@ -850,7 +901,7 @@ Corey Hart @ http://www.codenothing.com
 
 
 
-<h3><a name='settings'>settings</a> - <span class='type'>.autoComplete('settings', newSettings)</span></h3>
+<h3><a name='settings'>.autoComplete('settings', newSettings)</a></h3>
 <p style='margin-bottom: 20px;'>
 	The settings method allows for changes to the settings for that inputs autoComplete at any
 	point of time. This can be very useful if the metadata plugin is not installed, yet separate
@@ -862,14 +913,16 @@ Corey Hart @ http://www.codenothing.com
 	are passed to the function as parameters. Just return the array [newSettings, cache]. Here's the format:
 </p>
 
-<pre>
-$('input').autoComplete('settings', function(settings, cache){
+<pre class='js'>
+jQuery('input').autoComplete( 'settings', function( settings, cache ) {
 	// ...Check or make changes to the current settings and cache here...
-	return [settings, cache];
+	return [ settings, cache ];
 });
 </pre>
 
-<br><br>
+
+
+<h2 style='margin-bottom: 0px;'>Instance Methods (Quick access to Event Triggers)</h2>
 
 
 </body>
