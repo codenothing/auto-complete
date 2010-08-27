@@ -106,14 +106,6 @@ var AutoCompletes = {
 	// Auto-complete using formatSupply to build a custom list
 	// Fuzzy Searching technique described by Dustin Diaz @ http://www.dustindiaz.com/autocomplete-fuzzy-matching/
 	search7: function(){
-		var ReplaceSupport = false;
-		try {
-			var test = 'tist'.replace( /i/, function(){
-				return 'e';
-			});
-			ReplaceSupport = test === 'test';
-		} catch ( e ) {}
-
 		CSV(function( supply ) {
 			var cache = {}, rword = /\W/g;
 			jQuery('input[name=search7]').removeAttr('disabled').autoComplete({

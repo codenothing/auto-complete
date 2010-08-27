@@ -737,6 +737,15 @@ jQuery.autoComplete = function( self, options ) {
 			ACData.settings = settings;
 		},
 
+		// Hides the drop down and clears the input (does not flush)
+		'autoComplete.clear': function( event ) {
+			if ( ! ACData.active ) {
+				return TRUE;
+			}
+			$ul.html( '' ).hide( LastEvent = event );
+			$input.val( '' );
+		},
+
 		// Clears the Cache & requests (requests can be blocked from clearing)
 		'autoComplete.flush': function( event, cacheOnly ) {
 			if ( ! ACData.active ) {
@@ -873,16 +882,33 @@ jQuery.autoComplete = function( self, options ) {
 			}
 		},
 
-		// Add enabling event (only applicable after disable)
-		'autoComplete.enable': function( event ) {
-			ACData.active = TRUE;
+		// Enabling/Disabling/Getter all rolled into one
+		'autoComplete.active' : function( event, active ) {
+			// Stash the current event
 			LastEvent = event;
+
+			// Getter form, return input autoComplete activity
+			if ( active === undefined ) {
+				return ACData.active;
+			}
+
+			// Setter form, enable/disable autoComplete
+			ACData.active = active;
+			if ( ! active ) {
+				$ul.html('').hide( event );
+			}
+		},
+
+		// Add enabling event (only applicable after disable)
+		// *Deprecated*
+		'autoComplete.enable': function( event ) {
+			return $input.trigger( 'autoComplete.active', [ true ] );
 		},
 
 		// Add disable event
+		// *Deprecated*
 		'autoComplete.disable': function( event ) {
-			ACData.active = FALSE;
-			$ul.html('').hide( LastEvent = event );
+			return $input.trigger( 'autoComplete.active', [ false ] );
 		},
 
 		// Add a destruction function
