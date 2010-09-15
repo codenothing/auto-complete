@@ -8,6 +8,7 @@
 -Micro optimizations implemented for all data access
 -Now caching the compiled version of lists (created through the plugin)
 -Added forceFormat setting to override using cached versions of the compiled list
+-Added regex method for pattern matching during dataSupply searching
 
 
 # Internval Changes
