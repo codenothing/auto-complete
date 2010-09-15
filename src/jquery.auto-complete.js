@@ -275,6 +275,9 @@ var
 			ajaxCache: jQuery.ajaxSettings.cache,
 			// Data Configuration
 			dataSupply: [],
+			regex: function( event, ui ) {
+				return new RegExp( '^' + ui.search, 'i' );
+			},
 			dataFn: undefined,
 			formatSupply: undefined,
 			// Drop List CSS
@@ -1051,7 +1054,14 @@ jQuery.autoComplete = function( self, options ) {
 		} else {
 			var i = -1, l = settings.dataSupply.length, ui, entry,
 				fn = jQuery.isFunction( settings.dataFn ),
-				regex = fn ? undefined : new RegExp( '^' + cache.val, 'i' );
+				regex = fn ? undefined : settings.regex.call( self, event, {
+					search: cache.val,
+					val: inputval,
+					supply: settings.dataSupply,
+					settings: settings,
+					cache: cache,
+					ul: $ul
+				});
 
 			for ( ; ++i < l ; ) {
 				// Force object wrapper for entry

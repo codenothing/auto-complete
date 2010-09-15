@@ -88,6 +88,7 @@ Corey Hart @ http://www.codenothing.com
 	<li><a href='#postFormat'>postFormat</a></li>
 	<li><a href='#postVar'>postVar</a></li>
 	<li><a href='#preventEnterSubmit'>preventEnterSubmit</a></li>
+	<li><a href='#regex'>regex</a></li>
 	<li><a href='#requestType'>requestType</a></li>
 	<li><a href='#rollover'>rollover</a></li>
 	<li><a href='#striped'>striped</a></li>
@@ -560,6 +561,25 @@ Corey Hart @ http://www.codenothing.com
 	Prevents form submission when user selects a value from the UL drop down list using the enter key. This setting has been
 	defaulted to true to conform to IE quirkiness. If the application requires form submission on enter, set this value to false
 	to perform like so.
+</p>
+
+
+
+<h3><div class='default'>Internal Function</div> <a name='regex'>regex</a> - <span class='type'>Function (event, ui)</span></h3>
+<p>
+	Creates a regular expression to be used when doing pattern matching on <a href='#dataSupply'>dataSupply</a>.
+</p>
+<ul class='ui'>
+	<li class='title'>The ui object</li>
+	<li><b>search:</b> The input value being searched</li>
+	<li><b>val:</b> The current full string value of the input (only differs when <a href='#multiple'>multiple</a> is true)</li>
+	<li><b>supply:</b> The complete array currently being searched.</li>
+	<li><b>settings:</b> Current settings attached to the input in focus</li>
+	<li><b>cache:</b> Current cache attached to the input in focus</li>
+	<li><b>ul:</b> Cached $ul jQuery object of the drop down list.</li>
+</ul>
+<p class='notes'>
+	<b>Note*:</b> This function must return a <a href='http://www.w3schools.com/jsref/jsref_obj_regexp.asp'>Regex Object</a>.
 </p>
 
 
